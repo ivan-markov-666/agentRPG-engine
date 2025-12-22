@@ -1,21 +1,95 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "additionalProperties": {
-    "type": "object",
-    "properties": {
-      "enabled": { "type": "boolean" },
-      "desc": { "type": "string" },
-      "min": { "type": "number" },
-      "max": { "type": "number" },
-      "range": {
-        "type": "array",
-        "items": { "type": "number" },
-        "minItems": 2,
-        "maxItems": 2
+  "properties": {
+    "health": { "$ref": "#/definitions/baseStat0100" },
+    "energy": { "$ref": "#/definitions/baseStat0100" },
+    "mana": { "$ref": "#/definitions/baseStat0100" },
+    "stamina": { "$ref": "#/definitions/baseStat0100" },
+    "hunger": { "$ref": "#/definitions/baseStat0100" },
+    "thirst": { "$ref": "#/definitions/baseStat0100" },
+    "morale": { "$ref": "#/definitions/baseStat0100" },
+    "reputation": { "$ref": "#/definitions/reputationCapability" },
+    "currency": { "$ref": "#/definitions/currencyCapability" },
+    "level": { "$ref": "#/definitions/minOneCapability" },
+    "skill_ranks": { "$ref": "#/definitions/minOneCapability" }
+  },
+  "additionalProperties": { "$ref": "#/definitions/baseCapability" },
+  "definitions": {
+    "baseCapability": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "desc": { "type": "string" },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "range": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "note": { "type": "string" }
       },
-      "note": { "type": "string" }
+      "additionalProperties": true
     },
-    "additionalProperties": true
+    "baseStat0100": {
+      "allOf": [
+        { "$ref": "#/definitions/baseCapability" },
+        {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "minimum": 0, "maximum": 100 },
+            "max": { "type": "number", "minimum": 0, "maximum": 100 }
+          }
+        }
+      ]
+    },
+    "reputationCapability": {
+      "allOf": [
+        { "$ref": "#/definitions/baseCapability" },
+        {
+          "type": "object",
+          "required": ["range"],
+          "properties": {
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": [
+                { "const": -100 },
+                { "const": 100 }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "currencyCapability": {
+      "allOf": [
+        { "$ref": "#/definitions/baseCapability" },
+        {
+          "type": "object",
+          "required": ["min"],
+          "properties": {
+            "min": { "type": "number", "minimum": 0 },
+            "max": { "type": "number", "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "minOneCapability": {
+      "allOf": [
+        { "$ref": "#/definitions/baseCapability" },
+        {
+          "type": "object",
+          "required": ["min"],
+          "properties": {
+            "min": { "type": "number", "minimum": 1 }
+          }
+        }
+      ]
+    }
   }
 }

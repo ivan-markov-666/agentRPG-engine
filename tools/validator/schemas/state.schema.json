@@ -18,7 +18,57 @@
         "additionalProperties": true
       }
     },
-    "stats": { "type": "object" }
+    "stats": { "$ref": "#/definitions/stats" }
   },
-  "additionalProperties": true
+  "additionalProperties": true,
+  "definitions": {
+    "stats": {
+      "type": "object",
+      "properties": {
+        "health": { "$ref": "#/definitions/range0100" },
+        "energy": { "$ref": "#/definitions/range0100" },
+        "mana": { "$ref": "#/definitions/range0100" },
+        "stamina": { "$ref": "#/definitions/range0100" },
+        "hunger": { "$ref": "#/definitions/range0100" },
+        "thirst": { "$ref": "#/definitions/range0100" },
+        "morale": { "$ref": "#/definitions/range0100" },
+        "reputation": { "$ref": "#/definitions/reputationMap" },
+        "currency": { "$ref": "#/definitions/currencyMap" },
+        "status_effects": { "$ref": "#/definitions/statusEffects" },
+        "date_time": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": { "$ref": "#/definitions/genericStat" }
+    },
+    "range0100": { "type": "number", "minimum": 0, "maximum": 100 },
+    "reputationMap": {
+      "type": "object",
+      "additionalProperties": { "type": "number", "minimum": -100, "maximum": 100 }
+    },
+    "currencyMap": {
+      "type": "object",
+      "properties": {
+        "gold": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": { "type": ["number", "object"] }
+    },
+    "statusEffects": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "stack": { "type": "integer", "minimum": 0 }
+        },
+        "additionalProperties": true
+      }
+    },
+    "genericStat": {
+      "anyOf": [
+        { "type": "number" },
+        {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/genericStat" }
+        }
+      ]
+    }
+  }
 }

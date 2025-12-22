@@ -7,6 +7,7 @@ const { spawnSync } = require('child_process');
 const { checkCapabilities } = require('../checks/capabilities');
 const { checkQuests } = require('../checks/quests');
 const { checkRequiredFiles } = require('../checks/files');
+const { checkSchemas } = require('../checks/schema');
 
 function setupGame(files) {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'validator-test-'));
@@ -51,6 +52,30 @@ async function runCheck(checkFn, files) {
       'player-data/runtime/state.json': { stats: { mana: 120 } },
     });
     assert(issues.some((i) => i.code === 'CAP-RUNTIME-RANGE'), 'Expected CAP-RUNTIME-RANGE');
+  }
+
+  // CAP-SCHEMA guardrail (negative min)
+  {
+    const base = setupGame({
+      'config/capabilities.json': { health: { enabled: true, min: -5, max: 100 } },
+      'player-data/runtime/state.json': { stats: {} },
+    });
+    const issues = [];
+    const ctx = { base, loadJson, issues };
+    await checkSchemas(ctx);
+    assert(issues.some((i) => i.code === 'CAP-SCHEMA'), 'Expected CAP-SCHEMA for invalid min');
+  }
+
+  // STATE-SCHEMA guardrail (runtime out of range)
+  {
+    const base = setupGame({
+      'config/capabilities.json': { health: { enabled: true, min: 0, max: 100 } },
+      'player-data/runtime/state.json': { stats: { health: 150, reputation: { guild: 200 } } },
+    });
+    const issues = [];
+    const ctx = { base, loadJson, issues };
+    await checkSchemas(ctx);
+    assert(issues.some((i) => i.code === 'STATE-SCHEMA'), 'Expected STATE-SCHEMA for health 150');
   }
 
   // QUEST-LINK and UNLOCK-UNKNOWN
@@ -126,7 +151,19 @@ async function runCheck(checkFn, files) {
     const ctx = { base, loadJson, issues };
     await checkCapabilities(ctx);
     const hasYamlWarn = issues.some((i) => i.code === 'YAML-NOT-AVAILABLE' || i.code === 'YAML-PARSE');
-    assert(hasYamlWarn, 'Expected YAML warning when parsing YAML without parser');
+    const yamlInstalled = (() => {
+      try {
+        require.resolve('yaml');
+        return true;
+      } catch (e) {
+        return false;
+      }
+    })();
+    if (yamlInstalled) {
+      assert(!hasYamlWarn, 'YAML module installed; should parse without warnings');
+    } else {
+      assert(hasYamlWarn, 'Expected YAML warning when parser is missing');
+    }
   }
 
   // Exploration empty when enabled
@@ -148,19 +185,24 @@ async function runCheck(checkFn, files) {
   {
     const base = setupGame({
       'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
-      'scenario/index.md': '# Intro\ntext long enough to pass.',
+      'scenario/index.md': '# Intro\nThis index is long enough to pass the minimum length.',
       'scenario/quests/available.json': [{ quest_id: 'q1', title: 'Q1' }],
       'scenario/quests/q1.md': '# Q1\n## Summary\ns\n## Steps\n- s\n## Rewards\n- r\n',
       'scenario/quests/unlock-triggers.json': {},
       'player-data/runtime/state.json': { stats: {} }, // missing mana -> CAP-RUNTIME
       'player-data/runtime/completed-quests.json': [],
-      'config/capabilities.json': { mana: { enabled: true } },
+      'config/capabilities.json': { mana: { enabled: true, min: 0, max: 10 } },
     });
     const cliPath = path.resolve(__dirname, '../index.js');
     const out = spawnSync('node', [cliPath, '--path', base, '--summary'], { encoding: 'utf8' });
-    assert(out.stdout.includes('Summary:'), 'Summary mode should print summary line');
+    const outCombined = `${out.stdout || ''}${out.stderr || ''}`;
+    assert(outCombined.includes('Summary:'), `Summary mode should print summary line\n${outCombined}`);
     const outIgnore = spawnSync('node', [cliPath, '--path', base, '--summary', '--ignore', 'CAP-RUNTIME'], { encoding: 'utf8' });
-    assert(outIgnore.stdout.includes('Summary: 0 error(s), 0 warning(s)'), 'Ignore should remove CAP-RUNTIME warning');
+    const outIgnoreCombined = `${outIgnore.stdout || ''}${outIgnore.stderr || ''}`;
+    const m = outIgnoreCombined.match(/Summary:\s*(\d+) error\(s\),\s*(\d+) warning\(s\)/);
+    assert(m, `Expected Summary line in output\n${outIgnoreCombined}`);
+    assert.strictEqual(Number(m[1]), 0, `Ignore run should have 0 errors\n${outIgnoreCombined}`);
+    assert.strictEqual(Number(m[2]), 0, `Ignore should remove CAP-RUNTIME warning\n${outIgnoreCombined}`);
   }
 
   console.log('All validator tests passed.');
