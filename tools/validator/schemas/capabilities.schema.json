@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "properties": {
+      "enabled": { "type": "boolean" },
+      "desc": { "type": "string" },
+      "min": { "type": "number" },
+      "max": { "type": "number" },
+      "range": {
+        "type": "array",
+        "items": { "type": "number" },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "note": { "type": "string" }
+    },
+    "additionalProperties": true
+  }
+}

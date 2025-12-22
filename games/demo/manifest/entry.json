@@ -1,0 +1,9 @@
+{
+  "id": "demo",
+  "game_id": "demo",
+  "title": "Demo Game",
+  "version": "0.1.0",
+  "engine_layers": ["@agentrpg/engine"],
+  "capabilities_file": "config/capabilities.json",
+  "scenario_index": "scenario/index.md"
+}

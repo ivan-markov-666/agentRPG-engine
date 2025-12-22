@@ -1,0 +1,39 @@
+[
+  {
+    "run_id": "dev-001",
+    "timestamp": "2025-12-22T11:10:00.000Z",
+    "duration_ms": 180,
+    "errors": 1,
+    "warnings": 2,
+    "top_codes": [
+      { "code": "FILE-MISSING", "count": 1 },
+      { "code": "QUEST-CONTENT", "count": 1 }
+    ],
+    "issues": [
+      { "level": "ERROR", "code": "FILE-MISSING", "file": "manifest/entry.json", "message": "Missing required file" },
+      { "level": "WARN", "code": "QUEST-CONTENT", "file": "scenario/quests/main-quest.md", "message": "Missing \"Rewards\" section" }
+    ]
+  },
+  {
+    "run_id": "dev-002",
+    "timestamp": "2025-12-22T11:20:00.000Z",
+    "duration_ms": 142,
+    "errors": 0,
+    "warnings": 1,
+    "top_codes": [
+      { "code": "QUEST-CONTENT", "count": 1 }
+    ],
+    "issues": [
+      { "level": "WARN", "code": "QUEST-CONTENT", "file": "scenario/quests/main-quest.md", "message": "Missing \"Rewards\" section" }
+    ]
+  },
+  {
+    "run_id": "dev-003",
+    "timestamp": "2025-12-22T11:35:00.000Z",
+    "duration_ms": 130,
+    "errors": 0,
+    "warnings": 0,
+    "top_codes": [],
+    "issues": []
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "health": {"enabled": true, "desc": "HP", "min": 0, "max": 100},
+  "energy": {"enabled": true, "desc": "Stamina", "min": 0, "max": 100},
+  "mana": {"enabled": true, "desc": "Magic energy", "min": 0, "max": 100},
+  "stamina": {"enabled": true, "desc": "Physical endurance", "min": 0, "max": 100},
+  "hunger": {"enabled": true, "desc": "Hunger level", "min": 0, "max": 100},
+  "thirst": {"enabled": true, "desc": "Thirst level", "min": 0, "max": 100},
+  "reputation": {"enabled": true, "desc": "Faction reps", "range": [-100, 100]},
+  "currency": {"enabled": true, "desc": "Gold", "min": 0},
+  "morale": {"enabled": true, "desc": "Party morale", "min": 0, "max": 100},
+  "armor": {"enabled": true, "desc": "Physical damage reduction"},
+  "stealth": {"enabled": true, "desc": "Sneak ability"},
+  "perception": {"enabled": true, "desc": "Detect hidden"}
+}

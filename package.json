@@ -1,0 +1,13 @@
+{
+  "name": "agentrpg-tools",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "validate": "node tools/validator/index.js",
+    "test": "node tools/validator/tests/validator.test.js",
+    "archive:telemetry": "node tools/archive-telemetry.js"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "current_area_id": "default-area",
+  "active_quests": [
+    {"quest_id": "main-quest-01", "status": "active", "progress": 0, "current_step_id": "step-1"}
+  ],
+  "stats": {
+    "health": 32,
+    "energy": 12,
+    "mana": 0,
+    "stamina": 18,
+    "morale": 50,
+    "hunger": 20,
+    "thirst": 10,
+    "reputation": {
+      "guild": 15,
+      "village": -5
+    },
+    "currency": {
+      "gold": 120
+    },
+    "armor": 5,
+    "stealth": 8,
+    "perception": 12
+  }
+}

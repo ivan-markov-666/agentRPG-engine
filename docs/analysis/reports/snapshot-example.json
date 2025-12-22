@@ -1,0 +1,51 @@
+[
+  {
+    "run": "2025-12-22T11:00Z",
+    "errors": 0,
+    "warnings": 2,
+    "top_codes": [
+      { "code": "CAP-RUNTIME", "count": 1 },
+      { "code": "QUEST-CONTENT", "count": 1 }
+    ],
+    "issues": [
+      {
+        "level": "WARN",
+        "code": "CAP-RUNTIME",
+        "file": "games/demo/player-data/runtime/state.json",
+        "message": "Missing runtime values: mana",
+        "fix": "Add mana to stats or disable capability"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-CONTENT",
+        "file": "games/demo/scenario/quests/main-quest-01.md",
+        "message": "Missing \"Rewards\" section",
+        "fix": "Add ## Rewards with XP/loot"
+      }
+    ]
+  },
+  {
+    "run": "2025-12-22T11:20Z",
+    "errors": 0,
+    "warnings": 1,
+    "top_codes": [
+      { "code": "QUEST-CONTENT", "count": 1 }
+    ],
+    "issues": [
+      {
+        "level": "WARN",
+        "code": "QUEST-CONTENT",
+        "file": "games/demo/scenario/quests/main-quest-01.md",
+        "message": "Missing \"Rewards\" section",
+        "fix": "Add ## Rewards with XP/loot"
+      }
+    ]
+  },
+  {
+    "run": "2025-12-22T11:35Z",
+    "errors": 0,
+    "warnings": 0,
+    "top_codes": [],
+    "issues": []
+  }
+]

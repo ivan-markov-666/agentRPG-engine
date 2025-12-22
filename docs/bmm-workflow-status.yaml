@@ -1,0 +1,19 @@
+generated: "2025-12-14T16:42:00+02:00"
+project: "AgentRPG Engine"
+project_type: "platform"
+project_level: 3
+selected_track: "method"
+field_type: "greenfield"
+workflow_path: ".bmad/bmm/workflows/workflow-status/paths/method-greenfield.yaml"
+workflow_status:
+  brainstorm-project: "docs/analysis/brainstorming-session-2025-12-14T16-45-00+0200.md"
+  research: "docs/analysis/research/domain-similar-open-source-llm-rpg-engines-and-if-frameworks-research-2025-12-19.md"
+  product-brief: recommended
+  prd: required
+  create-ux-design: conditional
+  create-architecture: required
+  create-epics-and-stories: required
+  test-design: recommended
+  validate-architecture: optional
+  implementation-readiness: required
+  sprint-planning: required

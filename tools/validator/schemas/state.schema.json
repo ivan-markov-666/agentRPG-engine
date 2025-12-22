@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "current_area_id": { "type": "string" },
+    "active_quests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "quest_id": { "type": "string" },
+          "status": { "type": "string" },
+          "progress": { "type": "number" },
+          "current_step_id": { "type": "string" },
+          "flags": { "type": "object" }
+        },
+        "required": ["quest_id"],
+        "additionalProperties": true
+      }
+    },
+    "stats": { "type": "object" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,63 @@
+[
+  {
+    "run_id": "dev-001",
+    "timestamp": "2025-12-22T12:05:00.000Z",
+    "duration_ms": 150,
+    "errors": 0,
+    "warnings": 1,
+    "issues": [
+      {
+        "level": "WARN",
+        "code": "QUEST-CONTENT",
+        "file": "games/demo/scenario/quests/main-quest-01.md",
+        "message": "Missing \"Rewards\" section",
+        "fix": "Add ## Rewards with XP/loot"
+      }
+    ]
+  },
+  {
+    "run_id": "dev-20251222-1528a",
+    "timestamp": "2025-12-22T13:25:24.237Z",
+    "duration_ms": 17,
+    "errors": 0,
+    "warnings": 4,
+    "issues": [
+      {
+        "level": "WARN",
+        "code": "MANIFEST-FIELD",
+        "file": "manifest/entry.json",
+        "message": "Missing 'id'",
+        "fix": "Add required manifest fields"
+      },
+      {
+        "level": "WARN",
+        "code": "SCHEMA-NOT-AVAILABLE",
+        "file": "validator",
+        "message": "ajv not installed; skipping schema validation",
+        "fix": "Install ajv or ignore if not needed"
+      },
+      {
+        "level": "WARN",
+        "code": "SCHEMA-NOT-AVAILABLE",
+        "file": "validator",
+        "message": "ajv not installed; skipping schema validation",
+        "fix": "Install ajv or ignore if not needed"
+      },
+      {
+        "level": "WARN",
+        "code": "CAP-UNKNOWN-RUNTIME",
+        "file": "player-data/runtime/state.json",
+        "message": "Runtime has unknown capabilities: morale",
+        "fix": "Remove or add to capabilities.json"
+      }
+    ]
+  },
+  {
+    "run_id": "dev-20251222-1548a",
+    "timestamp": "2025-12-22T13:41:02.799Z",
+    "duration_ms": 143,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  }
+]
