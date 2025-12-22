@@ -6,7 +6,20 @@ function getAjv(issues) {
     // Lazy require
     // eslint-disable-next-line global-require, import/no-extraneous-dependencies
     const Ajv = require('ajv');
-    return new Ajv({ allErrors: true, strict: false });
+    const ajv = new Ajv({ allErrors: true, strict: false });
+    try {
+      const addFormats = require('ajv-formats');
+      addFormats(ajv);
+    } catch (e) {
+      ajv.addFormat('date-time', {
+        validate: (value) => {
+          if (typeof value !== 'string') return false;
+          const timestamp = Date.parse(value);
+          return Number.isFinite(timestamp);
+        },
+      });
+    }
+    return ajv;
   } catch (e) {
     add(issues, 'WARN', 'SCHEMA-NOT-AVAILABLE', 'validator', 'ajv not installed; skipping schema validation', 'Install ajv or ignore if not needed');
     return null;
