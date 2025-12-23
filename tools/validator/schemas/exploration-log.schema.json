@@ -1,0 +1,53 @@
+{
+  "$id": "https://agent-rpg/schemas/exploration-log.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Exploration Log",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "title", "type", "added_at", "origin"],
+    "additionalProperties": false,
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]{3,60}$"
+      },
+      "title": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 120
+      },
+      "type": {
+        "type": "string",
+        "enum": ["city", "landmark", "dungeon", "mcp", "side-quest-hook", "poi"]
+      },
+      "area_id": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]{3,60}$"
+      },
+      "description": {
+        "type": "string",
+        "minLength": 40,
+        "maxLength": 2000
+      },
+      "added_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 32
+        },
+        "maxItems": 10,
+        "uniqueItems": true
+      },
+      "origin": {
+        "type": "string",
+        "enum": ["player-request", "gm-suggested"]
+      }
+    }
+  }
+}

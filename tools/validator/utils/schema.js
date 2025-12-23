@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const { add, loadData } = require('./io');
 
@@ -28,6 +29,7 @@ function getAjv(issues) {
 
 function validateFileWithSchema(base, relFile, schemaPath, codePrefix, issues) {
   const filePath = path.join(base, relFile);
+  if (!fs.existsSync(filePath)) return;
   const data = loadData(filePath, issues);
   if (!data) return;
   const ajv = getAjv(issues);

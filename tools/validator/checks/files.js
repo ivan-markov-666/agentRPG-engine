@@ -63,6 +63,32 @@ async function checkRequiredFiles(ctx) {
         add(issues, 'WARN', 'FILE-TYPE', 'player-data/runtime/exploration-log.json', 'Exploration log should be an array', 'Use [] or array of entries');
       } else if (explorationEnabled && Array.isArray(explData) && explData.length === 0) {
         add(issues, 'WARN', 'EXPLORATION-EMPTY', 'player-data/runtime/exploration-log.json', 'Exploration enabled but log is empty', 'Add entries when exploration occurs or disable exploration');
+      } else if (Array.isArray(explData)) {
+        const seenIds = new Set();
+        const seenTitles = new Set();
+        explData.forEach((entry, idx) => {
+          if (!entry || typeof entry !== 'object') return;
+          if (entry.id) {
+            if (seenIds.has(entry.id)) {
+              add(issues, 'WARN', 'EXPLORATION-DUPLICATE-ID', 'player-data/runtime/exploration-log.json', `Duplicate exploration id '${entry.id}' (index ${idx})`, 'Use unique ids for each entry');
+            } else {
+              seenIds.add(entry.id);
+            }
+          }
+          if (entry.title) {
+            if (seenTitles.has(entry.title)) {
+              add(issues, 'WARN', 'EXPLORATION-DUPLICATE-TITLE', 'player-data/runtime/exploration-log.json', `Duplicate exploration title '${entry.title}' (index ${idx})`, 'Use unique titles for each entry');
+            } else {
+              seenTitles.add(entry.title);
+            }
+          }
+          if (entry.area_id) {
+            const areaFile = path.join(base, 'scenario/areas', `${entry.area_id}.md`);
+            if (!exists(areaFile)) {
+              add(issues, 'WARN', 'EXPLORATION-AREA-MISSING', 'player-data/runtime/exploration-log.json', `Entry '${entry.title || entry.id}' references missing area '${entry.area_id}'`, 'Create scenario/areas file or update area_id');
+            }
+          }
+        });
       }
     }
   }
