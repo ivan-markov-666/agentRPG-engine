@@ -17,6 +17,13 @@ async function checkSchemas(ctx) {
     'STATE',
     issues
   );
+  validateFileWithSchema(
+    base,
+    'player-data/runtime/exploration-log.json',
+    path.join(__dirname, '..', 'schemas', 'exploration-log.schema.json'),
+    'EXPLORATION',
+    issues
+  );
 }
 
 module.exports = { checkSchemas };

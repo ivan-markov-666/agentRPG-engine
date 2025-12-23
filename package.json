@@ -6,7 +6,10 @@
     "validate": "node tools/validator/index.js",
     "test": "node tools/validator/tests/validator.test.js",
     "archive:telemetry": "node tools/archive-telemetry.js",
-    "metrics:report": "node tools/metrics/report.js"
+    "metrics:report": "node tools/metrics/report.js",
+    "exploration:add": "node tools/exploration/add-entry.js",
+    "quest:add": "node tools/quests/add-quest.js",
+    "area:add": "node tools/areas/add-area.js"
   },
   "dependencies": {
     "ajv": "^8.17.1",

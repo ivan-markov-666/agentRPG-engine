@@ -78,6 +78,19 @@ async function runCheck(checkFn, files) {
     assert(issues.some((i) => i.code === 'STATE-SCHEMA'), 'Expected STATE-SCHEMA for health 150');
   }
 
+  // EXPLORATION-SCHEMA guardrail
+  {
+    const base = setupGame({
+      'player-data/runtime/exploration-log.json': [
+        { id: 'bad entry', title: 'City', type: 'unknown', origin: 'gm' }
+      ],
+    });
+    const issues = [];
+    const ctx = { base, loadJson, issues };
+    await checkSchemas(ctx);
+    assert(issues.some((i) => i.code === 'EXPLORATION-SCHEMA'), 'Expected EXPLORATION-SCHEMA for invalid entry');
+  }
+
   // QUEST-LINK and UNLOCK-UNKNOWN
   {
     const issues = await runCheck(checkQuests, {
@@ -97,6 +110,38 @@ async function runCheck(checkFn, files) {
       'scenario/quests/unlock-triggers.json': {},
     });
     assert(issues.some((i) => i.code === 'QUEST-CONTENT'), 'Expected QUEST-CONTENT');
+  }
+
+  // UNLOCK-MISSING
+  {
+    const issues = await runCheck(checkQuests, {
+      'scenario/quests/available.json': [
+        { quest_id: 'q-missing-unlock', title: 'Quest Missing Unlock' },
+        { quest_id: 'q-has-unlock', title: 'Quest Has Unlock' }
+      ],
+      'scenario/quests/q-missing-unlock.md': '# Quest Missing Unlock\n## Summary\nThis summary has enough content to avoid warnings.\n## Steps\n- step\n## Rewards\n- reward\n',
+      'scenario/quests/q-has-unlock.md': '# Quest Has Unlock\n## Summary\nThis summary has enough content to avoid warnings.\n## Steps\n- step\n## Rewards\n- reward\n',
+      'scenario/quests/unlock-triggers.json': { 'q-has-unlock': 'always' },
+    });
+    assert(issues.some((i) => i.code === 'UNLOCK-MISSING'), 'Expected UNLOCK-MISSING');
+  }
+
+  // QUEST-ENTRY, QUEST-TITLE-MISMATCH, SUMMARY/STEPS/REWARDS format
+  {
+    const issues = await runCheck(checkQuests, {
+      'scenario/quests/available.json': [
+        { quest_id: 'main-quest', title: 'Main Quest' },
+        { quest_id: 'broken-quest', title: '' },
+      ],
+      'scenario/quests/main-quest.md': '# Wrong Heading\n## Summary\nToo short.\n## Steps\nDo something without bullet\n## Rewards\nXP\n',
+      'scenario/quests/broken-quest.md': '# Broken Quest\n## Summary\nThis summary has enough content to avoid warnings.\n## Steps\n- step\n## Rewards\n- reward\n',
+      'scenario/quests/unlock-triggers.json': {},
+    });
+    assert(issues.some((i) => i.code === 'QUEST-ENTRY'), 'Expected QUEST-ENTRY for missing title');
+    assert(issues.some((i) => i.code === 'QUEST-TITLE-MISMATCH'), 'Expected QUEST-TITLE-MISMATCH');
+    assert(issues.some((i) => i.code === 'QUEST-SUMMARY-SHORT'), 'Expected QUEST-SUMMARY-SHORT');
+    assert(issues.some((i) => i.code === 'QUEST-STEPS-FORMAT'), 'Expected QUEST-STEPS-FORMAT');
+    assert(issues.some((i) => i.code === 'QUEST-REWARDS-SHORT'), 'Expected QUEST-REWARDS-SHORT');
   }
 
   // INDEX-EMPTY and MANIFEST-FIELD
@@ -181,14 +226,36 @@ async function runCheck(checkFn, files) {
     assert(issues.some((i) => i.code === 'EXPLORATION-EMPTY'), 'Expected EXPLORATION-EMPTY');
   }
 
+  // Exploration duplicates and missing area checks
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+      'scenario/index.md': '# Intro\nThis index provides a detailed overview of the campaign and passes the length check.',
+      'scenario/quests/available.json': [{ quest_id: 'quest-1', title: 'Quest One' }],
+      'scenario/quests/unlock-triggers.json': {},
+      'scenario/areas/default-area.md': '# Default area\n',
+      'player-data/runtime/state.json': { exploration_enabled: true },
+      'player-data/runtime/completed-quests.json': [],
+      'player-data/runtime/exploration-log.json': [
+        { id: 'cliff-outlook', title: 'Velora Cliff Outlook', type: 'landmark' },
+        { id: 'cliff-outlook', title: 'Velora Cliff Outlook', type: 'landmark' },
+        { id: 'mistwood-tower', title: 'Mistwood Tower', type: 'poi', area_id: 'missing-area' }
+      ],
+      'config/capabilities.json': {},
+    });
+    assert(issues.some((i) => i.code === 'EXPLORATION-DUPLICATE-ID'), 'Expected EXPLORATION-DUPLICATE-ID');
+    assert(issues.some((i) => i.code === 'EXPLORATION-DUPLICATE-TITLE'), 'Expected EXPLORATION-DUPLICATE-TITLE');
+    assert(issues.some((i) => i.code === 'EXPLORATION-AREA-MISSING'), 'Expected EXPLORATION-AREA-MISSING');
+  }
+
   // Summary-only and ignore codes
   {
     const base = setupGame({
       'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
       'scenario/index.md': '# Intro\nThis index is long enough to pass the minimum length.',
       'scenario/quests/available.json': [{ quest_id: 'q1', title: 'Q1' }],
-      'scenario/quests/q1.md': '# Q1\n## Summary\ns\n## Steps\n- s\n## Rewards\n- r\n',
-      'scenario/quests/unlock-triggers.json': {},
+      'scenario/quests/q1.md': '# Q1\n## Summary\nThis summary contains enough descriptive text to pass validation.\n## Steps\n- Go to the forest\n- Investigate the ruins\n## Rewards\n- 200 XP and a bronze amulet\n',
+      'scenario/quests/unlock-triggers.json': { q1: 'always' },
       'player-data/runtime/state.json': { stats: {} }, // missing mana -> CAP-RUNTIME
       'player-data/runtime/completed-quests.json': [],
       'config/capabilities.json': { mana: { enabled: true, min: 0, max: 10 } },

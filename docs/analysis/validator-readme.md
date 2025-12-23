@@ -55,15 +55,23 @@
 - Quest ID↔title: duplicate titles, липсващи quest файлове спрямо available.json.
 - Quest content: WARN ако файлът е празен/твърде кратък или без хедър.
 - Exploration log: WARN ако enabled, но log липсва/не е масив/е празен масив.
-- Schema: WARN ако нарушава JSON Schema (capabilities/state) или липсва ajv.
+- Schema: WARN ако нарушава JSON Schema (capabilities/state/exploration log) или липсва ajv (`CAP-SCHEMA`, `STATE-SCHEMA`, `EXPLORATION-SCHEMA`).
 - Допълнителни проверки:
   - CAP-RUNTIME-RANGE: runtime стойности извън min/max или range; CAP-DISABLED-RUNTIME: стойност за disabled capability.
   - CAP-DISABLED-RANGE: capability е disabled, но има range/min/max; CAP-UNKNOWN-RUNTIME: runtime stats съдържа ключове, които не са в capabilities.
   - QUEST-ID-FORMAT: quest_id не е slug (a-z0-9-).
   - QUEST-LINK: [[link]] не сочи към съществуващ quest/area; QUEST-LINK-SELF: линк към самия quest.
-  - UNLOCK-UNKNOWN: unlock-triggers сочи към липсващ quest; UNLOCK-FORMAT: стойността не е string/array.
+  - UNLOCK-UNKNOWN: unlock-triggers сочи към липсващ quest; UNLOCK-FORMAT: стойността не е string/array; UNLOCK-MISSING: quest от available.json няма unlock политика.
   - QUEST-CONTENT: липсва Summary/Steps/Rewards секция; QUEST-EMPTY-LIST ако available.json е празен.
   - INDEX-EMPTY/INDEX-SHORT: scenario/index.md празен или прекалено кратък; MANIFEST-FIELD: липсва id/title/version.
+
+## Release checklist (локално, преди GM session)
+1) `npm run validate -- --path games/<gameId> --strict --summary`
+2) Ако добавяш нови неща:
+   - area: `npm run area:add -- --id <area-id> --title "..." --description "..." --game <gameId>`
+   - quest: `npm run quest:add -- --title "..." --game <gameId>`
+   - exploration entry: `npm run exploration:add -- --title "..." --type poi --area <area-id> --game <gameId>`
+3) Snapshot regression (по избор): `npm run validate -- --path games/<gameId> --json docs/analysis/reports/latest-run.json --append --snapshot docs/analysis/reports/latest-run.json --strict --summary`
 
 ## Ограничения / TODO
 - YAML поддръжка: налична ако е инсталиран `yaml` пакет; иначе WARN.
@@ -266,6 +274,21 @@ Summary: 1 error(s), 1 warning(s) | Top: QUEST-CONTENT:1, QUEST-LINK:1
 | **QUEST** | QUEST-EMPTY-LIST, QUEST-CONTENT, QUEST-LINK, QUEST-LINK-SELF, UNLOCK-UNKNOWN | Провери `scenario/quests/*`; добави Summary/Steps/Rewards, оправи [[links]] към реални quest/area ID, синхронизирай `available.json` и `unlock-triggers.json`. |
 | **EXPLORATION / STATE** | EXPLORATION-EMPTY, INDEX-SHORT | Ако `exploration_enabled=true`, попълни `player-data/runtime/exploration-log.json`; добави повече контекст в `scenario/index.md`. |
 | **SCHEMA / YAML** | SCHEMA-ERROR, YAML-PARSE | Увери се, че JSON отговаря на схемата; при YAML инсталирай `yaml` пакета и валидирай структурата. |
+
+## Exploration log пример (валиден запис)
+```json
+{
+  "id": "mistwood-spire",
+  "title": "Mistwood Spire lookout",
+  "type": "landmark",
+  "area_id": "mistwood",
+  "description": "Crystal tower that pierces the fog above Mistwood; scouts use it to watch the northern frontier.",
+  "added_at": "2025-12-22T18:55:00Z",
+  "tags": ["scouting", "fog"],
+  "origin": "gm-suggested"
+}
+```
+Guardrails: slug `id`, тип от {`city`,`landmark`,`dungeon`,`mcp`,`side-quest-hook`,`poi`}, описания ≥40 символа, ISO8601 `added_at`, максимум 10 уникални `tags`, `origin` = `player-request`/`gm-suggested`.
 
 ## Definition of Done (локален чеклист)
 - `npm run validate -- --path games/<id> --json reports/last.json --append --snapshot reports/last.json --strict --summary` връща `Summary: 0 error(s), 0 warning(s)`.
