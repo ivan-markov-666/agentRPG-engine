@@ -2,6 +2,36 @@ const fs = require('fs');
 const path = require('path');
 const { loadData, add } = require('../utils/io');
 
+const areaContentCache = new Map();
+
+function clearAreaCache() {
+  areaContentCache.clear();
+}
+
+function getAreaContent(base, areaId) {
+  const cacheKey = `${base}:${areaId}`;
+  if (areaContentCache.has(cacheKey)) {
+    return areaContentCache.get(cacheKey);
+  }
+  const filePath = path.join(base, 'scenario/areas', `${areaId}.md`);
+  if (!fs.existsSync(filePath)) {
+    areaContentCache.set(cacheKey, null);
+    return null;
+  }
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    areaContentCache.set(cacheKey, content);
+    return content;
+  } catch (e) {
+    areaContentCache.set(cacheKey, null);
+    return null;
+  }
+}
+
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function extractSection(content, heading) {
   const pattern = new RegExp(`##\\s*${heading}[\\s\\S]*?(?=\\n##\\s|$)`, 'i');
   const match = content.match(pattern);
@@ -16,6 +46,7 @@ function hasList(text) {
 
 async function checkQuests(ctx) {
   const { base, issues } = ctx;
+  clearAreaCache();
   const availablePath = path.join(base, 'scenario/quests/available.json');
   if (!fs.existsSync(availablePath)) return;
   const available = loadData(availablePath, issues);
@@ -29,14 +60,23 @@ async function checkQuests(ctx) {
   if (!entries.length) {
     add(issues, 'WARN', 'QUEST-EMPTY-LIST', 'scenario/quests/available.json', 'No quests listed in available.json', 'Add at least one quest entry');
   }
+  const seenQuestIds = new Set();
   entries.forEach(({ quest_id, title }) => {
     if (!quest_id || !title) {
       add(issues, 'ERROR', 'QUEST-ENTRY', 'scenario/quests/available.json', 'Each quest entry needs quest_id and title', 'Fill both quest_id and title');
       return;
     }
+    if (seenQuestIds.has(quest_id)) {
+      add(issues, 'WARN', 'QUEST-ID-DUPLICATE', 'scenario/quests/available.json', `Duplicate quest_id '${quest_id}' detected`, 'Ensure quest ids are unique');
+    } else {
+      seenQuestIds.add(quest_id);
+    }
     availableIds.add(quest_id);
     if (!/^[a-z0-9-]+$/.test(quest_id)) {
       add(issues, 'WARN', 'QUEST-ID-FORMAT', 'scenario/quests/available.json', `Quest id '${quest_id}' should be slug (a-z0-9-)`, 'Rename to slug-safe id');
+    }
+    if (typeof title === 'string' && title.trim().length < 5) {
+      add(issues, 'WARN', 'QUEST-TITLE-SHORT', 'scenario/quests/available.json', `Quest '${quest_id}' title is very short`, 'Use at least 5 characters for quest titles');
     }
     if (titleMap.has(title)) {
       add(issues, 'ERROR', 'TITLE-MISMATCH', 'scenario/quests/available.json', `Duplicate title '${title}'`, 'Rename to be unique');
@@ -99,6 +139,12 @@ async function checkQuests(ctx) {
           const areaLink = path.join(base, 'scenario/areas', `${link}.md`);
           if (!fs.existsSync(questLink) && !fs.existsSync(areaLink)) {
             add(issues, 'WARN', 'QUEST-LINK', `scenario/quests/${quest_id}.md`, `Link [[${link}]] not found as quest or area`, 'Create file or adjust link target');
+          } else if (fs.existsSync(areaLink)) {
+            const areaContent = getAreaContent(base, link);
+            const questPattern = new RegExp(`\\[\\[${escapeRegExp(quest_id)}\\]\\]`);
+            if (areaContent && !questPattern.test(areaContent)) {
+              add(issues, 'WARN', 'QUEST-AREA-BACKLINK', `scenario/quests/${quest_id}.md`, `Area [[${link}]] does not reference this quest`, 'Add [[quest_id]] inside area file to keep navigation bidirectional');
+            }
           }
         });
       }
@@ -122,6 +168,33 @@ async function checkQuests(ctx) {
         const val = unlocks[qid];
         if (!(typeof val === 'string' || Array.isArray(val))) {
           add(issues, 'WARN', 'UNLOCK-FORMAT', 'scenario/quests/unlock-triggers.json', `Unlock value for '${qid}' should be string or array`, 'Use string condition or array of conditions');
+          return;
+        }
+        if (typeof val === 'string') {
+          if (!val.trim()) {
+            add(issues, 'WARN', 'UNLOCK-EMPTY', 'scenario/quests/unlock-triggers.json', `Unlock condition for '${qid}' is empty`, 'Use e.g. \"always\" or concrete condition');
+          }
+        } else if (Array.isArray(val)) {
+          if (val.length === 0) {
+            add(issues, 'WARN', 'UNLOCK-EMPTY', 'scenario/quests/unlock-triggers.json', `Unlock condition array for '${qid}' is empty`, 'Provide at least one condition or "always"');
+          }
+          const seenConds = new Set();
+          val.forEach((cond, idx) => {
+            if (typeof cond !== 'string') {
+              add(issues, 'WARN', 'UNLOCK-VALUE-TYPE', 'scenario/quests/unlock-triggers.json', `Unlock condition #${idx + 1} for '${qid}' must be string`, 'Use string tokens, e.g. quest ids or tags');
+              return;
+            }
+            const trimmed = cond.trim();
+            if (!trimmed) {
+              add(issues, 'WARN', 'UNLOCK-EMPTY', 'scenario/quests/unlock-triggers.json', `Unlock condition #${idx + 1} for '${qid}' is empty`, 'Remove empty entries or add condition');
+              return;
+            }
+            if (seenConds.has(trimmed)) {
+              add(issues, 'WARN', 'UNLOCK-DUPLICATE', 'scenario/quests/unlock-triggers.json', `Unlock condition '${trimmed}' for '${qid}' is duplicated`, 'Remove duplicate conditions');
+            } else {
+              seenConds.add(trimmed);
+            }
+          });
         }
       });
     }
