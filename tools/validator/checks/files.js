@@ -66,6 +66,7 @@ async function checkRequiredFiles(ctx) {
       } else if (Array.isArray(explData)) {
         const seenIds = new Set();
         const seenTitles = new Set();
+        const entryIdSet = new Set();
         explData.forEach((entry, idx) => {
           if (!entry || typeof entry !== 'object') return;
           if (entry.id) {
@@ -73,6 +74,7 @@ async function checkRequiredFiles(ctx) {
               add(issues, 'WARN', 'EXPLORATION-DUPLICATE-ID', 'player-data/runtime/exploration-log.json', `Duplicate exploration id '${entry.id}' (index ${idx})`, 'Use unique ids for each entry');
             } else {
               seenIds.add(entry.id);
+              entryIdSet.add(entry.id);
             }
           }
           if (entry.title) {
@@ -88,7 +90,22 @@ async function checkRequiredFiles(ctx) {
               add(issues, 'WARN', 'EXPLORATION-AREA-MISSING', 'player-data/runtime/exploration-log.json', `Entry '${entry.title || entry.id}' references missing area '${entry.area_id}'`, 'Create scenario/areas file or update area_id');
             }
           }
+          const description = typeof entry.description === 'string' ? entry.description.trim() : '';
+          if (!description || description.replace(/\s+/g, ' ').length < 60) {
+            add(issues, 'WARN', 'EXPLORATION-DESCRIPTION-SHORT', 'player-data/runtime/exploration-log.json', `Description for '${entry.title || entry.id || `index ${idx}`}' is too short`, 'Provide ≥60 characters detailing hooks/risks');
+          }
+          const tagsCount = Array.isArray(entry.tags) ? entry.tags.filter((tag) => typeof tag === 'string' && tag.trim()).length : 0;
+          if (tagsCount < 1) {
+            add(issues, 'WARN', 'EXPLORATION-TAGS-MIN', 'player-data/runtime/exploration-log.json', `Entry '${entry.title || entry.id || `index ${idx}`}' has no tags`, 'Add at least one descriptive tag (theme, danger, faction)');
+          }
         });
+        if (state && Array.isArray(state.exploration_log_preview)) {
+          state.exploration_log_preview.forEach((previewId) => {
+            if (!entryIdSet.has(previewId)) {
+              add(issues, 'WARN', 'EXPLORATION-PREVIEW-MISMATCH', 'player-data/runtime/state.json', `exploration_log_preview references missing id '${previewId}'`, 'Update preview list to include only existing exploration ids');
+            }
+          });
+        }
       }
     }
   }

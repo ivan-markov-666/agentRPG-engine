@@ -4,6 +4,7 @@ const path = require('path');
 const { checkRequiredFiles } = require('./checks/files');
 const { checkCapabilities } = require('./checks/capabilities');
 const { checkOrphans } = require('./checks/orphans');
+const { checkAreas } = require('./checks/areas');
 const { checkQuests } = require('./checks/quests');
 const { checkSchemas } = require('./checks/schema');
 const { reportConsole } = require('./reporters/console');
@@ -59,6 +60,7 @@ async function main() {
   await checkSchemas(context);
   await checkCapabilities(context);
   await checkOrphans(context);
+  await checkAreas(context);
   await checkQuests(context);
 
   if (args.strict) {

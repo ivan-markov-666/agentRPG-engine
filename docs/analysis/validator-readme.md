@@ -59,11 +59,13 @@
 - Допълнителни проверки:
   - CAP-RUNTIME-RANGE: runtime стойности извън min/max или range; CAP-DISABLED-RUNTIME: стойност за disabled capability.
   - CAP-DISABLED-RANGE: capability е disabled, но има range/min/max; CAP-UNKNOWN-RUNTIME: runtime stats съдържа ключове, които не са в capabilities.
-  - QUEST-ID-FORMAT: quest_id не е slug (a-z0-9-).
-  - QUEST-LINK: [[link]] не сочи към съществуващ quest/area; QUEST-LINK-SELF: линк към самия quest.
-  - UNLOCK-UNKNOWN: unlock-triggers сочи към липсващ quest; UNLOCK-FORMAT: стойността не е string/array; UNLOCK-MISSING: quest от available.json няма unlock политика.
-  - QUEST-CONTENT: липсва Summary/Steps/Rewards секция; QUEST-EMPTY-LIST ако available.json е празен.
+  - QUEST-ID-FORMAT: quest_id не е slug (a-z0-9-); QUEST-ID-DUPLICATE: два записа споделят един и същи quest_id.
+  - QUEST-LINK: [[link]] не сочи към съществуващ quest/area; QUEST-LINK-SELF: линк към самия quest; QUEST-AREA-BACKLINK: quest сочи към area, която не връща [[quest_id]].
+  - UNLOCK-UNKNOWN: unlock-triggers сочи към липсващ quest; UNLOCK-FORMAT: стойността не е string/array; UNLOCK-MISSING: quest от available.json няма unlock политика; UNLOCK-EMPTY/UNLOCK-DUPLICATE/UNLOCK-VALUE-TYPE: празни/дублирани или не-string условия.
+  - QUEST-CONTENT: липсва Summary/Steps/Rewards секция; QUEST-TITLE-SHORT ако заглавието е под 5 символа; QUEST-EMPTY-LIST ако available.json е празен.
   - INDEX-EMPTY/INDEX-SHORT: scenario/index.md празен или прекалено кратък; MANIFEST-FIELD: липсва id/title/version.
+  - AREA-* guardrails: AREA-DESCRIPTION / AREA-POINTS / AREA-CONNECTIONS за липсващи секции, AREA-POINTS-FORMAT / AREA-CONNECTIONS-FORMAT за списъци, AREA-LINK за неизвестни цели, AREA-QUEST-BACKLINK когато area сочи към quest без [[area_id]] референция, AREA-LINK-SELF за само-линкове.
+  - EXPLORATION-* guardrails: EXPLORATION-DESCRIPTION-SHORT (описание <60 знака), EXPLORATION-TAGS-MIN (липсват tags), EXPLORATION-DUPLICATE-ID/TITLE, EXPLORATION-AREA-MISSING (несъществуваща area), EXPLORATION-PREVIEW-MISMATCH (preview IDs без реални записи).
 
 ## Release checklist (локално, преди GM session)
 1) `npm run validate -- --path games/<gameId> --strict --summary`
