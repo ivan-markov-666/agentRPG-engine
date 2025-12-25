@@ -85,6 +85,17 @@ async function runCheck(checkFn, files) {
     assert(issues.some((i) => i.code === 'CAP-RUNTIME-RANGE'), 'Expected CAP-RUNTIME-RANGE');
   }
 
+  // CAP-RUNTIME-BOUNDS
+  {
+    const issues = await runCheck(checkCapabilities, {
+      'config/capabilities.json': {
+        armor: { enabled: true, desc: 'Physical protection' }
+      },
+      'player-data/runtime/state.json': { stats: { armor: 5 } },
+    });
+    assert(issues.some((i) => i.code === 'CAP-RUNTIME-BOUNDS'), 'Expected CAP-RUNTIME-BOUNDS');
+  }
+
   // CAP-SCHEMA guardrail (negative min)
   {
     const base = setupGame({

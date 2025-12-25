@@ -1,4 +1,4 @@
-# Main Quest: Prove Your Worth
+# Prove Your Worth
 
 ## Summary
 Earn the village's trust by helping the elder and securing the outskirts.

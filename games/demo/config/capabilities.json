@@ -8,7 +8,7 @@
   "reputation": {"enabled": true, "desc": "Faction reps", "range": [-100, 100]},
   "currency": {"enabled": true, "desc": "Gold", "min": 0},
   "morale": {"enabled": true, "desc": "Party morale", "min": 0, "max": 100},
-  "armor": {"enabled": true, "desc": "Physical damage reduction"},
-  "stealth": {"enabled": true, "desc": "Sneak ability"},
-  "perception": {"enabled": true, "desc": "Detect hidden"}
+  "armor": {"enabled": true, "desc": "Physical damage reduction", "min": 0, "max": 50},
+  "stealth": {"enabled": true, "desc": "Sneak ability", "min": 0, "max": 100},
+  "perception": {"enabled": true, "desc": "Detect hidden", "min": 0, "max": 100}
 }

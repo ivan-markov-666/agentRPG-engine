@@ -21,8 +21,8 @@
       "properties": {
         "enabled": { "type": "boolean" },
         "desc": { "type": "string" },
-        "min": { "type": "number" },
-        "max": { "type": "number" },
+        "min": { "type": "number", "minimum": 0 },
+        "max": { "type": "number", "minimum": 0 },
         "range": {
           "type": "array",
           "items": { "type": "number" },

@@ -1,0 +1,146 @@
+[
+  {
+    "run_id": "dev-001",
+    "timestamp": "2025-12-22T12:05:00.000Z",
+    "duration_ms": 150,
+    "errors": 0,
+    "warnings": 1,
+    "issues": [
+      {
+        "level": "WARN",
+        "code": "QUEST-CONTENT",
+        "file": "games/demo/scenario/quests/main-quest-01.md",
+        "message": "Missing \"Rewards\" section",
+        "fix": "Add ## Rewards with XP/loot"
+      }
+    ]
+  },
+  {
+    "run_id": "dev-20251222-1528a",
+    "timestamp": "2025-12-22T13:25:24.237Z",
+    "duration_ms": 17,
+    "errors": 0,
+    "warnings": 4,
+    "issues": [
+      {
+        "level": "WARN",
+        "code": "MANIFEST-FIELD",
+        "file": "manifest/entry.json",
+        "message": "Missing 'id'",
+        "fix": "Add required manifest fields"
+      },
+      {
+        "level": "WARN",
+        "code": "SCHEMA-NOT-AVAILABLE",
+        "file": "validator",
+        "message": "ajv not installed; skipping schema validation",
+        "fix": "Install ajv or ignore if not needed"
+      },
+      {
+        "level": "WARN",
+        "code": "SCHEMA-NOT-AVAILABLE",
+        "file": "validator",
+        "message": "ajv not installed; skipping schema validation",
+        "fix": "Install ajv or ignore if not needed"
+      },
+      {
+        "level": "WARN",
+        "code": "CAP-UNKNOWN-RUNTIME",
+        "file": "player-data/runtime/state.json",
+        "message": "Runtime has unknown capabilities: morale",
+        "fix": "Remove or add to capabilities.json"
+      }
+    ]
+  },
+  {
+    "run_id": "dev-20251222-1548a",
+    "timestamp": "2025-12-22T13:41:02.799Z",
+    "duration_ms": 143,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "run_id": "dev-20251225-run1",
+    "timestamp": "2025-12-25T19:08:15.160Z",
+    "duration_ms": 97,
+    "errors": 0,
+    "warnings": 5,
+    "issues": [
+      {
+        "level": "WARN",
+        "code": "EXPLORATION-TAGS-MIN",
+        "file": "player-data/runtime/exploration-log.json",
+        "message": "Entry 'TestLocation' has no tags",
+        "fix": "Add at least one descriptive tag (theme, danger, faction)"
+      },
+      {
+        "level": "WARN",
+        "code": "AREA-DESCRIPTION",
+        "file": "scenario\\areas\\default-area.md",
+        "message": "Missing \"## Description\" section",
+        "fix": "Describe the area vibe and purpose (2-3 sentences)"
+      },
+      {
+        "level": "WARN",
+        "code": "AREA-POINTS",
+        "file": "scenario\\areas\\default-area.md",
+        "message": "Missing \"## Points of interest\" section",
+        "fix": "List at least one POI"
+      },
+      {
+        "level": "WARN",
+        "code": "AREA-CONNECTIONS",
+        "file": "scenario\\areas\\default-area.md",
+        "message": "Missing \"## Connections\" section",
+        "fix": "List exits, fast-travel, or quest hooks"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-TITLE-MISMATCH",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "Heading \"Main Quest: Prove Your Worth\" differs from available title \"Prove Your Worth\"",
+        "fix": "Align quest heading with available.json title"
+      }
+    ]
+  },
+  {
+    "run_id": "dev-20251225-run2",
+    "timestamp": "2025-12-25T19:09:53.483Z",
+    "duration_ms": 110,
+    "errors": 0,
+    "warnings": 2,
+    "issues": [
+      {
+        "level": "WARN",
+        "code": "AREA-LINK",
+        "file": "scenario\\areas\\default-area.md",
+        "message": "Link [[forest-outskirts]] not found as quest or area",
+        "fix": "Create file or adjust link target"
+      },
+      {
+        "level": "WARN",
+        "code": "AREA-LINK",
+        "file": "scenario\\areas\\default-area.md",
+        "message": "Link [[training-grounds]] not found as quest or area",
+        "fix": "Create file or adjust link target"
+      }
+    ]
+  },
+  {
+    "run_id": "dev-20251225-run3",
+    "timestamp": "2025-12-25T19:10:17.317Z",
+    "duration_ms": 100,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "run_id": "dev-20251225-run4",
+    "timestamp": "2025-12-25T19:25:42.662Z",
+    "duration_ms": 125,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  }
+]

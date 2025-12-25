@@ -1,4 +1,5 @@
   const statusStackIssues = [];
+  const missingBounds = [];
 const fs = require('fs');
 const path = require('path');
 const { loadData, add } = require('../utils/io');
@@ -80,8 +81,13 @@ async function checkCapabilities(ctx) {
     const hasRange = Array.isArray(def.range) && def.range.length === 2 && def.range.every((v) => typeof v === 'number');
     const min = typeof def.min === 'number' ? def.min : undefined;
     const max = typeof def.max === 'number' ? def.max : undefined;
+    const hasBounds = hasRange || min !== undefined || max !== undefined;
     if (enabled && value !== undefined) {
-      validateRuntimeValue(k, value, def, { hasRange, min, max, outOfRange, statusStackIssues });
+      if (typeof value === 'number' && !hasBounds) {
+        missingBounds.push(k);
+      } else {
+        validateRuntimeValue(k, value, def, { hasRange, min, max, outOfRange, statusStackIssues });
+      }
     }
   });
   if (missing.length > 0) {
@@ -93,6 +99,16 @@ async function checkCapabilities(ctx) {
   }
   if (outOfRange.length > 0) {
     add(issues, 'ERROR', 'CAP-RUNTIME-RANGE', 'player-data/runtime/state.json', `Runtime values out of range: ${outOfRange.join('; ')}`, 'Adjust stats or capability ranges');
+  }
+  if (missingBounds.length > 0) {
+    add(
+      issues,
+      'WARN',
+      'CAP-RUNTIME-BOUNDS',
+      'config/capabilities.json',
+      `Capabilities missing min/max or range but used as numeric runtime stats: ${missingBounds.join(', ')}`,
+      'Add min/max or range to the capability definition'
+    );
   }
   if (statusStackIssues.length > 0) {
     add(issues, 'WARN', 'CAP-STATUS-STACK', 'player-data/runtime/state.json', `Invalid status_effects stack: ${statusStackIssues.join('; ')}`, 'Ensure stack is integer >= 0');
