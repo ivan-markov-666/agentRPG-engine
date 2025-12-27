@@ -14,5 +14,37 @@
     "errors": 0,
     "warnings": 0,
     "issues": []
+  },
+  {
+    "run_id": "dev-local",
+    "timestamp": "2025-12-25T19:44:23.259Z",
+    "duration_ms": 140,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "run_id": "dev-20251225-auto",
+    "timestamp": "2025-12-25T19:48:21.440Z",
+    "duration_ms": 116,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "run_id": "dev-20251225-auto",
+    "timestamp": "2025-12-25T19:48:44.730Z",
+    "duration_ms": 119,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "run_id": "dev-20251225-quests",
+    "timestamp": "2025-12-25T19:53:33.723Z",
+    "duration_ms": 111,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
   }
 ]

@@ -27,7 +27,7 @@
       },
       "description": {
         "type": "string",
-        "minLength": 40,
+        "minLength": 60,
         "maxLength": 2000
       },
       "added_at": {
@@ -41,6 +41,7 @@
           "minLength": 2,
           "maxLength": 32
         },
+        "minItems": 1,
         "maxItems": 10,
         "uniqueItems": true
       },
@@ -48,6 +49,21 @@
         "type": "string",
         "enum": ["player-request", "gm-suggested"]
       }
-    }
+    },
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "type": {
+              "enum": ["city", "landmark", "dungeon", "poi"]
+            }
+          },
+          "required": ["type"]
+        },
+        "then": {
+          "required": ["area_id"]
+        }
+      }
+    ]
   }
 }

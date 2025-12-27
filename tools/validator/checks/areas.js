@@ -44,6 +44,13 @@ function hasList(text) {
   return /^[-*+]\s+/m.test(text) || /^[0-9]+\.\s+/m.test(text);
 }
 
+function countListItems(text) {
+  if (!text) return 0;
+  const pattern = /^(\s*)([-*+]|[0-9]+\.)\s+/gm;
+  const matches = text.match(pattern);
+  return matches ? matches.length : 0;
+}
+
 async function checkAreas(ctx) {
   const { base, issues } = ctx;
   clearQuestCache();
@@ -78,12 +85,38 @@ async function checkAreas(ctx) {
       add(issues, 'WARN', 'AREA-POINTS', relPath, 'Missing "## Points of interest" section', 'List at least one POI');
     } else if (!hasList(points)) {
       add(issues, 'WARN', 'AREA-POINTS-FORMAT', relPath, 'Points of interest should be a list', 'Use "-" bullets or numbered list');
+    } else if (countListItems(points) < 1) {
+      add(issues, 'WARN', 'AREA-POINTS-COUNT', relPath, 'Points of interest list is empty', 'Add at least one POI entry');
     }
     const connections = extractSection(content, 'Connections');
     if (!connections) {
       add(issues, 'WARN', 'AREA-CONNECTIONS', relPath, 'Missing "## Connections" section', 'List exits, fast-travel, or quest hooks');
     } else if (!hasList(connections)) {
       add(issues, 'WARN', 'AREA-CONNECTIONS-FORMAT', relPath, 'Connections section should be a list', 'Use "-" bullets or numbered list');
+    } else if (countListItems(connections) < 1) {
+      add(issues, 'WARN', 'AREA-CONNECTIONS-COUNT', relPath, 'Connections list is empty', 'Add at least one connection/hook');
+    }
+    const notes = extractSection(content, 'Notes');
+    if (!notes) {
+      add(issues, 'WARN', 'AREA-NOTES-MISSING', relPath, 'Missing "## Notes" section', 'Add key NPC hooks, threats, or GM reminders');
+    } else if (!hasList(notes)) {
+      add(issues, 'WARN', 'AREA-NOTES-FORMAT', relPath, 'Notes section should contain a bullet or numbered list', 'Use "-" bullets for NPC hooks/threats');
+    }
+    const conditions = extractSection(content, 'Conditions');
+    if (!conditions) {
+      add(issues, 'WARN', 'AREA-CONDITIONS-MISSING', relPath, 'Missing "## Conditions" section', 'List access requirements, timers, or environmental constraints');
+    } else if (!hasList(conditions)) {
+      add(issues, 'WARN', 'AREA-CONDITIONS-FORMAT', relPath, 'Conditions section should be a list', 'Use "-" bullets for requirements or timers');
+    } else if (countListItems(conditions) < 1) {
+      add(issues, 'WARN', 'AREA-CONDITIONS-COUNT', relPath, 'Conditions list is empty', 'Add at least one requirement or warning');
+    }
+    const threats = extractSection(content, 'Threats');
+    if (!threats) {
+      add(issues, 'WARN', 'AREA-THREATS-MISSING', relPath, 'Missing "## Threats" section', 'Outline fail hooks/escalations tied to this area');
+    } else if (!hasList(threats)) {
+      add(issues, 'WARN', 'AREA-THREATS-FORMAT', relPath, 'Threats section should contain a list', 'Use "-" bullets describing escalation or fail hooks');
+    } else if (countListItems(threats) < 1) {
+      add(issues, 'WARN', 'AREA-THREATS-COUNT', relPath, 'Threats list is empty', 'Add at least one threat/escalation bullet');
     }
 
     const linkMatches = [...content.matchAll(/\[\[([^[\]]+)\]\]/g)].map((m) => m[1]);

@@ -2,8 +2,30 @@
 const fs = require('fs');
 const path = require('path');
 
+const TYPES_REQUIRING_AREA = new Set(['city', 'landmark', 'dungeon', 'poi']);
+const ALLOWED_TYPES = new Set(['city', 'landmark', 'dungeon', 'mcp', 'side-quest-hook', 'poi']);
+const TYPE_AUTO_TAGS = {
+  city: ['city'],
+  landmark: ['landmark'],
+  dungeon: ['dungeon'],
+  poi: ['poi'],
+  mcp: ['mcp'],
+  'side-quest-hook': ['side-quest'],
+};
+
 function parseArgs(argv) {
-  const args = { game: 'demo', title: null, type: 'poi', area: null, origin: 'player-request', desc: null, tags: [] };
+  const args = {
+    game: 'demo',
+    title: null,
+    type: 'poi',
+    area: null,
+    origin: 'player-request',
+    desc: null,
+    tags: [],
+    id: null,
+    previewLimit: 5,
+    previewMode: 'newest',
+  };
   for (let i = 2; i < argv.length; i += 1) {
     const flag = argv[i];
     const next = argv[i + 1];
@@ -33,6 +55,12 @@ function parseArgs(argv) {
         break;
       case '--id':
         if (next) args.id = next;
+        break;
+      case '--preview-limit':
+        if (next && !Number.isNaN(Number(next))) args.previewLimit = Math.max(1, Number(next));
+        break;
+      case '--preview-mode':
+        if (next) args.previewMode = next.toLowerCase();
         break;
       default:
         break;
@@ -84,6 +112,10 @@ function main() {
     console.error('Usage: npm run exploration:add -- --title "..." [--game demo] [--type dungeon] [--area id] [--origin player-request|gm-suggested] [--desc "..."] [--tags tag1,tag2]');
     process.exit(1);
   }
+  if (!ALLOWED_TYPES.has(args.type)) {
+    console.error(`[ERROR] Unsupported exploration type '${args.type}'. Allowed: ${Array.from(ALLOWED_TYPES).join(', ')}`);
+    process.exit(1);
+  }
   const gameBase = path.join(__dirname, '..', '..', 'games', args.game);
   if (!fs.existsSync(gameBase)) {
     console.error(`[ERROR] Game folder not found: ${gameBase}`);
@@ -91,6 +123,10 @@ function main() {
   }
   const logPath = path.join(gameBase, 'player-data', 'runtime', 'exploration-log.json');
   const statePath = path.join(gameBase, 'player-data', 'runtime', 'state.json');
+  if (TYPES_REQUIRING_AREA.has(args.type) && !args.area) {
+    console.error(`[ERROR] Exploration type '${args.type}' requires --area <area-id> to satisfy guardrails.`);
+    process.exit(1);
+  }
   if (args.area) {
     const areaFile = path.join(gameBase, 'scenario', 'areas', `${args.area}.md`);
     if (!fs.existsSync(areaFile)) {
@@ -107,9 +143,12 @@ function main() {
   const state = readJson(statePath, {});
   const baseId = args.id || slugify(args.title);
   const entryId = ensureUniqueId(baseId, logData);
-  const description =
+  let description =
     args.desc ||
-    `${args.title} (${args.type}) recently discovered during free exploration. Document notable hooks/risks before using in session.`;
+    `${args.title} (${args.type}) recently discovered during free exploration. Document notable hooks, motives, and dangers before using in session.`;
+  if (description.replace(/\s+/g, ' ').trim().length < 60) {
+    description = `${description.trim()} Additional details: note its history, current faction tensions, and rewards to keep the log ≥60 characters.`;
+  }
   const entry = {
     id: entryId,
     title: args.title,
@@ -119,8 +158,17 @@ function main() {
     description,
   };
   if (args.area) entry.area_id = args.area;
-  const uniqueTags = Array.from(new Set((args.tags || []).filter(Boolean))).slice(0, 10);
-  if (uniqueTags.length > 0) entry.tags = uniqueTags;
+  const providedTags = (args.tags || []).filter(Boolean);
+  const autoTagSet = new Set(providedTags);
+  const typeTagList = TYPE_AUTO_TAGS[args.type] || [];
+  typeTagList.forEach((tag) => autoTagSet.add(tag));
+  if (args.area) {
+    autoTagSet.add(`area:${args.area}`);
+  }
+  if (autoTagSet.size === 0) {
+    autoTagSet.add('hook');
+  }
+  entry.tags = Array.from(autoTagSet).slice(0, 10);
 
   logData.push(entry);
   writeJson(logPath, logData);
@@ -133,10 +181,17 @@ function main() {
     if (!Array.isArray(state.exploration_log_preview)) {
       state.exploration_log_preview = [];
     }
-    state.exploration_log_preview = [
-      entry.id,
-      ...state.exploration_log_preview.filter((id) => id !== entry.id),
-    ].slice(0, 5);
+    if (args.previewMode === 'append') {
+      state.exploration_log_preview = [
+        ...state.exploration_log_preview.filter((id) => id !== entry.id),
+        entry.id,
+      ].slice(-args.previewLimit);
+    } else {
+      state.exploration_log_preview = [
+        entry.id,
+        ...state.exploration_log_preview.filter((id) => id !== entry.id),
+      ].slice(0, args.previewLimit);
+    }
     writeJson(statePath, state);
   }
 

@@ -63,7 +63,7 @@
     },
     "genericStat": {
       "anyOf": [
-        { "type": "number" },
+        { "type": "number", "minimum": 0 },
         {
           "type": "object",
           "additionalProperties": { "$ref": "#/definitions/genericStat" }

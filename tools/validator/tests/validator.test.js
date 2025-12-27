@@ -120,6 +120,18 @@ async function runCheck(checkFn, files) {
     assert(issues.some((i) => i.code === 'STATE-SCHEMA'), 'Expected STATE-SCHEMA for health 150');
   }
 
+  // STATE-SCHEMA guardrail (nested negative stat)
+  {
+    const base = setupGame({
+      'config/capabilities.json': { armor: { enabled: true, min: 0, max: 50 } },
+      'player-data/runtime/state.json': { stats: { armor: { bonus: -1 } } },
+    });
+    const issues = [];
+    const ctx = { base, loadJson, issues };
+    await checkSchemas(ctx);
+    assert(issues.some((i) => i.code === 'STATE-SCHEMA'), 'Expected STATE-SCHEMA for nested negative stat');
+  }
+
   // EXPLORATION-SCHEMA guardrail
   {
     const base = setupGame({
@@ -201,6 +213,45 @@ async function runCheck(checkFn, files) {
     assert(issues.some((i) => i.code === 'UNLOCK-DUPLICATE'), 'Expected UNLOCK-DUPLICATE for repeated condition');
   }
 
+  // UNLOCK-DEPENDENCY-UNKNOWN
+  {
+    const questContent = `# Quest Main
+## Summary
+This summary has sufficient descriptive text to pass guardrails for narratives.
+## Story
+Explain the factions rallying around the quest target and how success changes the balance of power.
+## Hooks
+- Hook from [[default-area]] urging action.
+## Encounters
+- Ambush near the river.
+## Steps
+- Scout the area.
+- Resolve the threat.
+## Rewards
+- XP: 120 XP for restoring order.
+- Gold: 60 gold coins for expenses.
+- Loot: Relic recovered from the shrine.
+- Social: Reputation boost with the town council.
+## Notes
+- NPCs: Council envoy offers support.
+## Outcome
+- The town regains stability.
+## Aftermath
+- Follow-up quest unlocks to secure the outskirts.
+## Outcome Hooks
+- Hook: Merchant requests an escort mission.
+## Conditions
+- Reputation at least Neutral with the council.
+## Fail State
+- Smugglers overrun the trade routes.`;
+    const issues = await runCheck(checkQuests, {
+      'scenario/quests/available.json': [{ quest_id: 'quest-main', title: 'Quest Main' }],
+      'scenario/quests/quest-main.md': questContent,
+      'scenario/quests/unlock-triggers.json': { 'quest-main': ['missing-side-quest'] },
+    });
+    assert(issues.some((i) => i.code === 'UNLOCK-DEPENDENCY-UNKNOWN'), 'Expected UNLOCK-DEPENDENCY-UNKNOWN');
+  }
+
   // QUEST-AREA-BACKLINK
   {
     const issues = await runCheck(checkQuests, {
@@ -250,6 +301,46 @@ async function runCheck(checkFn, files) {
     assert(issues.some((i) => i.code === 'QUEST-SUMMARY-SHORT'), 'Expected QUEST-SUMMARY-SHORT');
     assert(issues.some((i) => i.code === 'QUEST-STEPS-FORMAT'), 'Expected QUEST-STEPS-FORMAT');
     assert(issues.some((i) => i.code === 'QUEST-REWARDS-SHORT'), 'Expected QUEST-REWARDS-SHORT');
+  }
+
+  // COMPLETED-QUEST-UNKNOWN
+  {
+    const questContent = `# Quest Known
+## Summary
+Detailed summary describing the stakes and motivations to satisfy guardrails.
+## Story
+The militia prepares a final push to reclaim the watchtower before rival factions intervene.
+## Hooks
+- Rally point announced at the [[default-area]].
+## Encounters
+- Siege the outer wall.
+## Steps
+- Establish supply lines.
+- Assault the watchtower.
+## Rewards
+- XP: 180 XP for leadership.
+- Gold: 90 gold coins funded by the council.
+- Loot: Banner recovered from the battlements.
+- Social: Influence gain with the militia commanders.
+## Notes
+- NPCs: Commander Aeris coordinates the strike.
+## Outcome
+- Watchtower secured and signaling restored.
+## Aftermath
+- Follow-up scouting missions unlock.
+## Outcome Hooks
+- Hook: Diplomats request protection during negotiations.
+## Conditions
+- Reputation Friendly with militia.
+## Fail State
+- Rival faction captures the watchtower and hinders trade.`;
+    const issues = await runCheck(checkQuests, {
+      'scenario/quests/available.json': [{ quest_id: 'quest-known', title: 'Quest Known' }],
+      'scenario/quests/quest-known.md': questContent,
+      'scenario/quests/unlock-triggers.json': { 'quest-known': 'always' },
+      'player-data/runtime/completed-quests.json': [{ quest_id: 'quest-missing', completed_at: '2025-01-01T00:00:00Z' }],
+    });
+    assert(issues.some((i) => i.code === 'COMPLETED-QUEST-UNKNOWN'), 'Expected COMPLETED-QUEST-UNKNOWN');
   }
 
   // INDEX-EMPTY and MANIFEST-FIELD
@@ -362,7 +453,11 @@ async function runCheck(checkFn, files) {
       'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
       'scenario/index.md': '# Intro\nThis index is long enough to pass the minimum length.',
       'scenario/quests/available.json': [{ quest_id: 'q1', title: 'Quest One' }],
-      'scenario/quests/q1.md': '# Quest One\n## Summary\nThis summary contains enough descriptive text to pass validation.\n## Steps\n- Go to the forest\n- Investigate the ruins\n## Rewards\n- 200 XP and a bronze amulet\n',
+      'scenario/quests/q1.md': '# Quest One\n## Summary\nThis summary contains enough descriptive text to pass validation.\n## Story\nA short story explaining how the elder needs help securing both the square and the training grounds.\n## Hooks\n- Speak with locals in the [[default-area]] to discover the militia shortage.\n- Follow rumors at the [[training-grounds]] that hint at sabotage.\n## Encounters\n- A staged duel that turns deadly when saboteurs interfere.\n- Wilderness ambush near the training trail.\n## Steps\n- Visit the [[default-area]] to meet the elder\n- Investigate the [[training-grounds]] beyond the hill\n## Rewards\n- XP: 200 XP from the guard captain\n- Gold: 80 gold coins for equipment repairs\n- Loot: Enchanted wolf fang amulet recovered near the [[training-grounds]].\n- Social: Reputation boost with the militia council.\n## Notes\n- NPCs: Elder, militia sergeant Isla.\n- Hooks: Unlocks access to advanced drills upon success.\n## Outcome\n- The militia regains control of the outskirts.\n- New training options open for vetted squads.\n## Aftermath\n- Merchants unlock rare gear.\n- Follow-up quest: Patrol the watchtower ruins.\n## Outcome Hooks\n- [[default-area]] NPC response: Elder offers a diplomacy mission.\n- [[training-grounds]] escalation hook: Saboteur cells regroup for revenge.\n## Conditions\n- Reputation at least Friendly with the guard.\n- Finish within two in-game days.\n## Fail State\n- Merchants increase prices by 20%.\n- Rival squad claims the reward and blocks future access.\n',
+      'scenario/areas/default-area.md':
+        '# Default Area\n## Description\nThis description is comfortably over sixty characters to satisfy validator requirements for areas.\n## Points of interest\n- Market square\n## Connections\n- [[training-grounds]]\n[[q1]] quest hook for newcomers\n## Notes\n- NPCs: Elder quest giver.\n- Hooks: Newcomer jobs and market rumors.\n## Conditions\n- Reputation Neutral or higher with the militia.\n- No hostile encounters allowed inside the square.\n## Threats\n- Wolves breaching the square cause merchants to double prices.\n- Rival adventurers may poach quests if ignored for sessions.\n',
+      'scenario/areas/training-grounds.md':
+        '# Training Grounds\n## Description\nA dusty field dedicated to drills and sparring matches for adventurers.\n## Points of interest\n- Weapon racks\n## Connections\n- [[default-area]]\n[[q1]] training session notice\n## Notes\n- NPCs: Sergeant Isla overseeing drills.\n- Hooks: Rival squad challenges and gear requests.\n## Conditions\n- Access allowed only to recruits approved by the elder.\n- Drills must be supervised during daytime hours.\n## Threats\n- Saboteurs may rig training dummies to explode.\n- Skipping nightly patrols triggers wolf ambushes near the village.\n',
       'scenario/quests/unlock-triggers.json': { q1: 'always' },
       'player-data/runtime/state.json': { stats: {} }, // missing mana -> CAP-RUNTIME
       'player-data/runtime/completed-quests.json': [],

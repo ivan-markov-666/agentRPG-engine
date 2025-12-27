@@ -25,14 +25,37 @@
     ```
 
 ### Exploration log helper (CLI)
-- Скрипт: `npm run exploration:add -- --title "..." [--game demo] [--type dungeon] [--area area-id] [--origin player-request|gm-suggested] [--desc "..."] [--tags tag1,tag2]`.
-- Автоматично генерира slug `id`, ISO8601 `added_at`, базов description (ако липсва), опционални `tags` (до 10), поддържа `--area` само ако има съответен `scenario/areas/<area>.md`.
-- Ако `player-data/runtime/exploration-log.json` липсва → създава масив; ако `state.json` няма `exploration_enabled`, го включва и попълва `exploration_log_preview` с последните entry ID-та.
+- Скрипт: `npm run exploration:add -- --title "..." [--game demo] [--type dungeon] [--area area-id] [--origin player-request|gm-suggested] [--desc "..."] [--tags tag1,tag2] [--preview-limit 5] [--preview-mode newest|append]`.
+- Валидира типа срещу guardrails (city/landmark/dungeon/poi автоматично изискват `--area`) и проверява дали целевата area markdown съществува.
+- Ако описанието е твърде кратко (<60 символа) добавя подсказки, за да мине `EXPLORATION-DESCRIPTION-SHORT`. Ако не подадеш tags → добавя placeholder/автотагове (по тип + `area:<id>`) за минимум 1 таг. Скриптът поддържа до 10 уникални тага и обновява `state.exploration_log_preview`, като `--preview-limit` и `--preview-mode` контролират подредбата (по подразбиране newest, алтернатива append).
 
 ### Quest helper (CLI)
-- Скрипт: `npm run quest:add -- --title "..." [--id quest-slug] [--summary "..."] [--steps "Step A|Step B"] [--rewards "500 XP|Rare loot"] [--game demo]`.
-- Автоматично генерира slug `quest_id` (ако не е подаден), проверява `scenario/quests/available.json` за дублирани ID/заглавия (поддържа масив или map), добавя новия запис и създава Markdown файл с `Summary / Steps / Rewards` скеле.
-- Стъпките по подразбиране са номериран списък; наградите получават placeholder, ако не са подадени. Скриптът отказва да overwrite-ва съществуващ quest файл, за да пази историите.
+- Скрипт: `npm run quest:add -- --title "..." [--id quest-slug] [--summary "..."] [--story "..."] [--hooks "Hook A|Hook B"] [--encounters "Fight|Puzzle"] [--steps "Step A|Step B"] [--rewards "500 XP|Rare loot"] [--notes "NPC: ...|Consequence: ..."] [--outcome "Success hook|Faction change"] [--aftermath "Follow-up hook|World change"] [--outcome-hooks "Hook1|Hook2"] [--conditions "Prereq|Timer"] [--fail "Outcome|Consequence"] [--areas "default-area|training-grounds"] [--game demo]`.
+- Автоматично генерира slug `quest_id` (ако не е подаден), проверява `scenario/quests/available.json` за дублирани ID/заглавия (поддържа масив или map), добавя новия запис и създава Markdown файл със секции `Summary / Story / Hooks / Encounters / Steps / Rewards / Notes / Outcome / Aftermath / Outcome Hooks / Conditions / Fail State (+ Linked Areas)`.
+- Ако не подадеш стойности, скриптът попълва placeholder bullets: Hooks/Encounters/Outcome/Aftermath/Outcome Hooks/Notes с "-" списъци, Steps като номериран списък (>=2), Rewards с XP/Gold/Loot/Social шаблон. Така новият quest файл минава guardrails директно.
+- `--areas` валидира съществуването на таргет area файлове и добавя `## Linked Areas`. Допълнителни automation-и:
+  1. `--auto-area-notes` → бележка в area `## Notes` (`- Quest hook: [[quest-id]] — Title`).
+  2. `--auto-area-hooks` → напомняне в quest Notes (`- [[area]]: Add encounter/POI hooks…`).
+  3. `--auto-encounters` → генерира `"Encounter near [[area]]: ..."` entries.
+  4. `--sync-area-notes` → копира area Notes в quest Hooks/Encounters.
+  5. `--area-conditions` / `--area-threats` → копират area Conditions/Threats към quest Conditions/Fail State.
+  6. `--auto-outcome-hooks` → извлича ноти/условия/заплахи от areas и прави `Outcome Hooks`.
+  7. `--auto-rewards-breakdown` → гарантира XP/Gold/Loot/Social редове според стъпки, areas и `--reward-tier`.
+  8. `--reward-tier easy|standard|epic` → мащабира XP/Gold сумите при автоматично генериране на Rewards.
+  9. `--auto-area-backlinks` → добавя `[[quest-id]] quest tie-in` ред под `## Connections` във всяка свързана area, за да поддържа двупосочни линкове.
+  10. `--unlock "<policy>"` и `--unlock-requires "quest-a|quest-b"` → директно попълват `unlock-triggers.json` с условие (`always`, `faction:trusted`, и т.н.) и списък dependencies (други quest id или token-и). Комбинираното значение е `[policy, ...requires]`, при липса на данни се използва `always`.
+  11. `--exploration-hook` → гарантира, че всяка линкната area има запис в `player-data/runtime/exploration-log.json` с `quest:<id>` таг (създава/обновява лог-а автоматично, за да отговори на `EXPLORATION-QUEST-*` guardrails).
+
+### Economy tooling
+- Команда `npm run economy:report -- --game demo [--json out.json]` събира Rewards breakdown от всички куестове, агрегира XP/Gold общо/средно и показва Loot/Social броячите. При `--json` записва подробен отчет (пер-квест стойности + предупреждения за липсващи файлове) в JSON.
+
+### Scenario overview helper
+- `npm run scenario:index -- --game demo` регенерира `games/<game>/scenario/index.md`, генерирайки таблица с всички куестове (линкове, unlock conditions, кратки summary) и всички areas (линк + описание). Това гарантира, че `scenario/index.md` никога не пада под минималната дължина (`INDEX-SHORT`) и предоставя актуален roadmap за GM екипа.
+
+### Area helper (CLI)
+- Скрипт: `npm run area:add -- --id area-slug [--title "..."] [--description "..."] [--points "POI A|POI B"] [--connections "Link A|Link B"] [--notes "NPC: ...|Threat: ..."] [--conditions "Prereq|Timer"] [--threats "Escalation|Fail"] [--game demo]`.
+- Генерира slug за файл `scenario/areas/<id>.md`, проверява дали не съществува и scaffold-ва секции `Description / Points of interest / Connections / Notes`.
+- Ако не подадеш стойности → описанието получава 2-6 изречения placeholder; POI/Connections се попълват с примерни bullet-и, Notes съдържа NPC/Threat подсказки, а Conditions/Threats добавят изисквания/ескалации. Така новите area файлове покриват `AREA-POINTS-*`, `AREA-CONNECTIONS-*`, `AREA-NOTES-*`, `AREA-CONDITIONS-*`, `AREA-THREATS-*` guardrails по подразбиране.
 
 ### Release checklist (преди GM session / pre-release)
 - 1) (По нужда) Добави/обнови area: `npm run area:add -- --id <area-id> --title "..." --description "..." --game <gameId>`
@@ -67,6 +90,21 @@
   }
   ```
 
+### Sprint Metrics Workflow
+1. **Локално validate + telemetry:** стартирай `npm run validate:metrics -- --path games/<gameId> --run-id <tag>`, който ще изпълни валидатора и автоматично ще запише telemetry (`docs/analysis/reports/telemetry-history.json`) и регенерира `metrics-summary.md`.
+2. **Custom history/output (по избор):** `npm run metrics:report -- --history docs/analysis/reports/telemetry-history.json --out docs/analysis/metrics-summary.md --limit 10`.
+3. **Архив преди release или при ≥50 run-а:** `npm run archive:telemetry -- --label sprint01`.
+4. **Definition of Done:** следи `docs/analysis/metrics-summary.md` да показва ≥3 поредни clean run-а, avg duration <200 ms, snapshot `New codes = none`.
+
+### Git hook (pre-push validate + metrics)
+1. Скрипт: `scripts/pre-push-validate.sh` приема средата `ARPG_GAME`, `ARPG_RUN_ID`, `ARPG_LIMIT` (по избор) и изпълнява `npm run validate:metrics -- --game <game> --run-id <tag> --auto-archive 50`.
+2. Инсталация:
+   ```bash
+   cp scripts/pre-push-validate.sh .git/hooks/pre-push
+   chmod +x .git/hooks/pre-push
+   ```
+3. По желание за PowerShell: добави `.git/hooks/pre-push` файл, който извиква `pwsh -File scripts\\pre-push-validate.ps1` (ако добавиш еквивалентен PS скрипт). Това гарантира автоматично DoD валидиране преди `git push`.
+
 ### Telemetry baseline (22 дек 2025)
 | Показател | Стойност | Източник |
 |-----------|----------|----------|
@@ -79,11 +117,43 @@
 
 ## Sprint 01 — Validator Reliability
 - **Schema guardrails:** `config/capabilities.*` и `player-data/runtime/state.json` вече се валидират чрез JSON Schema + Ajv (вкл. `ajv-formats`). Валидацията следи вложени стойности (`reputation.*`, `currency.*`, `status_effects.*.stack>=0`) и връща `CAP-RUNTIME-RANGE` / `CAP-STATUS-STACK` при отклонения.
-- **Exploration log schema:** `player-data/runtime/exploration-log.json` минава през `EXPLORATION-SCHEМА` guardrail (slug `id`, тип от {`city`,`landmark`,`dungeon`,`mcp`,`side-quest-hook`,`poi`}, `added_at` ISO8601, `origin` = `player-request`/`gm-suggested`, описания ≥40 символа, `tags` ≤10 уникални записа). Липсващ/празен лог при включено exploration води до `FILE-MISSING-OPTIONAL` / `EXPLORATION-EMPTY`. Допълнителни проверки: `EXPLORATION-DESCRIPTION-SHORT`, `EXPLORATION-TAGS-MIN`, `EXPLORATION-DUPLICATE-*`, `EXPLORATION-AREA-MISSING`, както и `EXPLORATION-PREVIEW-MISMATCH` когато `state.json` съдържа preview ID-та без реални записи.
+- **Exploration log schema:** `player-data/runtime/exploration-log.json` минава през `EXPLORATION-SCHEМА` guardrail (slug `id`, тип от {`city`,`landmark`,`dungeon`,`mcp`,`side-quest-hook`,`poi`}, `added_at` ISO8601, `origin` = `player-request`/`gm-suggested`, описания ≥60 символа, `tags` 1–10 уникални записа). Липсващ/празен лог при включено exploration води до `FILE-MISSING-OPTIONAL` / `EXPLORATION-EMPTY`. Допълнителни проверки: `EXPLORATION-DESCRIPTION-SHORT`, `EXPLORATION-TAGS-MIN`, `EXPLORATION-DUPLICATE-*`, `EXPLORATION-AREA-MISSING`, както и `EXPLORATION-PREVIEW-MISMATCH` когато `state.json` съдържа preview ID-та без реални записи.
 - **Unit & integration tests:** `tools/validator/tests/validator.test.js` покрива SCHEMA guardrails, YAML fallback, snapshot/ignore сценарий и изисква чист `scenario/index.md`.
-- **Quest / area guardrails:** `available.json` засича `QUEST-ID-DUPLICATE`, заглавия под 5 символа (`QUEST-TITLE-SHORT`) и липсващи unlock политики (`UNLOCK-MISSING`). Unlock стойностите проверяват празни/дублирани условия (`UNLOCK-EMPTY`, `UNLOCK-DUPLICATE`, `UNLOCK-VALUE-TYPE`). Линковете към `[[areas]]` искат двупосочни връзки (`QUEST-AREA-BACKLINK`). Новият area guardrail следи `scenario/areas/*.md` за задължителни секции, списъци и валидни линкове (`AREA-DESCRIPTION`, `AREA-POINTS`, `AREA-CONNECTIONS`, `AREA-LINK`, `AREA-QUEST-BACKLINK`, др.).
+- **Quest / area guardrails:** `available.json` засича `QUEST-ID-DUPLICATE`, заглавия под 5 символа (`QUEST-TITLE-SHORT`) и липсващи unlock политики (`UNLOCK-MISSING`). Unlock стойностите проверяват празни/дублирани условия (`UNLOCK-EMPTY`, `UNLOCK-DUPLICATE`, `UNLOCK-VALUE-TYPE`). Линковете към `[[areas]]` искат двупосочни връзки (`QUEST-AREA-BACKLINK`). Quest файловете задължително съдържат `Summary`, `Story`, `Hooks`, `Encounters`, `Steps`, `Rewards` и `Notes` секции (Steps ≥2 entries, Rewards/Hooks/Encounters/Notes ≥1). Area файловете следят за `Description` ≥60 символа, списъци в `Points of interest` и `Connections`, плюс `Notes` bullet list за NPC hooks/заплахи (`AREA-NOTES-*`). Guardrail-ите `AREA-LINK` и `AREA-QUEST-BACKLINK` гарантират, че връзките към quests са реални и двупосочни.
 - **Telemetry отчети:** пусни `npm run metrics:report` (по избор с `--history <file> --out <file> --limit <N>`), за да регенерираш `docs/analysis/metrics-summary.md` от `docs/analysis/reports/telemetry-history.json`.
 - **DoD reminder:** ≥3 последователни чисти run-а (`errors=0`, `warnings=0`, `CAP errors=0`, snapshot `New codes = none`, средно време <200 ms). Документ: `docs/analysis/build-focus-2025-12-sprint01.md`.
+
+**Пример quest / area секции**
+
+```markdown
+# Quest Name
+## Summary
+Кратък pitch (≥30 символа).
+## Story
+По-дълъг narrative контекст.
+## Hooks
+- Списък с GM prompts / table entries.
+## Encounters
+- Списък с врагове или препятствия.
+## Steps
+1. Насочени стъпки (≥2).
+## Rewards
+- XP / loot / социални последици (≥1).
+## Notes
+- NPC hooks, тайни, специални условия.
+```
+
+```markdown
+# Area Name
+## Description
+≥60 символа атмосфера.
+## Points of interest
+- Списък с POI (≥1).
+## Connections
+- Списък с линкове към други areas/quests (≥1).
+## Notes
+- NPC-та, plot hooks, опасности.
+```
 
 **Пример exploration log entry**
 ```json

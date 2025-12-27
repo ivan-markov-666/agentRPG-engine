@@ -3,6 +3,7 @@
     "id": "testlocation",
     "title": "TestLocation",
     "type": "poi",
+    "area_id": "default-area",
     "added_at": "2025-12-22T21:23:50.736Z",
     "origin": "player-request",
     "tags": ["mystery"],

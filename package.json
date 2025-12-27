@@ -5,9 +5,12 @@
   "scripts": {
     "validate": "node tools/validator/index.js",
     "test": "node tools/validator/tests/validator.test.js",
+    "validate:metrics": "node tools/scripts/validate-metrics.js",
     "archive:telemetry": "node tools/archive-telemetry.js",
     "metrics:report": "node tools/metrics/report.js",
     "exploration:add": "node tools/exploration/add-entry.js",
+    "economy:report": "node tools/economy/report.js",
+    "scenario:index": "node tools/scenario/update-index.js",
     "quest:add": "node tools/quests/add-quest.js",
     "area:add": "node tools/areas/add-area.js"
   },
