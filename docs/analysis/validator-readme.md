@@ -4,9 +4,9 @@
 Проверява файловите договори на игра върху AgentRPG Engine: задължителни файлове, CAP-* правила, orphans, quest ID↔title. Опционално генерира JSON репорт за telemetry.
 
 ## Използване
-- `node tools/validator/index.js --path games/<gameId> [--json out.json] [--append] [--debug] [--strict] [--summary] [--run-id <id>] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2] [--auto-archive 50]`
-- npm script (package.json): `npm run validate -- --path games/<gameId> [--json out.json] [--append] [--debug] [--strict] [--summary] [--run-id <id>] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2] [--auto-archive 50]`
-- Ако няма `--run-id`, логът ползва auto-id (timestamp) и append-ва, ако файлът вече е масив.
+- `node tools/validator/index.js --path games/<gameId> --run-id <id> [--json out.json] [--append] [--debug] [--strict] [--summary] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2] [--auto-archive 50]`
+- npm script (package.json): `npm run validate -- --path games/<gameId> --run-id <id> [--json out.json] [--append] [--debug] [--strict] [--summary] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2] [--auto-archive 50]`
+- Без `--run-id` CLI прекратява изпълнение (`[ERROR][RUN-ID] Missing required --run-id <value>`). Използвай helper скриптовете `tools/scripts/run-id.(ps1|sh)` за генерация.
 - `--append` (с `--json out.json`): апендва новия резултат в масив, ако файлът е масив; иначе overwrite.
 - `--strict`: treat WARN като ERROR.
 - `--summary`: показва само обобщение (удобно за CI или бърз lint pass).
@@ -14,11 +14,11 @@
 - `--ignore CODE1,CODE2`: временно скрива изброените кодове от отчета (само за локални експерименти).
 
 ### Примерни команди
-- Базова проверка: `npm run validate -- --path games/demo`
-- Запис в JSON + append: `npm run validate -- --path games/demo --json reports/last.json --append`
-- Строг режим: `npm run validate -- --path games/demo --strict`
-- Snapshot срещу предишен отчет: `npm run validate -- --path games/demo --json reports/last.json --append --snapshot reports/last.json`
-- Telemetry с run-id: `npm run validate -- --path games/demo --run-id dev-001 --log telemetry.json`
+- Базова проверка: `npm run validate -- --path games/demo --run-id dev-local`
+- Запис в JSON + append: `npm run validate -- --path games/demo --run-id dev-local --json reports/last.json --append`
+- Строг режим: `npm run validate -- --path games/demo --run-id dev-local --strict`
+- Snapshot срещу предишен отчет: `npm run validate -- --path games/demo --run-id dev-local --json reports/last.json --append --snapshot reports/last.json`
+- Telemetry + log: `npm run validate -- --path games/demo --run-id dev-001 --log docs/analysis/reports/telemetry-history.json`
 - Debug (показва INFO): `npm run validate -- --path games/demo --debug`
 - Snapshot пример (2 run-а, append):  
   1) `npm run validate -- --path games/demo --json reports/last.json --append`  
@@ -52,7 +52,7 @@
 - `--auto-archive <N>` (по избор): след успешен telemetry лог автоматично извиква архивиращия скрипт, ако историята има ≥N записи. При skip отпечатва `[AUTO-ARCHIVE][SKIP]`, при успех `[AUTO-ARCHIVE] Archived ...` и рестартира history файла.
 - Exit code: 0 само когато няма ERRORS и guardrail side-effects са успешни.
 - JSON (ако `--json out.json`): `{ errors, warnings, cap_errors, issues: [...] }`
-- Telemetry лог (ако `--run-id` и `--log`): `{ run_id, timestamp, duration_ms, errors, warnings, issues }`
+- Telemetry лог (изисква `--run-id` + `--log`): `{ runId, run_id, timestamp, duration_ms, errors, warnings, issues }`
 
 ### Troubleshooting (guards)
 - `[ERROR][SNAPSHOT] ENOENT ...` — провери, че файлът, подаден към `--snapshot`, съществува (или махни флага). Провалът е блокиращ → CLI връща 1.

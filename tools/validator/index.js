@@ -99,7 +99,11 @@ async function main() {
     process.exit(1);
   }
   if (!args.path) {
-    console.error('Usage: npx agentrpg-validate --path games/<gameId> [--json out.json] [--append] [--debug] [--strict] [--snapshot prev.json] [--summary] [--ignore CODE1,CODE2]');
+    console.error('Usage: npx agentrpg-validate --path games/<gameId> --run-id <id> [--json out.json] [--append] [--debug] [--strict] [--snapshot prev.json] [--summary] [--ignore CODE1,CODE2]');
+    process.exit(1);
+  }
+  if (!args.runId || !args.runId.trim()) {
+    console.error('[ERROR][RUN-ID] Missing required --run-id <value>. Generate one via tools/scripts/run-id.(ps1|sh).');
     process.exit(1);
   }
   const startTime = Date.now();
