@@ -6,6 +6,7 @@ The militia's training yard sits on a rocky hill overlooking the village, filled
 ## Points of interest
 - Weapon racks with practice gear
 - Observation deck for the militia sergeant
+- [[main-quest-01]] mission board tracking wolf sightings beyond the hill.
 
 ## Connections
 - [[default-area]] main gate
@@ -14,7 +15,7 @@ The militia's training yard sits on a rocky hill overlooking the village, filled
 ## Notes
 - NPCs: Sergeant Isla (drill instructor) and quartermaster Bren.
 - Encounters: Training duels that can become real if saboteurs strike.
-- Hooks: Rumors about sabotage attempts and missing supply crates.
+- Hooks: Rumors about sabotage attempts, missing supply crates, and updates on [[main-quest-01]].
 
 ## Conditions
 - Access allowed only to recruits approved by the elder or guard captain.

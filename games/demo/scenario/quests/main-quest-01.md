@@ -13,9 +13,10 @@ The elder reveals that strange howls echo from the forest while the training gro
 4. Report back to the elder for your reward.
 
 ## Rewards
-- 150 XP
-- 50 gold pieces
-- Reputation boost with the village
+- XP: 150 XP for defending the outskirts and restoring patrol routes.
+- Gold: 50 gold pieces plus resupply vouchers from the elder.
+- Loot: Wolf-fang charm that grants advantage on the next tracking check.
+- Social: Reputation boost with the village militia and merchants.
 
 ## Hooks
 - Visiting the [[default-area]] elder unlocks access to the militia quartermaster.

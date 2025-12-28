@@ -7,6 +7,8 @@
     "test": "node tools/validator/tests/validator.test.js",
     "validate:metrics": "node tools/scripts/validate-metrics.js",
     "archive:telemetry": "node tools/archive-telemetry.js",
+    "archive:telemetry:ps": "powershell -ExecutionPolicy Bypass -File tools/scripts/archive-telemetry.ps1",
+    "archive:telemetry:sh": "bash tools/scripts/archive-telemetry.sh",
     "metrics:report": "node tools/metrics/report.js",
     "exploration:add": "node tools/exploration/add-entry.js",
     "economy:report": "node tools/economy/report.js",

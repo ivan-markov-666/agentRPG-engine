@@ -14,7 +14,7 @@ status_definitions:
   done: Story е приета.
 
 development_status:
-  ST-001: ready-for-dev
+  ST-001: done
   ST-002: ready-for-dev
   ST-003: ready-for-dev
   ST-004: ready-for-dev

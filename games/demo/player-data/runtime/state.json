@@ -29,6 +29,7 @@
   },
   "exploration_enabled": true,
   "exploration_log_preview": [
-    "testlocation"
+    "village-square",
+    "training-spur"
   ]
 }

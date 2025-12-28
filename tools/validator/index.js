@@ -13,28 +13,57 @@ const { writeLog } = require('./utils/telemetry');
 
 function parseArgs(argv) {
   const args = { path: null, json: null, debug: false, runId: null, log: null, appendJson: false, strict: false, snapshot: null, summary: false, ignore: [] };
+  const valueFlags = new Set(['--path', '-p', '--json', '--run-id', '--log', '--snapshot', '--ignore']);
+
   for (let i = 2; i < argv.length; i++) {
-    const a = argv[i];
-    if ((a === '--path' || a === '-p') && argv[i + 1]) {
-      args.path = argv[++i];
-    } else if (a === '--json' && argv[i + 1]) {
-      args.json = argv[++i];
-    } else if (a === '--append') {
-      args.appendJson = true;
-    } else if (a === '--debug') {
-      args.debug = true;
-    } else if (a === '--strict') {
-      args.strict = true;
-    } else if (a === '--run-id' && argv[i + 1]) {
-      args.runId = argv[++i];
-    } else if (a === '--log' && argv[i + 1]) {
-      args.log = argv[++i];
-    } else if (a === '--snapshot' && argv[i + 1]) {
-      args.snapshot = argv[++i];
-    } else if (a === '--summary') {
-      args.summary = true;
-    } else if (a === '--ignore' && argv[i + 1]) {
-      args.ignore = argv[++i].split(',').map((s) => s.trim()).filter(Boolean);
+    const flag = argv[i];
+    const needsValue = valueFlags.has(flag);
+    const nextValue = needsValue ? argv[i + 1] : null;
+
+    if (needsValue) {
+      if (!nextValue || nextValue.startsWith('-')) {
+        throw new Error(`Flag ${flag} expects a value`);
+      }
+    }
+
+    switch (flag) {
+      case '--path':
+      case '-p':
+        args.path = argv[++i];
+        break;
+      case '--json':
+        args.json = argv[++i];
+        break;
+      case '--append':
+        args.appendJson = true;
+        break;
+      case '--debug':
+        args.debug = true;
+        break;
+      case '--strict':
+        args.strict = true;
+        break;
+      case '--run-id':
+        args.runId = argv[++i];
+        break;
+      case '--log':
+        args.log = argv[++i];
+        break;
+      case '--snapshot':
+        args.snapshot = argv[++i];
+        break;
+      case '--summary':
+        args.summary = true;
+        break;
+      case '--ignore':
+        args.ignore = argv[++i].split(',').map((s) => s.trim()).filter(Boolean);
+        break;
+      default:
+        if (flag.startsWith('-')) {
+          throw new Error(`Unknown flag: ${flag}`);
+        } else {
+          throw new Error(`Unexpected argument: ${flag}`);
+        }
     }
   }
   return args;
@@ -46,7 +75,13 @@ function loadJson(filePath) {
 }
 
 async function main() {
-  const args = parseArgs(process.argv);
+  let args;
+  try {
+    args = parseArgs(process.argv);
+  } catch (err) {
+    console.error(`[ERROR][ARGS] ${err.message}`);
+    process.exit(1);
+  }
   if (!args.path) {
     console.error('Usage: npx agentrpg-validate --path games/<gameId> [--json out.json] [--append] [--debug] [--strict] [--snapshot prev.json] [--summary] [--ignore CODE1,CODE2]');
     process.exit(1);
@@ -55,6 +90,7 @@ async function main() {
   const base = path.resolve(args.path);
   const issues = [];
   const context = { base, loadJson, issues };
+  let guardrailViolation = false;
 
   await checkRequiredFiles(context);
   await checkSchemas(context);
@@ -97,7 +133,8 @@ async function main() {
         console.log(`[INFO][SNAPSHOT] New codes: ${newCodes.join(', ') || 'none'} | Resolved: ${resolvedCodes.join(', ') || 'none'}`);
       }
     } catch (e) {
-      console.error('[WARN][SNAPSHOT]', e.message);
+      console.error('[ERROR][SNAPSHOT]', e.message);
+      guardrailViolation = true;
     }
   }
 
@@ -110,10 +147,11 @@ async function main() {
     try {
       writeLog(args.runId, args.log, issues, startTime);
     } catch (e) {
-      console.error('[WARN][LOG]', e.message);
+      console.error('[ERROR][LOG]', e.message);
+      guardrailViolation = true;
     }
   }
-  process.exit(hasError ? 1 : 0);
+  process.exit(hasError || guardrailViolation ? 1 : 0);
 }
 
 main().catch((err) => {

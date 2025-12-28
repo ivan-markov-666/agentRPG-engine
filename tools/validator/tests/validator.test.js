@@ -475,6 +475,64 @@ The militia prepares a final push to reclaim the watchtower before rival faction
     assert.strictEqual(Number(m[2]), 0, `Ignore should remove CAP-RUNTIME warning\n${outIgnoreCombined}`);
   }
 
+  // Unknown flag rejection
+  {
+    const base = setupGame({
+      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+      'scenario/index.md': '# Intro\nSome text here that is long enough.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+      'config/capabilities.json': {},
+    });
+    const cliPath = path.resolve(__dirname, '../index.js');
+    const result = spawnSync('node', [cliPath, '--path', base, '--fake-flag'], { encoding: 'utf8' });
+    const output = `${result.stdout || ''}${result.stderr || ''}`;
+    assert.strictEqual(result.status, 1, `CLI should exit 1 on unknown flag\n${output}`);
+    assert(output.includes('Unknown flag'), `Unknown flag error should be reported\n${output}`);
+  }
+
+  // Snapshot guardrail failure should exit 1
+  {
+    const base = setupGame({
+      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+      'scenario/index.md': '# Intro\nSome text here that is long enough.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': { stats: {} },
+      'player-data/runtime/completed-quests.json': [],
+      'config/capabilities.json': {},
+    });
+    const cliPath = path.resolve(__dirname, '../index.js');
+    const missingSnapshot = path.join(base, 'missing-snapshot.json');
+    const result = spawnSync('node', [cliPath, '--path', base, '--snapshot', missingSnapshot], { encoding: 'utf8' });
+    const output = `${result.stdout || ''}${result.stderr || ''}`;
+    assert.strictEqual(result.status, 1, `CLI should exit 1 when snapshot read fails\n${output}`);
+    assert(output.includes('[ERROR][SNAPSHOT]'), `Snapshot guardrail error should be reported\n${output}`);
+  }
+
+  // Log guardrail failure should exit 1
+  {
+    const base = setupGame({
+      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+      'scenario/index.md': '# Intro\nThis scenario overview contains enough descriptive content to pass guardrails easily.',
+      'scenario/quests/available.json': [{ quest_id: 'q1', title: 'Quest One' }],
+      'scenario/quests/q1.md': '# Quest One\n## Summary\nThis summary contains enough descriptive detail to satisfy the validator requirements for minimum length.\n## Steps\n- Visit the [[default-area]]\n## Rewards\n- XP: 50 experience for helping the militia.\n- Gold: 10 coins for supplies.\n- Loot: Wolf-fang charm token.\n- Social: Praise from the village council.\n',
+      'scenario/quests/unlock-triggers.json': {},
+      'scenario/areas/default-area.md': '# Default Area\n## Description\nThis is a sufficiently long description explaining the default area details and its bustling market square.\n## Points of interest\n- Market stall\n## Connections\n- [[training-grounds]]\n',
+      'scenario/areas/training-grounds.md': '# Training Grounds\n## Description\nTraining grounds description that exceeds the minimum description guardrail length for validation.\n## Points of interest\n- Weapon racks\n## Connections\n- [[default-area]]\n',
+      'player-data/runtime/state.json': { stats: {} },
+      'player-data/runtime/completed-quests.json': [],
+      'config/capabilities.json': {}
+    });
+    const cliPath = path.resolve(__dirname, '../index.js');
+    const result = spawnSync('node', [cliPath, '--path', base, '--run-id', 'test-run', '--log', base], { encoding: 'utf8' });
+    const output = `${result.stdout || ''}${result.stderr || ''}`;
+    assert.strictEqual(result.status, 1, `CLI should exit 1 when telemetry log write fails\n${output}`);
+    assert(output.includes('[ERROR][LOG]'), `Log guardrail error should be reported\n${output}`);
+  }
+
   console.log('All validator tests passed.');
 })().catch((err) => {
   console.error(err);
