@@ -303,9 +303,9 @@ Explain the factions rallying around the quest target and how success changes th
     assert(issues.some((i) => i.code === 'QUEST-REWARDS-SHORT'), 'Expected QUEST-REWARDS-SHORT');
   }
 
-  // COMPLETED-QUEST-UNKNOWN
-  {
-    const questContent = `# Quest Known
+// COMPLETED-QUEST-UNKNOWN
+{
+  const questContent = `# Quest Known
 ## Summary
 Detailed summary describing the stakes and motivations to satisfy guardrails.
 ## Story
@@ -334,121 +334,120 @@ The militia prepares a final push to reclaim the watchtower before rival faction
 - Reputation Friendly with militia.
 ## Fail State
 - Rival faction captures the watchtower and hinders trade.`;
-    const issues = await runCheck(checkQuests, {
-      'scenario/quests/available.json': [{ quest_id: 'quest-known', title: 'Quest Known' }],
-      'scenario/quests/quest-known.md': questContent,
-      'scenario/quests/unlock-triggers.json': { 'quest-known': 'always' },
-      'player-data/runtime/completed-quests.json': [{ quest_id: 'quest-missing', completed_at: '2025-01-01T00:00:00Z' }],
-    });
-    assert(issues.some((i) => i.code === 'COMPLETED-QUEST-UNKNOWN'), 'Expected COMPLETED-QUEST-UNKNOWN');
-  }
+  const issues = await runCheck(checkQuests, {
+    'scenario/quests/available.json': [{ quest_id: 'quest-known', title: 'Quest Known' }],
+    'scenario/quests/quest-known.md': questContent,
+    'scenario/quests/unlock-triggers.json': { 'quest-known': 'always' },
+    'player-data/runtime/completed-quests.json': [{ quest_id: 'quest-missing', completed_at: '2025-01-01T00:00:00Z' }],
+  });
+  assert(issues.some((i) => i.code === 'COMPLETED-QUEST-UNKNOWN'), 'Expected COMPLETED-QUEST-UNKNOWN');
+}
 
-  // INDEX-EMPTY and MANIFEST-FIELD
-  {
-    const issues = await runCheck(checkRequiredFiles, {
-      'manifest/entry.json': { id: 'game-1' }, // missing title/version
-      'scenario/index.md': '',
-      'scenario/quests/available.json': [],
-      'scenario/quests/unlock-triggers.json': {},
-      'player-data/runtime/state.json': {},
-      'player-data/runtime/completed-quests.json': [],
-      'config/capabilities.json': {},
-    });
-    assert(issues.some((i) => i.code === 'INDEX-EMPTY'), 'Expected INDEX-EMPTY');
-    assert(issues.some((i) => i.code === 'MANIFEST-FIELD'), 'Expected MANIFEST-FIELD');
-  }
+// INDEX-EMPTY and MANIFEST-FIELD
+{
+  const issues = await runCheck(checkRequiredFiles, {
+    'manifest/entry.json': { id: 'game-1' }, // missing title/version
+    'scenario/index.md': '',
+    'scenario/quests/available.json': [],
+    'scenario/quests/unlock-triggers.json': {},
+    'player-data/runtime/state.json': {},
+    'player-data/runtime/completed-quests.json': [],
+    'config/capabilities.json': {},
+  });
+  assert(issues.some((i) => i.code === 'INDEX-EMPTY'), 'Expected INDEX-EMPTY');
+  assert(issues.some((i) => i.code === 'MANIFEST-FIELD'), 'Expected MANIFEST-FIELD');
+}
 
-  // Integration: snapshot + strict
-  {
-    const base1 = setupGame({
-      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
-      'scenario/index.md': '# Intro\nSome text here that is long enough.',
-      'scenario/quests/available.json': [{ quest_id: 'q1', title: 'Quest 1' }],
-      'scenario/quests/q1.md': '# Q1\n## Summary\ntext\n## Steps\n- step\n## Rewards\n- xp',
-      'scenario/quests/unlock-triggers.json': {},
-      'player-data/runtime/state.json': { stats: {} }, // missing mana
-      'player-data/runtime/completed-quests.json': [],
-      'config/capabilities.json': { mana: { enabled: true, min: 0, max: 10 } },
-    });
-    const snapFile = path.join(base1, 'snap.json');
-    const cliPath = path.resolve(__dirname, '../index.js');
-    // First run produces CAP-RUNTIME (warn) and writes snapshot
-    const first = spawnSync('node', [cliPath, '--path', base1, '--json', snapFile], { encoding: 'utf8' });
-    assert.strictEqual(first.status, 0, `First run should exit 0, got ${first.status}\n${first.stdout}\n${first.stderr}`);
-    // Second run with stats fixed, snapshot should report resolved CAP-RUNTIME
-    fs.writeFileSync(path.join(base1, 'player-data/runtime/state.json'), JSON.stringify({ stats: { mana: 5 } }, null, 2));
-    const second = spawnSync('node', [cliPath, '--path', base1, '--json', snapFile, '--append', '--snapshot', snapFile], { encoding: 'utf8' });
-    assert.strictEqual(second.status, 0, `Second run should exit 0, got ${second.status}\n${second.stdout}\n${second.stderr}`);
-    assert(second.stdout.includes('Resolved: CAP-RUNTIME'), 'Snapshot should report resolved CAP-RUNTIME');
-    // Strict mode should fail when warning exists
-    fs.writeFileSync(path.join(base1, 'player-data/runtime/state.json'), JSON.stringify({ stats: {} }, null, 2));
-    const strictRun = spawnSync('node', [cliPath, '--path', base1, '--strict'], { encoding: 'utf8' });
-    assert.strictEqual(strictRun.status, 1, 'Strict should exit with error when WARN present');
-  }
+// Integration: snapshot + strict
+{
+  const base1 = setupGame({
+    'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+    'scenario/index.md': '# Intro\nSome text here that is long enough.',
+    'scenario/quests/available.json': [{ quest_id: 'q1', title: 'Quest 1' }],
+    'scenario/quests/q1.md': '# Q1\n## Summary\ntext\n## Steps\n- step\n## Rewards\n- xp',
+    'scenario/quests/unlock-triggers.json': {},
+    'player-data/runtime/state.json': { stats: {} }, // missing mana
+    'player-data/runtime/completed-quests.json': [],
+    'config/capabilities.json': { mana: { enabled: true, min: 0, max: 10 } },
+  });
+  const snapFile = path.join(base1, 'snap.json');
+  const cliPath = path.resolve(__dirname, '../index.js');
+  // First run produces CAP-RUNTIME (warn) and writes snapshot
+  const first = spawnSync('node', [cliPath, '--path', base1, '--run-id', 'snap-1', '--json', snapFile], { encoding: 'utf8' });
+  assert.strictEqual(first.status, 0, `First run should exit 0, got ${first.status}\n${first.stdout}\n${first.stderr}`);
+  // Second run with stats fixed, snapshot should report resolved CAP-RUNTIME
+  fs.writeFileSync(path.join(base1, 'player-data/runtime/state.json'), JSON.stringify({ stats: { mana: 5 } }, null, 2));
+  const second = spawnSync('node', [cliPath, '--path', base1, '--run-id', 'snap-2', '--json', snapFile, '--append', '--snapshot', snapFile], { encoding: 'utf8' });
+  assert.strictEqual(second.status, 0, `Second run should exit 0, got ${second.status}\n${second.stdout}\n${second.stderr}`);
+  assert(second.stdout.includes('Resolved: CAP-RUNTIME'), 'Snapshot should report resolved CAP-RUNTIME');
+  // Strict mode should fail when warning exists
+  fs.writeFileSync(path.join(base1, 'player-data/runtime/state.json'), JSON.stringify({ stats: {} }, null, 2));
+  const strictRun = spawnSync('node', [cliPath, '--path', base1, '--run-id', 'snap-3', '--strict'], { encoding: 'utf8' });
+  assert.strictEqual(strictRun.status, 1, 'Strict should exit with error when WARN present');
+}
 
-  // YAML fallback (expects WARN if yaml module missing)
-  {
-    const base = setupGame({
-      'config/capabilities.yml': 'mana:\n  enabled: true\n',
-    });
-    const issues = [];
-    const ctx = { base, loadJson, issues };
-    await checkCapabilities(ctx);
-    const hasYamlWarn = issues.some((i) => i.code === 'YAML-NOT-AVAILABLE' || i.code === 'YAML-PARSE');
-    const yamlInstalled = (() => {
-      try {
-        require.resolve('yaml');
-        return true;
-      } catch (e) {
-        return false;
-      }
-    })();
-    if (yamlInstalled) {
-      assert(!hasYamlWarn, 'YAML module installed; should parse without warnings');
-    } else {
-      assert(hasYamlWarn, 'Expected YAML warning when parser is missing');
+// YAML fallback (expects WARN if yaml module missing)
+{
+  const base = setupGame({
+    'config/capabilities.yml': 'mana:\n  enabled: true\n',
+  });
+  const issues = [];
+  const ctx = { base, loadJson, issues };
+  await checkCapabilities(ctx);
+  const hasYamlWarn = issues.some((i) => i.code === 'YAML-NOT-AVAILABLE' || i.code === 'YAML-PARSE');
+  const yamlInstalled = (() => {
+    try {
+      require.resolve('yaml');
+      return true;
+    } catch (e) {
+      return false;
     }
+  })();
+  if (yamlInstalled) {
+    assert(!hasYamlWarn, 'YAML module installed; should parse without warnings');
+  } else {
+    assert(hasYamlWarn, 'Expected YAML warning when parser is missing');
   }
+}
 
-  // Exploration empty when enabled
-  {
-    const issues = await runCheck(checkRequiredFiles, {
-      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
-      'scenario/index.md': '# Intro\nSome text here that is long enough.',
-      'scenario/quests/available.json': [],
-      'scenario/quests/unlock-triggers.json': {},
-      'player-data/runtime/state.json': { exploration_enabled: true },
-      'player-data/runtime/completed-quests.json': [],
-      'player-data/runtime/exploration-log.json': [],
-      'config/capabilities.json': {},
-    });
-    assert(issues.some((i) => i.code === 'EXPLORATION-EMPTY'), 'Expected EXPLORATION-EMPTY');
-  }
+// Exploration empty when enabled
+{
+  const issues = await runCheck(checkRequiredFiles, {
+    'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+    'scenario/index.md': '# Intro\nSome text here that is long enough.',
+    'scenario/quests/available.json': [],
+    'scenario/quests/unlock-triggers.json': {},
+    'player-data/runtime/state.json': { exploration_enabled: true },
+    'player-data/runtime/completed-quests.json': [],
+    'player-data/runtime/exploration-log.json': [],
+    'config/capabilities.json': {},
+  });
+  assert(issues.some((i) => i.code === 'EXPLORATION-EMPTY'), 'Expected EXPLORATION-EMPTY');
+}
 
-  // Exploration duplicates and missing area checks
-  {
-    const issues = await runCheck(checkRequiredFiles, {
-      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
-      'scenario/index.md': '# Intro\nThis index provides a detailed overview of the campaign and passes the length check.',
-      'scenario/quests/available.json': [{ quest_id: 'quest-1', title: 'Quest One' }],
-      'scenario/quests/unlock-triggers.json': {},
-      'scenario/areas/default-area.md': '# Default area\n',
-      'player-data/runtime/state.json': { exploration_enabled: true },
-      'player-data/runtime/completed-quests.json': [],
-      'player-data/runtime/exploration-log.json': [
-        { id: 'cliff-outlook', title: 'Velora Cliff Outlook', type: 'landmark' },
-        { id: 'cliff-outlook', title: 'Velora Cliff Outlook', type: 'landmark' },
-        { id: 'mistwood-tower', title: 'Mistwood Tower', type: 'poi', area_id: 'missing-area' }
-      ],
-      'config/capabilities.json': {},
-    });
-    assert(issues.some((i) => i.code === 'EXPLORATION-DUPLICATE-ID'), 'Expected EXPLORATION-DUPLICATE-ID');
-    assert(issues.some((i) => i.code === 'EXPLORATION-DUPLICATE-TITLE'), 'Expected EXPLORATION-DUPLICATE-TITLE');
-    assert(issues.some((i) => i.code === 'EXPLORATION-AREA-MISSING'), 'Expected EXPLORATION-AREA-MISSING');
-  }
+// Exploration duplicates and missing area checks
+{
+  const issues = await runCheck(checkRequiredFiles, {
+    'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+    'scenario/index.md': '# Intro\nThis index provides a detailed overview of the campaign and passes the length check.',
+    'scenario/quests/available.json': [{ quest_id: 'quest-1', title: 'Quest One' }],
+    'scenario/quests/unlock-triggers.json': {},
+    'scenario/areas/default-area.md': '# Default area\n',
+    'player-data/runtime/state.json': { exploration_enabled: true },
+    'player-data/runtime/completed-quests.json': [],
+    'player-data/runtime/exploration-log.json': [
+      { id: 'cliff-outlook', title: 'Velora Cliff Outlook', type: 'landmark' },
+      { id: 'cliff-outlook', title: 'Velora Cliff Outlook', type: 'landmark' },
+      { id: 'mistwood-tower', title: 'Mistwood Tower', type: 'poi', area_id: 'missing-area' }
+    ],
+    'config/capabilities.json': {},
+  });
+  assert(issues.some((i) => i.code === 'EXPLORATION-DUPLICATE-ID'), 'Expected EXPLORATION-DUPLICATE-ID');
+  assert(issues.some((i) => i.code === 'EXPLORATION-DUPLICATE-TITLE'), 'Expected EXPLORATION-DUPLICATE-TITLE');
+}
 
-  // Summary-only and ignore codes
-  {
+// Summary-only and ignore codes
+{
     const base = setupGame({
       'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
       'scenario/index.md': '# Intro\nThis index is long enough to pass the minimum length.',
@@ -464,10 +463,10 @@ The militia prepares a final push to reclaim the watchtower before rival faction
       'config/capabilities.json': { mana: { enabled: true, min: 0, max: 10 } },
     });
     const cliPath = path.resolve(__dirname, '../index.js');
-    const out = spawnSync('node', [cliPath, '--path', base, '--summary'], { encoding: 'utf8' });
+    const out = spawnSync('node', [cliPath, '--path', base, '--run-id', 'summary-1', '--summary'], { encoding: 'utf8' });
     const outCombined = `${out.stdout || ''}${out.stderr || ''}`;
     assert(outCombined.includes('Summary:'), `Summary mode should print summary line\n${outCombined}`);
-    const outIgnore = spawnSync('node', [cliPath, '--path', base, '--summary', '--ignore', 'CAP-RUNTIME'], { encoding: 'utf8' });
+    const outIgnore = spawnSync('node', [cliPath, '--path', base, '--run-id', 'summary-2', '--summary', '--ignore', 'CAP-RUNTIME'], { encoding: 'utf8' });
     const outIgnoreCombined = `${outIgnore.stdout || ''}${outIgnore.stderr || ''}`;
     const m = outIgnoreCombined.match(/Summary:\s*(\d+) error\(s\),\s*(\d+) warning\(s\)/);
     assert(m, `Expected Summary line in output\n${outIgnoreCombined}`);
@@ -487,7 +486,7 @@ The militia prepares a final push to reclaim the watchtower before rival faction
       'config/capabilities.json': {},
     });
     const cliPath = path.resolve(__dirname, '../index.js');
-    const result = spawnSync('node', [cliPath, '--path', base, '--fake-flag'], { encoding: 'utf8' });
+    const result = spawnSync('node', [cliPath, '--path', base, '--run-id', 'unknown-flag', '--fake-flag'], { encoding: 'utf8' });
     const output = `${result.stdout || ''}${result.stderr || ''}`;
     assert.strictEqual(result.status, 1, `CLI should exit 1 on unknown flag\n${output}`);
     assert(output.includes('Unknown flag'), `Unknown flag error should be reported\n${output}`);
@@ -506,7 +505,7 @@ The militia prepares a final push to reclaim the watchtower before rival faction
     });
     const cliPath = path.resolve(__dirname, '../index.js');
     const missingSnapshot = path.join(base, 'missing-snapshot.json');
-    const result = spawnSync('node', [cliPath, '--path', base, '--snapshot', missingSnapshot], { encoding: 'utf8' });
+    const result = spawnSync('node', [cliPath, '--path', base, '--run-id', 'snapshot-missing', '--snapshot', missingSnapshot], { encoding: 'utf8' });
     const output = `${result.stdout || ''}${result.stderr || ''}`;
     assert.strictEqual(result.status, 1, `CLI should exit 1 when snapshot read fails\n${output}`);
     assert(output.includes('[ERROR][SNAPSHOT]'), `Snapshot guardrail error should be reported\n${output}`);
@@ -531,6 +530,44 @@ The militia prepares a final push to reclaim the watchtower before rival faction
     const output = `${result.stdout || ''}${result.stderr || ''}`;
     assert.strictEqual(result.status, 1, `CLI should exit 1 when telemetry log write fails\n${output}`);
     assert(output.includes('[ERROR][LOG]'), `Log guardrail error should be reported\n${output}`);
+  }
+
+  // CLI requires --run-id
+  {
+    const base = setupGame({
+      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+      'scenario/index.md': '# Index\nThis is a sufficiently long description to pass guardrails.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': { stats: {} },
+      'player-data/runtime/completed-quests.json': [],
+      'config/capabilities.json': {},
+    });
+    const cliPath = path.resolve(__dirname, '../index.js');
+    const result = spawnSync('node', [cliPath, '--path', base], { encoding: 'utf8' });
+    const output = `${result.stdout || ''}${result.stderr || ''}`;
+    assert.strictEqual(result.status, 1, `CLI should exit 1 when run-id missing\n${output}`);
+    assert(output.includes('[ERROR][RUN-ID]'), `Missing run-id error should be reported\n${output}`);
+  }
+
+  // CLI logs telemetry with runId
+  {
+    const base = setupGame({
+      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+      'scenario/index.md': '# Index\nThis is a sufficiently long description to pass guardrails.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': { stats: {} },
+      'player-data/runtime/completed-quests.json': [],
+      'config/capabilities.json': {},
+    });
+    const cliPath = path.resolve(__dirname, '../index.js');
+    const logFile = path.join(base, 'telemetry.json');
+    const result = spawnSync('node', [cliPath, '--path', base, '--run-id', 'test-run', '--log', logFile], { encoding: 'utf8' });
+    const output = `${result.stdout || ''}${result.stderr || ''}`;
+    assert.strictEqual(result.status, 0, `CLI should succeed when run-id provided\n${output}`);
+    const logged = JSON.parse(fs.readFileSync(logFile, 'utf8'));
+    assert.strictEqual(logged.runId, 'test-run', 'Telemetry log should include runId field');
   }
 
   console.log('All validator tests passed.');

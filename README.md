@@ -11,10 +11,11 @@
 - Валидатор (CLI) README: `docs/analysis/validator-readme.md`
 
 ## Валидатор (CLI)
-- Пускане директно: `node tools/validator/index.js --path games/<gameId> [--json out.json] [--debug]`
-- NPM script: `npm run validate -- --path games/<gameId> [--json out.json] [--debug]`
+- Пускане директно: `node tools/validator/index.js --path games/<gameId> --run-id <prefix-uuid> [--json out.json] [--debug]`
+- NPM script: `npm run validate -- --path games/<gameId> --run-id <prefix-uuid> [--json out.json] [--debug]`
+- `--run-id` е **задължителен**. Използвай helper-ите `tools/scripts/run-id.ps1` и `tools/scripts/run-id.sh`, за да генерираш стойности като `dev-123e4567-e89b-12d3-a456-426614174000`.
 - Проверява: задължителни файлове, CAP-* правила, orphans (quests/areas), quest ID↔title; опционален JSON репорт.
-- Локален pre-release run: `npm run validate -- --path games/<gameId> --json reports/last.json --append --snapshot reports/last.json --strict --summary`
+- Локален pre-release run: `npm run validate -- --path games/<gameId> --run-id dev-local --json reports/last.json --append --snapshot reports/last.json --strict --summary`
 - Alias примери:
   - PowerShell (в `$PROFILE`):
     ```powershell
@@ -63,28 +64,32 @@
 - 3) (По нужда) Добави exploration entry (само ако area файлът вече съществува): `npm run exploration:add -- --title "..." --type poi --area <area-id> --game <gameId>`
 - 4) Пусни валидатор в строг режим: `npm run validate -- --path games/<gameId> --strict --summary`
 - 5) (Препоръчително) Snapshot regression чек: `npm run validate -- --path games/<gameId> --json docs/analysis/reports/latest-run.json --append --snapshot docs/analysis/reports/latest-run.json --strict --summary`
-- Run ID helper-и:
-  - PowerShell profile (пример за `$PROFILE`):
-    ```powershell
-    Import-Module "$PSScriptRoot/../scripts/run-id.ps1"
-    function arpg-run-id {
-      param([string]$persona = "dev", [switch]$branch)
-      New-AgentRPGRunId -Persona $persona -IncludeBranch:$branch
-    }
-    ```
-    Изпълнение: `npm run validate -- --run-id (arpg-run-id -persona gm -branch)`
-  - Bash `~/.bashrc`:
-    ```bash
-    source ~/Projects/LLMEngine/scripts/run-id.sh
-    arpg_run_id() { run_id "${1:-dev}" "${2:-true}"; }
-    ```
-    Изпълнение: `npm run validate -- --run-id "$(arpg_run_id gm true)" ...`
+66- Run ID helper-и:
+67-  - PowerShell (заявете функция в `$PROFILE`):
+68-    ```powershell
+69-    . "$PSScriptRoot/../scripts/run-id.ps1"
+70-    function arpg-run-id {
+71-      param([string]$Prefix = "dev", [switch]$Copy)
+72-      New-AgentRPGRunId -Prefix $Prefix -Copy:$Copy
+73-    }
+74-    ```
+75-    Изпълнение: `npm run validate -- --run-id (arpg-run-id -Prefix 'gm') ...`
+76-  - Bash `~/.bashrc` или `~/.zshrc`:
+77-    ```bash
+78-    source ~/Projects/agentRPG-engine/tools/scripts/run-id.sh
+79-    arpg_run_id() { run_id_generate "${1:-dev}"; }
+80-    ```
+81-    Изпълнение: `npm run validate -- --run-id "$(arpg_run_id gm)" ...`
 - Комбиниран task (snapshot → telemetry → summary):
   - PowerShell: `npm run validate -- --path games/demo --json ".\\docs\\analysis\\reports\\latest-run.json" --log ".\\docs\\analysis\\reports\\telemetry-history.json" --run-id dev-001 --append --snapshot ".\\docs\\analysis\\reports\\snapshot-example.json" --strict --summary`
   - Bash: `npm run validate -- --path games/demo --json ./docs/analysis/reports/latest-run.json --log ./docs/analysis/reports/telemetry-history.json --run-id dev-001 --append --snapshot ./docs/analysis/reports/snapshot-example.json --strict --summary`
   - Bash/Zsh:
     ```bash
-  arpg_validate() {
+    arpg_validate() {
+      game=${1:-demo}
+      npm run validate -- --path "games/$game" --json reports/last.json --append --snapshot reports/last.json --strict --summary
+    }
+    ```
     game=${1:-demo}
     npm run validate -- --path "games/$game" --json reports/last.json --append --snapshot reports/last.json --strict --summary
   }

@@ -6,6 +6,7 @@ function writeLog(runId, logPath, issues, startTime) {
   const errors = issues.filter((i) => i.level === 'ERROR').length;
   const warnings = issues.filter((i) => i.level === 'WARN').length;
   const payload = {
+    runId: runId || `${Date.now()}`,
     run_id: runId || `${Date.now()}`,
     timestamp: new Date().toISOString(),
     duration_ms: durationMs,
