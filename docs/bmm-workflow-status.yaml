@@ -8,12 +8,12 @@ workflow_path: ".bmad/bmm/workflows/workflow-status/paths/method-greenfield.yaml
 workflow_status:
   brainstorm-project: "docs/analysis/brainstorming-session-2025-12-14T16-45-00+0200.md"
   research: "docs/analysis/research/domain-similar-open-source-llm-rpg-engines-and-if-frameworks-research-2025-12-19.md"
-  product-brief: recommended
-  prd: required
+  product-brief: "docs/analysis/product-brief-A RPG game engine for LLM models.-2025-12-19.md"
+  prd: "docs/analysis/prd-backlog.md"
   create-ux-design: conditional
-  create-architecture: required
-  create-epics-and-stories: required
-  test-design: recommended
-  validate-architecture: optional
-  implementation-readiness: required
-  sprint-planning: required
+  create-architecture: "docs/architecture/agentRPG-engine-architecture.md"
+  create-epics-and-stories: "docs/stories/story-catalog.md"
+  test-design: "docs/analysis/test-design-epic-sprint01.md"
+  validate-architecture: "docs/architecture/validate-architecture.md"
+  implementation-readiness: "docs/architecture/implementation-readiness.md"
+  sprint-planning: "docs/sprint-artifacts/sprint-plan-sprint01.md"

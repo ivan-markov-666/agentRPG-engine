@@ -1,0 +1,28 @@
+generated: "2025-12-28T13:34:00Z"
+project: "AgentRPG Engine"
+project_level: 3
+project_type: "platform"
+track: "bmad-method"
+iteration: "Sprint 01"
+notes: |
+  Sprint 01 фокус: Validator Reliability, Guardrails, Observability, TS подготовка.
+
+status_definitions:
+  ready-for-dev: Story има попълнен файл и очаква изпълнение (dev-story).
+  in-progress: Story се разработва (dev-story in flight).
+  review: Story е изпълнена и чака code-review.
+  done: Story е приета.
+
+development_status:
+  ST-001: ready-for-dev
+  ST-002: ready-for-dev
+  ST-003: ready-for-dev
+  ST-004: ready-for-dev
+  ST-005: ready-for-dev
+  ST-006: ready-for-dev
+  ST-007: ready-for-dev
+  ST-008: ready-for-dev
+  ST-009: ready-for-dev
+  ST-010: ready-for-dev
+  ST-011: ready-for-dev
+  ST-012: ready-for-dev
