@@ -10,10 +10,23 @@ const { checkSchemas } = require('./checks/schema');
 const { reportConsole } = require('./reporters/console');
 const { reportJson } = require('./reporters/json');
 const { writeLog } = require('./utils/telemetry');
+const { archiveTelemetry } = require('../archive-telemetry');
 
 function parseArgs(argv) {
-  const args = { path: null, json: null, debug: false, runId: null, log: null, appendJson: false, strict: false, snapshot: null, summary: false, ignore: [] };
-  const valueFlags = new Set(['--path', '-p', '--json', '--run-id', '--log', '--snapshot', '--ignore']);
+  const args = {
+    path: null,
+    json: null,
+    debug: false,
+    runId: null,
+    log: null,
+    appendJson: false,
+    strict: false,
+    snapshot: null,
+    summary: false,
+    ignore: [],
+    autoArchive: null,
+  };
+  const valueFlags = new Set(['--path', '-p', '--json', '--run-id', '--log', '--snapshot', '--ignore', '--auto-archive']);
 
   for (let i = 2; i < argv.length; i++) {
     const flag = argv[i];
@@ -57,6 +70,9 @@ function parseArgs(argv) {
         break;
       case '--ignore':
         args.ignore = argv[++i].split(',').map((s) => s.trim()).filter(Boolean);
+        break;
+      case '--auto-archive':
+        args.autoArchive = Number(argv[++i]);
         break;
       default:
         if (flag.startsWith('-')) {
@@ -149,6 +165,25 @@ async function main() {
     } catch (e) {
       console.error('[ERROR][LOG]', e.message);
       guardrailViolation = true;
+    }
+    if (args.autoArchive && Number.isFinite(args.autoArchive)) {
+      try {
+        const archiveResult = archiveTelemetry({
+          label: args.runId || 'auto',
+          history: args.log,
+          archive: 'docs/analysis/reports/archive',
+          min: args.autoArchive,
+          cwd: process.cwd(),
+        });
+        if (!archiveResult.skipped) {
+          console.log(`[AUTO-ARCHIVE] Archived ${archiveResult.count} run(s) to ${archiveResult.archivePath}`);
+        } else {
+          console.log(`[AUTO-ARCHIVE][SKIP] History size below ${args.autoArchive} run threshold.`);
+        }
+      } catch (e) {
+        console.error('[ERROR][AUTO-ARCHIVE]', e.message);
+        guardrailViolation = true;
+      }
     }
   }
   process.exit(hasError || guardrailViolation ? 1 : 0);

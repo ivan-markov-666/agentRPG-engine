@@ -4,8 +4,8 @@
 Проверява файловите договори на игра върху AgentRPG Engine: задължителни файлове, CAP-* правила, orphans, quest ID↔title. Опционално генерира JSON репорт за telemetry.
 
 ## Използване
-- `node tools/validator/index.js --path games/<gameId> [--json out.json] [--append] [--debug] [--strict] [--summary] [--run-id <id>] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2]`
-- npm script (package.json): `npm run validate -- --path games/<gameId> [--json out.json] [--append] [--debug] [--strict] [--summary] [--run-id <id>] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2]`
+- `node tools/validator/index.js --path games/<gameId> [--json out.json] [--append] [--debug] [--strict] [--summary] [--run-id <id>] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2] [--auto-archive 50]`
+- npm script (package.json): `npm run validate -- --path games/<gameId> [--json out.json] [--append] [--debug] [--strict] [--summary] [--run-id <id>] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2] [--auto-archive 50]`
 - Ако няма `--run-id`, логът ползва auto-id (timestamp) и append-ва, ако файлът вече е масив.
 - `--append` (с `--json out.json`): апендва новия резултат в масив, ако файлът е масив; иначе overwrite.
 - `--strict`: treat WARN като ERROR.
@@ -49,6 +49,7 @@
 - Exit code: 1 ако:
   - има поне един `ERROR` (или предупреждение, което е ескалирано чрез `--strict`);
   - guardrail операции (`--snapshot`, `--log`) се провалят (валидаторът отпечатва `[ERROR][SNAPSHOT]...`/`[ERROR][LOG]...`).
+- `--auto-archive <N>` (по избор): след успешен telemetry лог автоматично извиква архивиращия скрипт, ако историята има ≥N записи. При skip отпечатва `[AUTO-ARCHIVE][SKIP]`, при успех `[AUTO-ARCHIVE] Archived ...` и рестартира history файла.
 - Exit code: 0 само когато няма ERRORS и guardrail side-effects са успешни.
 - JSON (ако `--json out.json`): `{ errors, warnings, cap_errors, issues: [...] }`
 - Telemetry лог (ако `--run-id` и `--log`): `{ run_id, timestamp, duration_ms, errors, warnings, issues }`
@@ -60,14 +61,14 @@
 - `[ERROR][LOG] EACCES ...` — липсват права за писане. Смени локацията или дай write permission преди повторен run.
 
 ### Архивиране чрез скрипт
-- Съществува helper `npm run archive:telemetry`, който стартира `tools/archive-telemetry.js`.
-- Пример:
-  ```bash
-  npm run archive:telemetry -- --label sprint01 --history docs/analysis/reports/telemetry-history.json
-  ```
-  - Флагове:
-    - `--label` / `-l`: ще се добави към името на архивния файл (default `telemetry`).
+- Съществува helper `npm run validation -- ... --log telemetry-history.json --auto-archive 50` (опционално) → автоматично тригърва архивиране, когато telemetry историята стигне ≥50 записа.
+- `npm run archive:telemetry -- --label sprint01` (при нужда) → прехвърля историята в `docs/analysis/reports/archive/`.
+- `npm run publish:telemetry -- --dest docs/analysis/reports/central-upload --history --all` → подготвя bundle за централен storage.
+- `npm run sync:telemetry -- --dest s3://bucket/path` (или локална папка) → качва `central-upload` съдържание (dry-run опция налична).
     - `--history`: път до текущия telemetry файл (default `docs/analysis/reports/telemetry-history.json`).
+    - `--archive`: директория за архиви (default `docs/analysis/reports/archive`).
+    - `--min`: минимален брой записи преди архив (default 50).
+    - `--dry-run`: показва какво би се случило без да променя файловете.
   - Скриптът:
     1. Проверява дали history файлът съществува и има съдържание (не празен масив).
     2. Създава `docs/analysis/reports/archive/<timestamp>-<label>.json`.
@@ -93,6 +94,17 @@
   0 23 * * * cd /path/to/agentRPG-engine && npm run archive:telemetry -- --label cron
   ```
 - Цел: дори без CI, локалните run-ове се архивират веднъж дневно (или според нуждата), за да не трупаме огромни telemetry-history файлове.
+- **Възстановяване на telemetry history**:
+  1. Избери архивния файл от `docs/analysis/reports/archive/<timestamp>-<label>.json`.
+  2. Копирай го обратно в `docs/analysis/reports/telemetry-history.json` (или нов файл) и продължи append-ването.
+  3. При нужда пускай `npm run metrics:report -- --history <архив>` за ретроспективен анализ.
+- **Централен storage / dashboard export**:
+  - Скрипт: `npm run publish:telemetry -- --dest docs/analysis/reports/central-upload --history --all`
+    - `--dest`: директория, която после синхронизираш с S3/Share/Analytics pipeline.
+    - `--all` (по избор): копира всички архивни JSON-и; иначе само най-новия.
+    - `--history`: добавя текущия `telemetry-history.json` към пакета.
+    - `--dry-run`: показва кои файлове ще се копират без да прави промени.
+  - Използвай след `archive:telemetry`, за да публикуваш данните към централен сторидж или да качиш артефакт в CI (пример: `actions/upload-artifact`).
 
 ## Проверки (v0)
 - Задължителни файлове: manifest/entry, scenario/index, quests/available, quests/unlock-triggers, state, completed-quests, capabilities (exporation-log само ако exploration е включен в state).
@@ -119,7 +131,7 @@
    - area: `npm run area:add -- --id <area-id> --title "..." --description "..." --game <gameId>`
    - quest: `npm run quest:add -- --title "..." --game <gameId>`
    - exploration entry: `npm run exploration:add -- --title "..." --type poi --area <area-id> --game <gameId>`
-3) Snapshot regression (по избор): `npm run validate -- --path games/<gameId> --json docs/analysis/reports/latest-run.json --append --snapshot docs/analysis/reports/latest-run.json --strict --summary`
+3) Snapshot regression (по избор): `npm run validate -- --path games/<gameId> --json docs/analysis/reports/latest-run.json --append --snapshot docs/analysis/reports/latest-run.json --strict --summary --auto-archive 50`
 
 ## CI / clean-run checklist
 1. **Install deps**: `npm install` (или pnpm/yarn еквивалент).
@@ -154,12 +166,14 @@
            - run: npm ci
            - run: npm run validate -- --path games/demo --json docs/analysis/reports/latest-run.json --append --snapshot docs/analysis/reports/latest-run.json --strict --summary --run-id "${{ github.run_id }}" --log docs/analysis/reports/telemetry-history.json
            - run: npm run archive:telemetry -- --label github-${{ github.run_number }}
+           - run: npm run publish:telemetry -- --dest docs/analysis/reports/central-upload --history --all
            - uses: actions/upload-artifact@v4
              with:
                name: validator-artifacts
                path: |
                  docs/analysis/reports/latest-run.json
                  docs/analysis/reports/archive/*.json
+                 docs/analysis/reports/central-upload
      ```
 5. **Before merge**: прегледай telemetry файла за последния run_id и запази clean state в репото (опция: комитни отчетите или ги качи като CI артефакти).
 
