@@ -4,12 +4,14 @@
 Проверява файловите договори на игра върху AgentRPG Engine: задължителни файлове, CAP-* правила, orphans, quest ID↔title. Опционално генерира JSON репорт за telemetry.
 
 ## Използване
-- `node tools/validator/index.js --path games/<gameId> [--json out.json] [--debug] [--run-id <id>] [--log telemetry.json]`
-- npm script (package.json): `npm run validate -- --path games/<gameId> [--json out.json] [--debug] [--run-id <id>] [--log telemetry.json] [--strict] [--snapshot prev.json]`
+- `node tools/validator/index.js --path games/<gameId> [--json out.json] [--append] [--debug] [--strict] [--summary] [--run-id <id>] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2]`
+- npm script (package.json): `npm run validate -- --path games/<gameId> [--json out.json] [--append] [--debug] [--strict] [--summary] [--run-id <id>] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2]`
 - Ако няма `--run-id`, логът ползва auto-id (timestamp) и append-ва, ако файлът вече е масив.
 - `--append` (с `--json out.json`): апендва новия резултат в масив, ако файлът е масив; иначе overwrite.
 - `--strict`: treat WARN като ERROR.
+- `--summary`: показва само обобщение (удобно за CI или бърз lint pass).
 - `--snapshot prev.json`: сравнява текущия run с предишен JSON (показва нови/решени кодове).
+- `--ignore CODE1,CODE2`: временно скрива изброените кодове от отчета (само за локални експерименти).
 
 ### Примерни команди
 - Базова проверка: `npm run validate -- --path games/demo`
@@ -44,9 +46,53 @@
 
 ## Изход
 - Конзола: `[LEVEL][CODE] file:message (suggested fix)`
-- Exit code: 0 ако няма ERROR; 1 при ERROR
+- Exit code: 1 ако:
+  - има поне един `ERROR` (или предупреждение, което е ескалирано чрез `--strict`);
+  - guardrail операции (`--snapshot`, `--log`) се провалят (валидаторът отпечатва `[ERROR][SNAPSHOT]...`/`[ERROR][LOG]...`).
+- Exit code: 0 само когато няма ERRORS и guardrail side-effects са успешни.
 - JSON (ако `--json out.json`): `{ errors, warnings, cap_errors, issues: [...] }`
 - Telemetry лог (ако `--run-id` и `--log`): `{ run_id, timestamp, duration_ms, errors, warnings, issues }`
+
+### Troubleshooting (guards)
+- `[ERROR][SNAPSHOT] ENOENT ...` — провери, че файлът, подаден към `--snapshot`, съществува (или махни флага). Провалът е блокиращ → CLI връща 1.
+- `[ERROR][SNAPSHOT] Unexpected token ...` — JSON е повреден; отвори файла и поправи синтаксиса или изтрий последния run, след което пусни валидатора отново.
+- `[ERROR][LOG] EISDIR ...` — `--log` сочи към директория/невалиден път. Задай валиден `.json` файл (примерно `docs/analysis/reports/telemetry-history.json`).
+- `[ERROR][LOG] EACCES ...` — липсват права за писане. Смени локацията или дай write permission преди повторен run.
+
+### Архивиране чрез скрипт
+- Съществува helper `npm run archive:telemetry`, който стартира `tools/archive-telemetry.js`.
+- Пример:
+  ```bash
+  npm run archive:telemetry -- --label sprint01 --history docs/analysis/reports/telemetry-history.json
+  ```
+  - Флагове:
+    - `--label` / `-l`: ще се добави към името на архивния файл (default `telemetry`).
+    - `--history`: път до текущия telemetry файл (default `docs/analysis/reports/telemetry-history.json`).
+  - Скриптът:
+    1. Проверява дали history файлът съществува и има съдържание (не празен масив).
+    2. Създава `docs/analysis/reports/archive/<timestamp>-<label>.json`.
+    3. Нулира history файла до `[]`.
+- Използвай го след release или когато telemetry логът достигне лимита от retention политиката.
+- За автоматизация (без npm): ползвай shell/Pwsh wrapper-ите:
+  - PowerShell: `tools/scripts/archive-telemetry.ps1 --Label nightly --History docs/analysis/reports/telemetry-history.json`
+  - Bash: `tools/scripts/archive-telemetry.sh --label nightly --history docs/analysis/reports/telemetry-history.json`
+
+### Периодично архивиране (локално)
+- **PowerShell task (Windows)**:
+  ```powershell
+  $script = "d:\Projects\agentRPG-engine\tools\archive-telemetry.ps1"
+  Set-Content $script @'
+  cd d:\Projects\agentRPG-engine
+  npm run archive:telemetry -- --label scheduled
+  '@
+  schtasks /Create /SC DAILY /ST 23:00 /TN "AgentRPG Telemetry Archive" /TR "powershell -ExecutionPolicy Bypass -File `"$script`""
+  ```
+- **Cron job (Linux/macOS)**:
+  ```bash
+  # m h dom mon dow command
+  0 23 * * * cd /path/to/agentRPG-engine && npm run archive:telemetry -- --label cron
+  ```
+- Цел: дори без CI, локалните run-ове се архивират веднъж дневно (или според нуждата), за да не трупаме огромни telemetry-history файлове.
 
 ## Проверки (v0)
 - Задължителни файлове: manifest/entry, scenario/index, quests/available, quests/unlock-triggers, state, completed-quests, capabilities (exporation-log само ако exploration е включен в state).
@@ -74,6 +120,48 @@
    - quest: `npm run quest:add -- --title "..." --game <gameId>`
    - exploration entry: `npm run exploration:add -- --title "..." --type poi --area <area-id> --game <gameId>`
 3) Snapshot regression (по избор): `npm run validate -- --path games/<gameId> --json docs/analysis/reports/latest-run.json --append --snapshot docs/analysis/reports/latest-run.json --strict --summary`
+
+## CI / clean-run checklist
+1. **Install deps**: `npm install` (или pnpm/yarn еквивалент).
+2. **Smoke run** (warnings allowed): `npm run validate -- --path games/<gameId> --summary`.
+3. **DoD run** (изисква telemetry + snapshot):
+   ```bash
+   npm run validate -- \
+     --path games/<gameId> \
+     --json docs/analysis/reports/latest-run.json \
+     --append \
+     --snapshot docs/analysis/reports/latest-run.json \
+     --strict \
+     --summary \
+     --run-id "$(whoami)-$(date +%Y%m%d-%H%M%S)" \
+     --log docs/analysis/reports/telemetry-history.json
+   ```
+   - Очакван изход: `Summary: 0 error(s), 0 warning(s)` и `[INFO][SNAPSHOT] New codes: none`.
+4. **CI gating & архив**:
+   - Fail the pipeline ако exit code != 0 (CAP errors, WARN при strict, snapshot/log guardrail fail).
+   - След clean run (0 errors/0 warnings) стартирай `npm run archive:telemetry -- --label <build-id>` за да нулираш локалния history и качи архивния файл като artifact.
+   - Архивирай `docs/analysis/reports/latest-run.json` / `telemetry-history.json` като build artifacts (или snapshot JSON + archive резултата).
+   - Примерен GitHub Actions job:
+     ```yaml
+     jobs:
+       validator:
+         runs-on: ubuntu-latest
+         steps:
+           - uses: actions/checkout@v4
+           - uses: actions/setup-node@v4
+             with:
+               node-version: 20
+           - run: npm ci
+           - run: npm run validate -- --path games/demo --json docs/analysis/reports/latest-run.json --append --snapshot docs/analysis/reports/latest-run.json --strict --summary --run-id "${{ github.run_id }}" --log docs/analysis/reports/telemetry-history.json
+           - run: npm run archive:telemetry -- --label github-${{ github.run_number }}
+           - uses: actions/upload-artifact@v4
+             with:
+               name: validator-artifacts
+               path: |
+                 docs/analysis/reports/latest-run.json
+                 docs/analysis/reports/archive/*.json
+     ```
+5. **Before merge**: прегледай telemetry файла за последния run_id и запази clean state в репото (опция: комитни отчетите или ги качи като CI артефакти).
 
 ## Ограничения / TODO
 - YAML поддръжка: налична ако е инсталиран `yaml` пакет; иначе WARN.
@@ -196,8 +284,17 @@ Summary: 1 error(s), 1 warning(s) | Top: QUEST-CONTENT:1, QUEST-LINK:1
 
 ## Telemetry retention и анализ
 - **Локация**: по подразбиране записваме в `docs/analysis/reports/telemetry-history.json`. Ползвай `--log docs/analysis/reports/telemetry-history.json --append`, за да пазиш история.
-- **Retention**: запази последните ~50 run-а (или 14 дни). При нужда архивирай старите в `reports/archive/YYYY-MM-DD-telemetry.json`.
-- **run_id naming**: `persona-iteration` (напр. `dev-01`, `gm-release-3`). Помага при групиране по човек/фаза.
+- **Retention политика**:
+  1. Пази максимум ~50 run-а или ~2 седмици локално (според екипа).
+  2. Когато лимитът бъде надхвърлен, архивирай:
+     ```bash
+     stamp=$(date +%Y-%m-%d)
+     mkdir -p docs/analysis/reports/archive
+     mv docs/analysis/reports/telemetry-history.json "docs/analysis/reports/archive/${stamp}-telemetry.json"
+     printf "[]\n" > docs/analysis/reports/telemetry-history.json
+     ```
+  3. Опция: качи архивния файл като CI artifact или в централен storage.
+- **run_id naming**: `persona-iteration` (напр. `dev-01`, `gm-release-3`) или `<branch>-<timestamp>`. Помага при групиране по човек/фаза/feature.
 - **Метрики за проследяване**:
   - `avg retries to clean run`: колко run-а с ERROR/WARN има преди `errors=warnings=0`.
   - `mean time to green`: разлика между timestamp на първия run с грешки и последния clean run.

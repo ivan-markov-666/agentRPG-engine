@@ -6,6 +6,7 @@ A small hub where villagers gather to trade news, rest, and seek help from the e
 ## Points of interest
 - The stone well that feeds the settlement.
 - Community notice board pinned with new adventuring hooks.
+- [[main-quest-01]] recruitment table where the elder posts urgent requests.
 
 ## Connections
 - Forest outskirts trail used for hunting quests.
@@ -15,7 +16,7 @@ A small hub where villagers gather to trade news, rest, and seek help from the e
 - NPCs: Elder (quest giver)
 - Features: Well, notice board
 - Safety: Safe zone, starting point
-- Hooks: Market gossip, quest postings
+- Hooks: Market gossip, quest postings, [[main-quest-01]] updates
 
 ## Conditions
 - Reputation Neutral or higher with the militia.
