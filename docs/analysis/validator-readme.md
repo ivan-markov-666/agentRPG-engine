@@ -42,6 +42,13 @@
   - `UNLOCK-UNKNOWN`, `UNLOCK-DEPENDENCY-UNKNOWN`, `UNLOCK-FORMAT`, `UNLOCK-DUPLICATE` — виж `scenario/quests/unlock-triggers.json`.
 - Quest markdown файловете се проверяват за broken `[[links]]`, липсващи секции и reward формати (`QUEST-LINK`, `QUEST-AREA-BACKLINK`, `QUEST-REWARDS-*`, и др.).
 
+### Exploration logging контрол (ST-008)
+- Активирай exploration режима чрез `player-data/runtime/state.json` (`"exploration_enabled": true` или `state.exploration.enabled = true`). При активен режим:
+  - Липсващ лог → `EXPLORATION-LOG-MISSING` (ERROR). Създай `player-data/runtime/exploration-log.json` и започни с `[]`.
+  - Schema нарушения → `EXPLORATION-SCHEMA` (ERROR). JSON Schema изисква `id`, `title`, `type (area|quest|event)`, `added_at` (ISO), `origin`, ≥60 символа `description`, 1–10 уникални тагове и условно `area_id` (за `area`) или `quest_id` (за `quest`).
+- Независимо от режима, се изпълняват и допълнителните guardrails от `checkRequiredFiles`: `EXPLORATION-DESCRIPTION-SHORT`, `EXPLORATION-TAGS-MIN`, `EXPLORATION-DUPLICATE-ID/TITLE`, `EXPLORATION-AREA-MISSING`, `EXPLORATION-PREVIEW-MISMATCH`.
+- `npm run exploration:add ...` помага за scaffold на валидни записи (виж README секцията „Exploration log helper“).
+
 ### Бързи alias-и (по избор)
 - PowerShell (добави в `$PROFILE`):
   ```powershell

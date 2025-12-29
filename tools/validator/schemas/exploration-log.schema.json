@@ -19,9 +19,13 @@
       },
       "type": {
         "type": "string",
-        "enum": ["city", "landmark", "dungeon", "mcp", "side-quest-hook", "poi"]
+        "enum": ["area", "quest", "event"]
       },
       "area_id": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]{3,60}$"
+      },
+      "quest_id": {
         "type": "string",
         "pattern": "^[a-z0-9-]{3,60}$"
       },
@@ -48,6 +52,11 @@
       "origin": {
         "type": "string",
         "enum": ["player-request", "gm-suggested"]
+      },
+      "notes": {
+        "type": "string",
+        "minLength": 0,
+        "maxLength": 2000
       }
     },
     "allOf": [
@@ -55,13 +64,26 @@
         "if": {
           "properties": {
             "type": {
-              "enum": ["city", "landmark", "dungeon", "poi"]
+              "const": "area"
             }
           },
           "required": ["type"]
         },
         "then": {
           "required": ["area_id"]
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "type": {
+              "const": "quest"
+            }
+          },
+          "required": ["type"]
+        },
+        "then": {
+          "required": ["quest_id"]
         }
       }
     ]
