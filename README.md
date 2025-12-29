@@ -131,6 +131,13 @@
 - **Recommended Actions:** автоматични подсказки за CAP проблеми, бавни run-ове или повторяеми кодове (`top codes` списъка).
 - Използвай го като „оперативен dashboard“ между sprint retro и DoD проверки.
 
+### TypeScript Tooling (EP-004)
+- **Скриптове:** `npm run typecheck` (строг `tsc --noEmit`), `npm run build:ts` (`tsc -p tsconfig.build.json` → `dist/` с declaration/source maps), `npm run lint:ts` (ESLint + `@typescript-eslint`).
+- **tsconfig структура:** `tsconfig.json` задава strict правила, Node16 module resolution, alias `@types/* → src/types/*`; `tsconfig.build.json` наследява и включва емитване на декларации.
+- **Shared типове:** `src/types/` съдържа `CapabilitiesConfig`, `ScenarioContract`, `TelemetryEntry` и barrel `index.ts`. Може да се импортират чрез `import { TelemetryEntry } from '@types';`.
+- **Миграция:** JS файловете остават валидни; новият TS код живее в `src/` и се компилира към `dist/`. При добавяне на нови типове/контракти обновявай `src/types/` и описвай промяната в архитектурния документ.
+- **Lint & формат:** `.eslintrc.cjs` е настроен за TS; Prettier служи като форматър (по избор `npx prettier --write src/**/*.ts`).
+
 ### Git hook (pre-push validate + metrics)
 1. Скрипт: `scripts/pre-push-validate.sh` приема средата `ARPG_GAME`, `ARPG_RUN_ID`, `ARPG_LIMIT` (по избор) и изпълнява `npm run validate:metrics -- --game <game> --run-id <tag> --auto-archive 50`.
 2. Инсталация:
