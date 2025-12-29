@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "validate": "node tools/validator/index.js",
-    "test": "node tools/validator/tests/validator.test.js && node tools/tests/archive-telemetry.test.js",
+    "test": "node tools/validator/tests/validator.test.js && node tools/tests/archive-telemetry.test.js && node tools/tests/metrics-report.test.js",
     "validate:metrics": "node tools/scripts/validate-metrics.js",
     "archive:telemetry": "node tools/archive-telemetry.js",
     "archive:telemetry:ps": "powershell -ExecutionPolicy Bypass -File tools/scripts/archive-telemetry.ps1",
