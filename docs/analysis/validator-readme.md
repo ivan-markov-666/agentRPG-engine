@@ -34,6 +34,14 @@
   - `[/stats/status_effects/poison/stack] must be >= 0`
 - Добави нови ключове чрез `genericStat` секцията на schema файла или разшири `definitions`, за да избегнеш `STATE-SCHEMA` нарушения.
 
+### Quest & Scenario contract контрол (ST-007)
+- `scenario/quests/available.json` се сверява срещу `scenario/index.md` и `scenario/quests/unlock-triggers.json`, за да няма orphan-и или несъответствия:
+  - `INDEX-QUEST-MISSING` — quest в available.json липсва от таблицата в index.md → пусни `npm run scenario:index` или добави реда ръчно.
+  - `INDEX-QUEST-UNKNOWN` — index съдържа quest, който липсва в available.json → изтрий реда или върни quest-а.
+  - `QUEST-ORPHAN` — quest файл липсва → създай markdown файла или премахни записа.
+  - `UNLOCK-UNKNOWN`, `UNLOCK-DEPENDENCY-UNKNOWN`, `UNLOCK-FORMAT`, `UNLOCK-DUPLICATE` — виж `scenario/quests/unlock-triggers.json`.
+- Quest markdown файловете се проверяват за broken `[[links]]`, липсващи секции и reward формати (`QUEST-LINK`, `QUEST-AREA-BACKLINK`, `QUEST-REWARDS-*`, и др.).
+
 ### Бързи alias-и (по избор)
 - PowerShell (добави в `$PROFILE`):
   ```powershell

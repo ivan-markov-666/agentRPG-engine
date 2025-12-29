@@ -259,6 +259,30 @@ async function runCheck(checkFn, files) {
     assert(issues.some((i) => i.code === 'QUEST-CONTENT'), 'Expected QUEST-CONTENT');
   }
 
+  // INDEX-QUEST-MISSING and INDEX-QUEST-UNKNOWN
+  {
+    const issues = await runCheck(checkQuests, {
+      'scenario/index.md': `# Index
+## Quest Overview
+| Quest | Unlock | Summary |
+| --- | --- | --- |
+| [Quest Alpha](scenario/quests/quest-alpha.md) | always | Alpha summary |
+| [Ghost Quest](scenario/quests/ghost.md) | always | Ghost summary |
+`,
+      'scenario/quests/available.json': [
+        { quest_id: 'quest-alpha', title: 'Quest Alpha' },
+        { quest_id: 'quest-beta', title: 'Quest Beta' }
+      ],
+      'scenario/quests/quest-alpha.md':
+        '# Quest Alpha\n## Summary\nThis is a long enough summary for the alpha quest to satisfy guardrails.\n## Steps\n- step one\n- step two\n## Rewards\n- XP: 100 XP\n- Gold: 50 gold',
+      'scenario/quests/quest-beta.md':
+        '# Quest Beta\n## Summary\nThis is a long enough summary for the beta quest to satisfy guardrails.\n## Steps\n- step one\n- step two\n## Rewards\n- XP: 120 XP\n- Gold: 60 gold',
+      'scenario/quests/unlock-triggers.json': { 'quest-alpha': 'always', 'quest-beta': 'always' },
+    });
+    assert(issues.some((i) => i.code === 'INDEX-QUEST-MISSING'), 'Expected INDEX-QUEST-MISSING for quest-beta absent in index');
+    assert(issues.some((i) => i.code === 'INDEX-QUEST-UNKNOWN'), 'Expected INDEX-QUEST-UNKNOWN for ghost quest in index');
+  }
+
   // UNLOCK-MISSING
   {
     const issues = await runCheck(checkQuests, {

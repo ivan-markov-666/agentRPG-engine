@@ -59,6 +59,23 @@ function isIsoDateString(value) {
   return Number.isFinite(parsed);
 }
 
+function parseScenarioIndexQuests(base) {
+  const indexPath = path.join(base, 'scenario/index.md');
+  if (!fs.existsSync(indexPath)) return null;
+  try {
+    const content = fs.readFileSync(indexPath, 'utf8');
+    const questRegex = /\[[^[\]]+\]\(scenario\/quests\/([a-z0-9-]+)\.md\)/gi;
+    const questIds = [];
+    let match;
+    while ((match = questRegex.exec(content)) !== null) {
+      questIds.push(match[1]);
+    }
+    return questIds;
+  } catch (err) {
+    return null;
+  }
+}
+
 async function checkQuests(ctx) {
   const { base, issues } = ctx;
   clearAreaCache();
@@ -167,6 +184,18 @@ async function checkQuests(ctx) {
   if (!entries.length) {
     add(issues, 'WARN', 'QUEST-EMPTY-LIST', 'scenario/quests/available.json', 'No quests listed in available.json', 'Add at least one quest entry');
   }
+  const indexQuestEntries = parseScenarioIndexQuests(base);
+  const indexQuestSet = new Set(indexQuestEntries || []);
+  if (indexQuestEntries && indexQuestEntries.length) {
+    const seenIndexQuests = new Set();
+    indexQuestEntries.forEach((questId) => {
+      if (seenIndexQuests.has(questId)) {
+        add(issues, 'WARN', 'INDEX-QUEST-DUPLICATE', 'scenario/index.md', `Quest '${questId}' is listed multiple times`, 'Keep single row per quest in quest table');
+      } else {
+        seenIndexQuests.add(questId);
+      }
+    });
+  }
   const seenQuestIds = new Set();
   entries.forEach(({ quest_id, title }) => {
     if (!quest_id || !title) {
@@ -189,6 +218,16 @@ async function checkQuests(ctx) {
       add(issues, 'ERROR', 'TITLE-MISMATCH', 'scenario/quests/available.json', `Duplicate title '${title}'`, 'Rename to be unique');
     } else {
       titleMap.set(title, quest_id);
+    }
+    if (indexQuestEntries && indexQuestEntries.length && !indexQuestSet.has(quest_id)) {
+      add(
+        issues,
+        'WARN',
+        'INDEX-QUEST-MISSING',
+        'scenario/index.md',
+        `Quest '${quest_id}' missing from scenario index quest table`,
+        'Run scenario:index or add row under "Quest Overview" table'
+      );
     }
     const questFile = path.join(base, 'scenario/quests', `${quest_id}.md`);
     if (!fs.existsSync(questFile)) {
@@ -522,6 +561,20 @@ async function checkQuests(ctx) {
         }
       });
     }
+  }
+  if (indexQuestEntries && indexQuestEntries.length) {
+    indexQuestEntries.forEach((questId) => {
+      if (!availableIds.has(questId)) {
+        add(
+          issues,
+          'WARN',
+          'INDEX-QUEST-UNKNOWN',
+          'scenario/index.md',
+          `Scenario index references quest '${questId}' not found in available.json`,
+          'Remove obsolete row or add quest to available.json'
+        );
+      }
+    });
   }
 }
 
