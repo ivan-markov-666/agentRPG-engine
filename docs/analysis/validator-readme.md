@@ -4,8 +4,8 @@
 Проверява файловите договори на игра върху AgentRPG Engine: задължителни файлове, CAP-* правила, orphans, quest ID↔title. Опционално генерира JSON репорт за telemetry.
 
 ## Използване
-- `node tools/validator/index.js --path games/<gameId> --run-id <id> [--json out.json] [--append] [--debug] [--strict] [--summary] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2] [--auto-archive 50]`
-- npm script (package.json): `npm run validate -- --path games/<gameId> --run-id <id> [--json out.json] [--append] [--debug] [--strict] [--summary] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2] [--auto-archive 50]`
+- Build-вариант: `npm run validate -- --path games/<gameId> --run-id <id> [--json out.json] [--append] [--debug] [--strict] [--summary] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2] [--auto-archive 50]`. Скриптът автоматично стартира `npm run build:ts` преди да извика `node dist/cli/validate.js`.
+- Dev-вариант (без предварителен build): `npm run validate:dev -- --path games/<gameId> --run-id <id> ...` (ts-node върху `src/cli/validate.ts` — полезно при промени по CLI-то).
 - Без `--run-id` CLI прекратява изпълнение (`[ERROR][RUN-ID] Missing required --run-id <value>`). Използвай helper скриптовете `tools/scripts/run-id.(ps1|sh)` за генерация.
 - `--append` (с `--json out.json`): апендва новия резултат в масив, ако файлът е масив; иначе overwrite.
 - `--strict`: treat WARN като ERROR.
@@ -14,7 +14,8 @@
 - `--ignore CODE1,CODE2`: временно скрива изброените кодове от отчета (само за локални експерименти).
 
 ### Примерни команди
-- Базова проверка: `npm run validate -- --path games/demo --run-id dev-local`
+- Базова проверка (build output): `npm run validate -- --path games/demo --run-id dev-local`
+- Dev run без build: `npm run validate:dev -- --path games/demo --run-id dev-local`
 - Запис в JSON + append: `npm run validate -- --path games/demo --run-id dev-local --json reports/last.json --append`
 - Строг режим: `npm run validate -- --path games/demo --run-id dev-local --strict`
 - Snapshot срещу предишен отчет: `npm run validate -- --path games/demo --run-id dev-local --json reports/last.json --append --snapshot reports/last.json`
