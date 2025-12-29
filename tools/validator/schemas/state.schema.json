@@ -3,6 +3,8 @@
   "type": "object",
   "properties": {
     "current_area_id": { "type": "string" },
+    "current_day": { "type": "integer", "minimum": 0 },
+    "current_hour": { "type": "integer", "minimum": 0, "maximum": 23 },
     "active_quests": {
       "type": "array",
       "items": {
@@ -18,7 +20,14 @@
         "additionalProperties": true
       }
     },
-    "stats": { "$ref": "#/definitions/stats" }
+    "stats": { "$ref": "#/definitions/stats" },
+    "flags": { "$ref": "#/definitions/flagMap" },
+    "inventories": { "$ref": "#/definitions/inventoryList" },
+    "exploration_enabled": { "type": "boolean" },
+    "exploration_log_preview": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
   },
   "additionalProperties": true,
   "definitions": {
@@ -60,6 +69,52 @@
         },
         "additionalProperties": true
       }
+    },
+    "flagMap": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          { "type": "boolean" },
+          { "type": "number", "minimum": 0 },
+          { "type": "string" }
+        ]
+      }
+    },
+    "inventoryList": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/inventory" }
+    },
+    "inventory": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slots": {
+          "type": "object",
+          "properties": {
+            "used": { "type": "integer", "minimum": 0 },
+            "max": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/inventoryItem" }
+        }
+      },
+      "required": ["id", "items"],
+      "additionalProperties": false
+    },
+    "inventoryItem": {
+      "type": "object",
+      "properties": {
+        "item_id": { "type": "string" },
+        "title": { "type": "string" },
+        "qty": { "type": "integer", "minimum": 0 },
+        "meta": { "type": "object" }
+      },
+      "required": ["item_id", "qty"],
+      "additionalProperties": true
     },
     "genericStat": {
       "anyOf": [
