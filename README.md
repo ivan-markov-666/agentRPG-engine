@@ -119,8 +119,17 @@
 ### Sprint Metrics Workflow
 1. **Локално validate + telemetry:** стартирай `npm run validate:metrics -- --path games/<gameId> --run-id <tag>`, който ще изпълни валидатора и автоматично ще запише telemetry (`docs/analysis/reports/telemetry-history.json`) и регенерира `metrics-summary.md`.
 2. **Custom history/output (по избор):** `npm run metrics:report -- --history docs/analysis/reports/telemetry-history.json --out docs/analysis/metrics-summary.md --limit 10`.
-3. **Архив преди release или при ≥50 run-а:** `npm run archive:telemetry -- --label sprint01`.
-4. **Definition of Done:** следи `docs/analysis/metrics-summary.md` да показва ≥3 поредни clean run-а, avg duration <200 ms, snapshot `New codes = none`.
+3. **Insights dashboard:** добави `--insights docs/analysis/metrics-insights.md`, за да генерираш документ с Summary / KPI Trends / Alerts / Recommended Actions. Емоджитата (✅/⚠️/❌) показват дали KPI пресищат прагoвете (runtime 200/230 ms, warnings 0.5/1, CAP ratio 5%/15%).
+4. **Архив преди release или при ≥50 run-а:** `npm run archive:telemetry -- --label sprint01`.
+5. **Definition of Done:** следи `docs/analysis/metrics-summary.md` и `metrics-insights.md` да показват ≥3 поредни clean run-а, avg duration <200 ms, snapshot `New codes = none`.
+
+#### Metrics Insights Dashboard
+- Файл: `docs/analysis/metrics-insights.md` (генерира се чрез `npm run metrics:report -- --insights docs/analysis/metrics-insights.md`).
+- **Summary:** последният run, clean ratio, средни KPI с емоджи статус.
+- **KPI Trends:** таблица с Avg runtime, Avg warnings/run, CAP alerts ratio, Clean run ratio, Latest warnings.
+- **Alerts:** списък с активните прагови аларми; при липса остават ✅.
+- **Recommended Actions:** автоматични подсказки за CAP проблеми, бавни run-ове или повторяеми кодове (`top codes` списъка).
+- Използвай го като „оперативен dashboard“ между sprint retro и DoD проверки.
 
 ### Git hook (pre-push validate + metrics)
 1. Скрипт: `scripts/pre-push-validate.sh` приема средата `ARPG_GAME`, `ARPG_RUN_ID`, `ARPG_LIMIT` (по избор) и изпълнява `npm run validate:metrics -- --game <game> --run-id <tag> --auto-archive 50`.
