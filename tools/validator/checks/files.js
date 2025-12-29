@@ -1,6 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const { loadData, add } = require('../utils/io');
+/**
+ * @typedef {import('../../../dist/types').RuntimeState} RuntimeState
+ * @typedef {import('../../../dist/types').ExplorationLogEntry} ExplorationLogEntry
+ */
 
 function exists(p) {
   return fs.existsSync(p);
@@ -51,6 +55,7 @@ async function checkRequiredFiles(ctx) {
     }
   }
   if (exists(statePath)) {
+    /** @type {RuntimeState | null} */
     const state = loadData(statePath, issues);
     const explorationEnabled = state && (state.exploration_enabled === true || (state.exploration && state.exploration.enabled === true));
     const expl = path.join(base, 'player-data/runtime/exploration-log.json');
@@ -65,6 +70,7 @@ async function checkRequiredFiles(ctx) {
       );
     }
     if (exists(expl)) {
+      /** @type {ExplorationLogEntry[] | null} */
       const explData = loadData(expl, issues);
       if (explData && !Array.isArray(explData)) {
         add(issues, 'WARN', 'FILE-TYPE', 'player-data/runtime/exploration-log.json', 'Exploration log should be an array', 'Use [] or array of entries');

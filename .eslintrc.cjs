@@ -3,6 +3,7 @@ module.exports = {
   env: {
     es2021: true,
     node: true,
+    commonjs: true,
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -20,5 +21,7 @@ module.exports = {
   ],
   rules: {
     '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/no-require-imports': 'off',
   },
 };

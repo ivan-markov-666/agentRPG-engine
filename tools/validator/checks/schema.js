@@ -1,6 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const { validateFileWithSchema } = require('../utils/schema');
+/**
+ * @typedef {import('../../../dist/types').RuntimeState} RuntimeState
+ */
 
 function isExplorationEnabled(base, loadJson) {
   const statePath = path.join(base, 'player-data/runtime/state.json');
@@ -9,6 +12,7 @@ function isExplorationEnabled(base, loadJson) {
     const loader = typeof loadJson === 'function'
       ? loadJson
       : (filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    /** @type {RuntimeState | null} */
     const state = loader(statePath);
     if (!state || typeof state !== 'object') return false;
     return state.exploration_enabled === true || (state.exploration && state.exploration.enabled === true);

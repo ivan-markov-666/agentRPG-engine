@@ -1,9 +1,15 @@
+/* eslint-disable import/no-commonjs */
 const fs = require('fs');
 const path = require('path');
 const { loadData, add } = require('../utils/io');
 
 const XP_RANGE = { min: 50, max: 1000 };
 const GOLD_RANGE = { min: 25, max: 500 };
+/**
+ * @typedef {import('../../../dist/types').QuestDefinition} QuestDefinition
+ * @typedef {import('../../../dist/types').UnlockTrigger} UnlockTrigger
+ */
+
 const areaContentCache = new Map();
 
 function clearAreaCache() {
@@ -24,7 +30,7 @@ function getAreaContent(base, areaId) {
     const content = fs.readFileSync(filePath, 'utf8');
     areaContentCache.set(cacheKey, content);
     return content;
-  } catch (e) {
+  } catch (_err) {
     areaContentCache.set(cacheKey, null);
     return null;
   }
@@ -71,7 +77,7 @@ function parseScenarioIndexQuests(base) {
       questIds.push(match[1]);
     }
     return questIds;
-  } catch (err) {
+  } catch (_err) {
     return null;
   }
 }
@@ -143,13 +149,11 @@ async function checkQuests(ctx) {
   }
   const explorationPath = path.join(base, 'player-data/runtime/exploration-log.json');
   const hasExplorationLog = fs.existsSync(explorationPath);
-  let explorationEntries = [];
   const explorationByArea = new Map();
   const explorationQuestTags = new Map();
   if (hasExplorationLog) {
     const logData = loadData(explorationPath, issues);
     if (Array.isArray(logData)) {
-      explorationEntries = logData;
       logData.forEach((entry) => {
         if (!entry || typeof entry !== 'object') return;
         const areaId = typeof entry.area_id === 'string' ? entry.area_id.trim() : null;
