@@ -502,7 +502,7 @@ The militia prepares a final push to reclaim the watchtower before rival faction
     try {
       require.resolve('yaml');
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   })();

@@ -1,6 +1,6 @@
 # ST-011 — Engine Core Type Definitions
 
-_Status: ready-for-dev_
+_Status: in-progress_
 
 ## Story Overview
 Като архитект искам общи TypeScript типове за scenario, state и capabilities контрактите, за да гарантирам, че всички слоеве (validator, engine runtime, tooling) използват еднакви структури.
@@ -24,4 +24,4 @@ _Status: ready-for-dev_
 _(pending)_
 
 ## Status
-ready-for-dev
+in-progress
