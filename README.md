@@ -24,11 +24,32 @@
       npm run validate -- --path "games/$game" --json reports/last.json --append --snapshot reports/last.json --strict --summary
     }
     ```
+    ```powershell
+    function arpg-validate {
+      param([string]$game = "demo")
+      npm run validate -- --path "games/$game" --json reports/last.json --append --snapshot reports/last.json --strict --summary
+    }
+    ```
 
-### Exploration log helper (CLI)
-- Скрипт: `npm run exploration:add -- --title "..." [--game demo] [--type dungeon] [--area area-id] [--origin player-request|gm-suggested] [--desc "..."] [--tags tag1,tag2] [--preview-limit 5] [--preview-mode newest|append]`.
-- Валидира типа срещу guardrails (city/landmark/dungeon/poi автоматично изискват `--area`) и проверява дали целевата area markdown съществува.
-- Ако описанието е твърде кратко (<60 символа) добавя подсказки, за да мине `EXPLORATION-DESCRIPTION-SHORT`. Ако не подадеш tags → добавя placeholder/автотагове (по тип + `area:<id>`) за минимум 1 таг. Скриптът поддържа до 10 уникални тага и обновява `state.exploration_log_preview`, като `--preview-limit` и `--preview-mode` контролират подредбата (по подразбиране newest, алтернатива append).
+- - ### Exploration log helper (CLI)
+- Скрипт: `npm run exploration:add -- --title "..." [--game demo] [--type area|quest|event] [--area area-id] [--quest quest-id] [--origin player-request|gm-suggested] [--desc "..."] [--tags tag1,tag2] [--notes "..."] [--preview-limit 5] [--preview-mode newest|append]`.
+- Валидира типа срещу guardrails (`area` изисква `--area`, `quest` изисква `--quest`) и проверява дали целевата area/quest markdown съществува.
+- Ако описанието е твърде кратко (<60 символа) добавя подсказки, за да мине `EXPLORATION-DESCRIPTION-SHORT`. Ако не подадеш tags → добавя placeholder/автотагове (по тип + `area:<id>`/`quest:<id>`) за минимум 1 таг. Скриптът поддържа до 10 уникални тага и обновява `state.exploration_log_preview`, като `--preview-limit` и `--preview-mode` контролират подредбата (по подразбиране newest, алтернатива append).
+- Активиране: в `player-data/runtime/state.json` задай `exploration_enabled: true` (или `exploration.enabled: true`) и поддържай `player-data/runtime/exploration-log.json` валиден спрямо schema. При активиран режим липсващ лог или schema нарушения водят до `ERROR`.
+- Пример entry:
+  ```json
+  {
+    "id": "training-spur",
+    "title": "Training Grounds Recon",
+    "type": "area",
+    "area_id": "training-grounds",
+    "added_at": "2025-12-22T21:27:12.100Z",
+    "origin": "gm-suggested",
+    "tags": ["scouting", "quest:main-quest-01"],
+    "description": "Sergeant Isla highlighted the wolf incursion vectors and marked hotspots tied to sabotage rumors.",
+    "notes": "Add this entry to exploration_log_preview for quick recap."
+  }
+  ```
 
 ### Quest helper (CLI)
 - Скрипт: `npm run quest:add -- --title "..." [--id quest-slug] [--summary "..."] [--story "..."] [--hooks "Hook A|Hook B"] [--encounters "Fight|Puzzle"] [--steps "Step A|Step B"] [--rewards "500 XP|Rare loot"] [--notes "NPC: ...|Consequence: ..."] [--outcome "Success hook|Faction change"] [--aftermath "Follow-up hook|World change"] [--outcome-hooks "Hook1|Hook2"] [--conditions "Prereq|Timer"] [--fail "Outcome|Consequence"] [--areas "default-area|training-grounds"] [--game demo]`.

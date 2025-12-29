@@ -55,7 +55,14 @@ async function checkRequiredFiles(ctx) {
     const explorationEnabled = state && (state.exploration_enabled === true || (state.exploration && state.exploration.enabled === true));
     const expl = path.join(base, 'player-data/runtime/exploration-log.json');
     if (explorationEnabled && !exists(expl)) {
-      add(issues, 'WARN', 'FILE-MISSING-OPTIONAL', 'player-data/runtime/exploration-log.json', 'Exploration log missing (required if exploration is enabled)', 'Create empty [] if exploration is enabled');
+      add(
+        issues,
+        'ERROR',
+        'EXPLORATION-LOG-MISSING',
+        'player-data/runtime/exploration-log.json',
+        'Exploration log missing (required when exploration is enabled)',
+        'Create player-data/runtime/exploration-log.json (use [] or array of entries)'
+      );
     }
     if (exists(expl)) {
       const explData = loadData(expl, issues);

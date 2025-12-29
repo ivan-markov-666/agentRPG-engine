@@ -27,7 +27,8 @@ function getAjv(issues) {
   }
 }
 
-function validateFileWithSchema(base, relFile, schemaPath, codePrefix, issues) {
+function validateFileWithSchema(base, relFile, schemaPath, codePrefix, issues, options = {}) {
+  const { level = 'WARN' } = options;
   const filePath = path.join(base, relFile);
   if (!fs.existsSync(filePath)) return;
   const data = loadData(filePath, issues);
@@ -41,7 +42,7 @@ function validateFileWithSchema(base, relFile, schemaPath, codePrefix, issues) {
   if (!ok && Array.isArray(validate.errors)) {
     validate.errors.forEach((err) => {
       const msg = `${err.instancePath || '/'} ${err.message || ''}`.trim();
-      add(issues, 'WARN', `${codePrefix}-SCHEMA`, relFile, msg, 'Adjust to schema');
+      add(issues, level, `${codePrefix}-SCHEMA`, relFile, msg, 'Adjust to schema');
     });
   }
 }

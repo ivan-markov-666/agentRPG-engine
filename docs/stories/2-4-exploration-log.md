@@ -1,6 +1,6 @@
 # ST-008 — Exploration Logging Enforcement
 
-_Status: ready-for-dev_
+_Status: in-progress_
 
 ## Story Overview
 Като дизайнер и QA искам валидиран exploration log (когато е активиран), за да гарантирам, че всяка explorative сесия има структуриран запис, който validator може да анализира.
@@ -24,4 +24,4 @@ _Status: ready-for-dev_
 _(pending)_
 
 ## Status
-ready-for-dev
+in-progress
