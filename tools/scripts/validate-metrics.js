@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const { spawnSync } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 function parseArgs(argv) {
   const args = {
@@ -79,7 +80,7 @@ function getHistoryEntries(historyPath) {
     if (Array.isArray(parsed)) return parsed.length;
     if (parsed && typeof parsed === 'object') return 1;
     return 0;
-  } catch (e) {
+  } catch {
     return 0;
   }
 }
@@ -87,7 +88,7 @@ function getHistoryEntries(historyPath) {
 function main() {
   const args = parseArgs(process.argv);
   const root = path.resolve(__dirname, '..', '..');
-  const validatorPath = path.join(root, 'tools', 'validator', 'index.js');
+  const validatorPath = path.join(root, 'dist', 'cli', 'validate.js');
   const metricsPath = path.join(root, 'tools', 'metrics', 'report.js');
   const archivePath = path.join(root, 'tools', 'archive-telemetry.js');
   const logPath = path.resolve(root, 'docs', 'analysis', 'reports', 'telemetry-history.json');

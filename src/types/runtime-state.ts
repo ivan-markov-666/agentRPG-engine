@@ -84,5 +84,9 @@ export interface RuntimeState {
   inventories?: Inventory[];
   exploration_enabled?: boolean;
   exploration_log_preview?: string[];
+  exploration?: {
+    enabled?: boolean;
+    [key: string]: unknown;
+  };
   [key: string]: unknown;
 }
