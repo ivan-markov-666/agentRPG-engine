@@ -4,11 +4,12 @@ const path = require('path');
 const assert = require('assert');
 const { spawnSync } = require('child_process');
 
-const { checkCapabilities } = require('../checks/capabilities');
-const { checkQuests } = require('../checks/quests');
-const { checkAreas } = require('../checks/areas');
-const { checkRequiredFiles } = require('../checks/files');
-const { checkSchemas } = require('../checks/schema');
+const distValidatorRoot = path.resolve(__dirname, '../../dist/validator');
+const { checkCapabilities } = require(path.join(distValidatorRoot, 'checks', 'capabilities.js'));
+const { checkQuests } = require(path.join(distValidatorRoot, 'checks', 'quests.js'));
+const { checkAreas } = require(path.join(distValidatorRoot, 'checks', 'areas.js'));
+const { checkRequiredFiles } = require(path.join(distValidatorRoot, 'checks', 'files.js'));
+const { checkSchemas } = require(path.join(distValidatorRoot, 'checks', 'schema.js'));
 
 function setupGame(files) {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'validator-test-'));
