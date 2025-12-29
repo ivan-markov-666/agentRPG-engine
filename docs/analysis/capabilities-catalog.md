@@ -23,7 +23,7 @@
 }
 ```
 
-### Примерна структура в `player-data/runtime/state.json` (stats)
+### Примерна структура в `player-data/runtime/state.json` (stats + schema)
 ```json
 {
   "stats": {
@@ -40,10 +40,15 @@
     },
     "currency": {
       "gold": 120
+    },
+    "status_effects": {
+      "poison": {"stack": 0}
     }
   }
 }
 ```
+
+> Подробният контракт е описан в [`tools/validator/schemas/state.schema.json`]. Validator-ът използва Ajv и ще връща `STATE-SCHEMA` предупреждения, ако `player-data/runtime/state.json` има отрицателни стойности, липсващи ключове или невалидни inventories/flags.
 
 ### Диапазони / насоки (примерни, описани в engine docs)
 - health: min 0; при `<=0` герой приключва (load/restart логика зависи от играта).
@@ -54,7 +59,12 @@
 - hunger/thirst: min 0; max по избор (напр. 100). При threshold (напр. <10) → penalties/DoT по избор на играта.
 - reputation: per faction, диапазон по избор (например [-100..100]).
 - currency: без горен лимит (граници по избор).
-- Допълнителни примерни ключове: `mana_regen`, `stamina_regen`, `armor`, `magic_resist`, `stealth`, `perception`.
+- Допълнителни примерни ключове: `mana_regен`, `stamina_regен`, `armor`, `magic_resist`, `stealth`, `perception`.
+
+### Inventories, flags и exploration
+- `flags`: map от `string -> boolean/number/string`, използван за глобални story тригери. Пример: `"flags": {"tutorial_complete": true, "favor_tokens": 2}`.
+- `inventories`: масив от обекти `{ id, name?, slots?, items[] }`, всеки item е `{ item_id, qty >= 0, title?, meta? }`. Използвай `slots.used/max`, за да дадеш guardrails за капацитета.
+- `exploration_enabled` и `exploration_log_preview` остават част от state файла; schema гарантира, че preview е масив от string ID-та.
 
 ### Още пример за `config/capabilities.json` (entries с диапазони)
 ```json

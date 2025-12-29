@@ -26,6 +26,14 @@
   Конзолата ще покаже `[INFO][SNAPSHOT] New codes: ... | Resolved: ...`
 - Локален “pre-release” чек (без CI): `npm run validate -- --path games/demo --json reports/last.json --append --snapshot reports/last.json --strict --summary`
 
+### State schema контрол
+- `player-data/runtime/state.json` се валидира срещу [`tools/validator/schemas/state.schema.json`]. Schema-та описва очакваните полета (`stats`, `flags`, `inventories`, `exploration_*`) и налага неотрицателни стойности, валидни `status_effects` stack-ове и структури за инвентари.
+- Нарушенията се маркират като `STATE-SCHEMA` предупреждения/грешки. Примери:
+  - `[/current_day] must be >= 0`
+  - `[/inventories/0/items/0/qty] must be >= 0`
+  - `[/stats/status_effects/poison/stack] must be >= 0`
+- Добави нови ключове чрез `genericStat` секцията на schema файла или разшири `definitions`, за да избегнеш `STATE-SCHEMA` нарушения.
+
 ### Бързи alias-и (по избор)
 - PowerShell (добави в `$PROFILE`):
   ```powershell

@@ -132,6 +132,85 @@ async function runCheck(checkFn, files) {
     assert(issues.some((i) => i.code === 'STATE-SCHEMA'), 'Expected STATE-SCHEMA for nested negative stat');
   }
 
+  // STATE-SCHEMA valid runtime state with inventories/flags
+  {
+    const base = setupGame({
+      'player-data/runtime/state.json': {
+        current_area_id: 'default-area',
+        current_day: 2,
+        current_hour: 14,
+        active_quests: [
+          {
+            quest_id: 'quest-1',
+            status: 'active',
+            progress: 0.5,
+            current_step_id: 'step-1',
+            flags: { rescued: true }
+          }
+        ],
+        stats: {
+          health: 50,
+          energy: 30,
+          mana: 10,
+          stamina: 40,
+          hunger: 15,
+          thirst: 5,
+          morale: 70,
+          reputation: { guild: 10, mages: -5 },
+          currency: { gold: 200, gems: { type: 'shard', value: 2 } },
+          status_effects: { burning: { stack: 0 } },
+          armor: 5
+        },
+        flags: {
+          tutorial_complete: true,
+          favor_tokens: 2
+        },
+        inventories: [
+          {
+            id: 'backpack',
+            name: 'Backpack',
+            slots: { used: 1, max: 10 },
+            items: [
+              { item_id: 'potion', title: 'Health Potion', qty: 2, meta: { rarity: 'common' } },
+              { item_id: 'bandage', title: 'Bandage', qty: 3 }
+            ]
+          }
+        ],
+        exploration_enabled: true,
+        exploration_log_preview: ['village-square']
+      }
+    });
+    const issues = [];
+    const ctx = { base, loadJson, issues };
+    await checkSchemas(ctx);
+    assert(!issues.some((i) => i.code === 'STATE-SCHEMA'), 'Valid runtime state should not trigger STATE-SCHEMA');
+  }
+
+  // STATE-SCHEMA invalid runtime state (negative values, bad inventory)
+  {
+    const base = setupGame({
+      'player-data/runtime/state.json': {
+        current_day: -1,
+        current_hour: 30,
+        stats: {
+          health: -10,
+          status_effects: { poison: { stack: -1 } }
+        },
+        inventories: [
+          {
+            id: 'bag',
+            items: [{ item_id: 'corrupted', qty: -3 }]
+          }
+        ],
+        exploration_log_preview: ['village-square']
+      }
+    });
+    const issues = [];
+    const ctx = { base, loadJson, issues };
+    await checkSchemas(ctx);
+    assert(issues.some((i) => i.code === 'STATE-SCHEMA'), 'Invalid runtime state should trigger STATE-SCHEMA');
+  }
+
   // EXPLORATION-SCHEMA guardrail
   {
     const base = setupGame({
