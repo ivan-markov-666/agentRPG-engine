@@ -58,7 +58,7 @@ _Last updated: 2025-12-28_
 - **Scripting:** PowerShell/Bash helpers (`scripts/run-id.*`, архивиране).
 - **Documentation:** Markdown каталози в `docs/analysis`, `docs/architecture`, `docs/stories`.
 - **TypeScript Strategy (EP-004):**
-  1. **Tooling Bootstrap (ST-010):** Въвеждаме `tsconfig.json`, `tsconfig.build.json`, ESLint с TS поддръжка, `npm run build:ts` и shared типове в `src/types/`.
+  1. **Tooling Bootstrap (ST-010):** Въведени са `tsconfig.json` (strict, Node16, alias `@types/*`), `tsconfig.build.json` (declaration/source maps към `dist/`), ESLint + Prettier конфигурации и npm скриптове `typecheck`, `build:ts`, `lint:ts`. Shared типове живеят в `src/types/` и се експортират чрез barrel `src/types/index.ts`.
   2. **Core Type Definitions (ST-011):** Типовете `CapabilityRanges`, `RuntimeState`, `QuestDefinition`, `UnlockTrigger`, `ExplorationLogEntry` се поддържат от един източник и се експортират към validator/CLI.
   3. **Validator CLI Migration (ST-012):** CLI логиката преминава към TS (`src/cli/validate.ts` → `dist/cli/validate.js`), за да използва строгите типове и да гарантира безопасни DoD run-ове.
   4. **Adoption Flow:** JS файловете се мигрират story по story; сборният TS build остава задължителен gate преди release. Документацията описва как да се добавят нови типове при промени в schema.
