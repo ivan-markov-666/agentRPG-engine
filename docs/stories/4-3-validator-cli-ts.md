@@ -1,6 +1,6 @@
 # ST-012 — Validator CLI Migration to TypeScript
 
-_Status: review_
+_Status: done_
 
 ## Story Overview
 Като dev team искам validator CLI модулът да бъде пренаписан в TypeScript, за да използва споделените типове и да разполагаме с по-силен статичен анализ преди DoD run-ове.
@@ -31,4 +31,4 @@ _Status: review_
 - `docs/stories/4-3-validator-cli-ts.md`: този файл (статус + лога).
 
 ## Status
-ready-for-dev
+done

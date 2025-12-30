@@ -40,7 +40,7 @@
         "stamina": { "$ref": "#/definitions/range0100" },
         "hunger": { "$ref": "#/definitions/range0100" },
         "thirst": { "$ref": "#/definitions/range0100" },
-        "morale": { "$ref": "#/definitions/range0100" },
+        "morale": { "$ref": "#/definitions/rangeNeg100100" },
         "reputation": { "$ref": "#/definitions/reputationMap" },
         "currency": { "$ref": "#/definitions/currencyMap" },
         "status_effects": { "$ref": "#/definitions/statusEffects" },
@@ -49,6 +49,7 @@
       "additionalProperties": { "$ref": "#/definitions/genericStat" }
     },
     "range0100": { "type": "number", "minimum": 0, "maximum": 100 },
+    "rangeNeg100100": { "type": "number", "minimum": -100, "maximum": 100 },
     "reputationMap": {
       "type": "object",
       "additionalProperties": { "type": "number", "minimum": -100, "maximum": 100 }

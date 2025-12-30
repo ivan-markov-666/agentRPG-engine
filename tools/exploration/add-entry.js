@@ -2,9 +2,22 @@
 const fs = require('fs');
 const path = require('path');
 
-const TYPES_REQUIRING_AREA = new Set(['city', 'landmark', 'dungeon', 'poi']);
-const ALLOWED_TYPES = new Set(['city', 'landmark', 'dungeon', 'mcp', 'side-quest-hook', 'poi']);
+const SCHEMA_TYPES = new Set(['area', 'quest', 'event']);
+const LEGACY_TYPES = new Set(['city', 'landmark', 'dungeon', 'mcp', 'side-quest-hook', 'poi']);
+const LEGACY_TYPE_TO_SCHEMA_TYPE = {
+  city: 'area',
+  landmark: 'area',
+  dungeon: 'area',
+  poi: 'area',
+  mcp: 'event',
+  'side-quest-hook': 'event',
+};
+const TYPES_REQUIRING_AREA = new Set(['area']);
+const ALLOWED_TYPES = new Set([...Array.from(SCHEMA_TYPES), ...Array.from(LEGACY_TYPES)]);
 const TYPE_AUTO_TAGS = {
+  area: ['area'],
+  quest: ['quest'],
+  event: ['event'],
   city: ['city'],
   landmark: ['landmark'],
   dungeon: ['dungeon'],
@@ -17,8 +30,9 @@ function parseArgs(argv) {
   const args = {
     game: 'demo',
     title: null,
-    type: 'poi',
+    type: 'event',
     area: null,
+    quest: null,
     origin: 'player-request',
     desc: null,
     tags: [],
@@ -43,6 +57,9 @@ function parseArgs(argv) {
         break;
       case '--area':
         if (next) args.area = next;
+        break;
+      case '--quest':
+        if (next) args.quest = next;
         break;
       case '--origin':
         if (next) args.origin = next;
@@ -109,11 +126,23 @@ function writeJson(filePath, data) {
 function main() {
   const args = parseArgs(process.argv);
   if (!args.title) {
-    console.error('Usage: npm run exploration:add -- --title "..." [--game demo] [--type dungeon] [--area id] [--origin player-request|gm-suggested] [--desc "..."] [--tags tag1,tag2]');
+    console.error(
+      'Usage: npm run exploration:add -- --title "..." [--game demo] [--type area|quest|event] [--area <area-id>] [--quest <quest-id>] [--origin player-request|gm-suggested] [--desc "..."] [--tags tag1,tag2]',
+    );
+    process.exit(1);
+  }
+  if (String(args.title).trim().length < 3) {
+    console.error('[ERROR] --title must be at least 3 characters.');
     process.exit(1);
   }
   if (!ALLOWED_TYPES.has(args.type)) {
     console.error(`[ERROR] Unsupported exploration type '${args.type}'. Allowed: ${Array.from(ALLOWED_TYPES).join(', ')}`);
+    process.exit(1);
+  }
+
+  const schemaType = LEGACY_TYPE_TO_SCHEMA_TYPE[args.type] || args.type;
+  if (!SCHEMA_TYPES.has(schemaType)) {
+    console.error(`[ERROR] Unsupported schema exploration type '${schemaType}'. Allowed: ${Array.from(SCHEMA_TYPES).join(', ')}`);
     process.exit(1);
   }
   const gameBase = path.join(__dirname, '..', '..', 'games', args.game);
@@ -123,8 +152,12 @@ function main() {
   }
   const logPath = path.join(gameBase, 'player-data', 'runtime', 'exploration-log.json');
   const statePath = path.join(gameBase, 'player-data', 'runtime', 'state.json');
-  if (TYPES_REQUIRING_AREA.has(args.type) && !args.area) {
-    console.error(`[ERROR] Exploration type '${args.type}' requires --area <area-id> to satisfy guardrails.`);
+  if (TYPES_REQUIRING_AREA.has(schemaType) && !args.area) {
+    console.error(`[ERROR] Exploration type '${schemaType}' requires --area <area-id> to satisfy guardrails.`);
+    process.exit(1);
+  }
+  if (schemaType === 'quest' && !args.quest) {
+    console.error('[ERROR] Exploration type \'quest\' requires --quest <quest-id>.');
     process.exit(1);
   }
   if (args.area) {
@@ -132,6 +165,14 @@ function main() {
     if (!fs.existsSync(areaFile)) {
       console.error(`[ERROR] Area markdown not found for area_id '${args.area}'. Expected file: ${areaFile}`);
       console.error('Create the area file or omit --area until it exists.');
+      process.exit(1);
+    }
+  }
+  if (args.quest) {
+    const questFile = path.join(gameBase, 'scenario', 'quests', `${args.quest}.md`);
+    if (!fs.existsSync(questFile)) {
+      console.error(`[ERROR] Quest markdown not found for quest_id '${args.quest}'. Expected file: ${questFile}`);
+      console.error('Create the quest file or omit --quest until it exists.');
       process.exit(1);
     }
   }
@@ -152,23 +193,31 @@ function main() {
   const entry = {
     id: entryId,
     title: args.title,
-    type: args.type,
+    type: schemaType,
     added_at: new Date().toISOString(),
     origin: args.origin === 'gm-suggested' ? 'gm-suggested' : 'player-request',
     description,
   };
   if (args.area) entry.area_id = args.area;
+  if (args.quest) entry.quest_id = args.quest;
   const providedTags = (args.tags || []).filter(Boolean);
   const autoTagSet = new Set(providedTags);
-  const typeTagList = TYPE_AUTO_TAGS[args.type] || [];
+  const typeTagList = TYPE_AUTO_TAGS[args.type] || TYPE_AUTO_TAGS[schemaType] || [];
   typeTagList.forEach((tag) => autoTagSet.add(tag));
   if (args.area) {
     autoTagSet.add(`area:${args.area}`);
   }
+  if (args.quest) {
+    autoTagSet.add(`quest:${args.quest}`);
+  }
   if (autoTagSet.size === 0) {
     autoTagSet.add('hook');
   }
-  entry.tags = Array.from(autoTagSet).slice(0, 10);
+  const safeTags = Array.from(autoTagSet)
+    .map((t) => String(t).trim())
+    .filter((t) => t.length >= 2 && t.length <= 32);
+  if (safeTags.length === 0) safeTags.push('hook');
+  entry.tags = safeTags.slice(0, 10);
 
   logData.push(entry);
   writeJson(logPath, logData);

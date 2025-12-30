@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { add, loadData } from '../utils/io';
+import { resolveScenarioIndex } from '../utils/manifest';
 import type { BasicContext } from '../context';
 import type { ExplorationLogEntry } from '../../types/exploration-log';
 
@@ -63,8 +64,8 @@ function isIsoDateString(value: unknown): boolean {
   return Number.isFinite(parsed);
 }
 
-function parseScenarioIndexQuests(base: string): string[] | null {
-  const indexPath = path.join(base, 'scenario/index.md');
+function parseScenarioIndexQuests(base: string, scenarioIndex: string): string[] | null {
+  const indexPath = path.join(base, scenarioIndex);
   if (!fs.existsSync(indexPath)) return null;
   try {
     const content = fs.readFileSync(indexPath, 'utf8');
@@ -95,6 +96,8 @@ type UnlockConfig = Record<string, string | string[]>;
 export async function checkQuests(ctx: BasicContext): Promise<void> {
   const { base, issues } = ctx;
   clearAreaCache();
+
+  const scenarioIndex = resolveScenarioIndex(base, issues);
 
   const availablePath = path.join(base, 'scenario/quests/available.json');
   if (!fs.existsSync(availablePath)) return;
@@ -214,17 +217,17 @@ export async function checkQuests(ctx: BasicContext): Promise<void> {
   const titleMap = new Map<string, string>();
   const availableIds = new Set<string>();
 
-  const indexQuestEntries = parseScenarioIndexQuests(base);
-  const indexQuestSet = new Set(indexQuestEntries || []);
-  if (indexQuestEntries && indexQuestEntries.length) {
+  const indexQuests = parseScenarioIndexQuests(base, scenarioIndex);
+  const indexQuestSet = new Set(indexQuests || []);
+  if (indexQuests && indexQuests.length) {
     const seenIndexQuests = new Set<string>();
-    indexQuestEntries.forEach((questId) => {
+    indexQuests.forEach((questId) => {
       if (seenIndexQuests.has(questId)) {
         add(
           issues,
           'WARN',
           'INDEX-QUEST-DUPLICATE',
-          'scenario/index.md',
+          scenarioIndex,
           `Quest '${questId}' is listed multiple times`,
           'Keep single row per quest in quest table',
         );
@@ -292,12 +295,12 @@ export async function checkQuests(ctx: BasicContext): Promise<void> {
     } else {
       titleMap.set(title, quest_id);
     }
-    if (indexQuestEntries && indexQuestEntries.length && !indexQuestSet.has(quest_id)) {
+    if (indexQuests && indexQuests.length && !indexQuestSet.has(quest_id)) {
       add(
         issues,
         'WARN',
         'INDEX-QUEST-MISSING',
-        'scenario/index.md',
+        scenarioIndex,
         `Quest '${quest_id}' missing from scenario index quest table`,
         'Run scenario:index or add row under "Quest Overview" table',
       );
@@ -470,14 +473,14 @@ export async function checkQuests(ctx: BasicContext): Promise<void> {
     }
   }
 
-  if (indexQuestEntries && indexQuestEntries.length) {
-    indexQuestEntries.forEach((questId) => {
+  if (indexQuests && indexQuests.length) {
+    indexQuests.forEach((questId) => {
       if (!availableIds.has(questId)) {
         add(
           issues,
           'WARN',
           'INDEX-QUEST-UNKNOWN',
-          'scenario/index.md',
+          scenarioIndex,
           `Scenario index references quest '${questId}' not found in available.json`,
           'Remove obsolete row or add quest to available.json',
         );

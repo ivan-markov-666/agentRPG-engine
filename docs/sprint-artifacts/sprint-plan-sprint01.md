@@ -1,6 +1,6 @@
 # Sprint Plan — Sprint 01 (Validator Reliability)
 
-_Last updated: 2025-12-28_
+_Last updated: 2025-12-30_
 
 ## 1. Sprint Goal
 Да засилим валидатора и наблюдаемостта така, че DoD да е автоматизирано проследим и guardrails за capabilities/state да са enforce-нати.
@@ -8,9 +8,9 @@ _Last updated: 2025-12-28_
 ## 2. Backlog Slice
 | Story | Description | Owner | Status |
 |-------|-------------|-------|--------|
-| ST-001 | Validator DoD CLI Enhancements | Dev | TODO |
-| ST-002 | Capabilities Guardrails Schema | Dev | TODO |
-| ST-003 | Metrics Automation Script | Dev/QA | TODO |
+| ST-001 | Validator DoD CLI Enhancements | Dev | done |
+| ST-002 | Capabilities Guardrails Schema | Dev | done |
+| ST-003 | Metrics Automation Script | Dev/QA | done |
 
 ## 3. Tasks & Dependencies
 - ST-001

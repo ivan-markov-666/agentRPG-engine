@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { add, loadData } from '../utils/io';
+import { resolveCapabilitiesFile } from '../utils/manifest';
 import type { Issue } from '../types';
 import type { RuntimeState } from '../../types/runtime-state';
 
@@ -32,20 +33,10 @@ interface ValidateRuntimeContext {
 
 export async function checkCapabilities(ctx: CheckContext): Promise<void> {
   const { base, issues } = ctx;
-  const candidates = ['config/capabilities.json', 'config/capabilities.yaml', 'config/capabilities.yml'];
-  let capFileRel: string | null = null;
-  let capPath: string | null = null;
-
-  for (const rel of candidates) {
-    const abs = path.join(base, rel);
-    if (fs.existsSync(abs)) {
-      capFileRel = rel;
-      capPath = abs;
-      break;
-    }
-  }
-
-  if (!capPath || !capFileRel) return;
+  const capFileRel = resolveCapabilitiesFile(base, issues);
+  if (!capFileRel) return;
+  const capPath = path.join(base, capFileRel);
+  if (!fs.existsSync(capPath)) return;
 
   const capsRaw = loadData(capPath, issues);
   if (!capsRaw || typeof capsRaw !== 'object') return;

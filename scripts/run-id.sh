@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-run_id() {
-  local persona="${1:-dev}"
-  local include_branch="${2:-false}"
-  local stamp
-  stamp="$(date +%Y%m%d-%H%M%S)"
-  if [[ "$include_branch" == "true" || "$include_branch" == "1" ]]; then
-    local branch
-    branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" || branch="no-git"
-    [[ -z "$branch" ]] && branch="unknown-branch"
-    printf "%s-%s-%s\n" "$persona" "$branch" "$stamp"
-  else
-    printf "%s-%s\n" "$persona" "$stamp"
-  fi
-}
+TOOLS_RUN_ID_SH="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/../tools/scripts/run-id.sh"
 
-export -f run_id
+if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
+  # shellcheck source=/dev/null
+  source "$TOOLS_RUN_ID_SH"
+  run_id() {
+    local prefix="${1:-dev}"
+    run_id_generate "$prefix"
+  }
+  export -f run_id
+  return 0
+fi
+
+bash "$TOOLS_RUN_ID_SH" "$@"

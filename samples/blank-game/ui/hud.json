@@ -1,0 +1,9 @@
+{
+  "schema_version": "ui.hud.v1",
+  "bars": {
+    "health": { "current": 50, "max": 100 },
+    "energy": { "current": 50, "max": 100 },
+    "mana": { "current": 0, "max": 100 }
+  },
+  "currency": { "gold": 50 }
+}

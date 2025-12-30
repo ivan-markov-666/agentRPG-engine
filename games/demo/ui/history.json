@@ -1,0 +1,6 @@
+{
+  "schema_version": "ui.history.v1",
+  "limit": 20,
+  "full_history_file": "player-data/runtime/history.full.jsonl",
+  "events": []
+}

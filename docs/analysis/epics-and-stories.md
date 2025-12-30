@@ -12,6 +12,8 @@ _Last updated: 2025-12-28_
 | EP-002 | Capabilities & Scenario Guardrails | Строги схеми и контракт валидации за capabilities, state и quests. | ST-002, ST-006, ST-007, ST-008 |
 | EP-003 | Observability & Metrics Automation | Пълна проследимост на метриките и telemetry архивиране. | ST-003, ST-009 |
 | EP-004 | TypeScript Migration & Tooling | Прехвърляне на core engine и validator към TypeScript с типови договори. | ST-010, ST-011, ST-012 |
+| EP-005 | Runtime Contracts & MVP Closure | File-first runtime contracts + schemas + minimal runtime loader + MVP gap closure. | ST-013, ST-014, ST-015, ST-016, ST-017, ST-018, ST-019, ST-020, ST-021 |
+| EP-006 | Content Tooling & Workflow Glue (MVP) | Official helper tools (README) за authoring/pipelines + repeatable local DoD workflow glue. | ST-022, ST-023, ST-024, ST-025, ST-026, ST-027, ST-028, ST-029, ST-030 |
 
 ## Story Breakdown
 ### EP-001 — Validator Reliability & CLI DoD
@@ -33,6 +35,28 @@ _Last updated: 2025-12-28_
 1. **ST-010 TypeScript Tooling Bootstrap** — добавяне на TS конфигурация, build scripts, shared types пакет.
 2. **ST-011 Engine Core Type Definitions** — типизиране на core engine (scenario/state/capabilities contracts).
 3. **ST-012 Validator CLI Migration to TS** — пренаписване на CLI entrypoints и тестове в TS, интеграция с AJV types.
+
+### EP-005 — Runtime Contracts & MVP Closure
+1. **ST-013 Runtime UI + Saves/History Contracts** — runtime pointers в manifest + schema/валидатор за ui/* и saves/history.
+2. **ST-014 Host Adapter Contract (runtime)** — HostAdapter + LocalFsHostAdapter + runtime loader smoke test.
+3. **ST-015 Session Init Contract (language + debug)** — schema/тип + validator schema check.
+4. **ST-016 Auto-remedy Tooling (init + scaffolds)** — exploration:init и quest:scaffold.
+5. **ST-017 Save File Contract + Minimal Load Support** — schema за save file + validator + minimal load.
+6. **ST-018 Completed Quests Contract (schema + validation)** — schema + по-строги проверки.
+7. **ST-019 Manifest Entry Contract (schema + engine compatibility)** — manifest schema + engine_layers/compat.
+8. **ST-020 World Frame Contract (scenario/world)** — world frame файл + validator checks.
+9. **ST-021 Orphan Auto-remedy (quests/areas)** — remediation tooling за orphan state references.
+
+### EP-006 — Content Tooling & Workflow Glue (MVP)
+1. **ST-022 Quest Authoring Tool (quest:add)** — CLI за добавяне на quest markdown + sync на `available.json` / `unlock-triggers.json`.
+2. **ST-023 Area Authoring Tool (area:add)** — CLI scaffold за area markdown с guardrail-friendly placeholder-и.
+3. **ST-024 Scenario Index Generator (scenario:index)** — CLI за регенерация на `scenario/index.md` (quests/areas overview).
+4. **ST-025 Economy Rewards Report (economy:report)** — агрегиран rewards отчет (console + optional JSON).
+5. **ST-026 Telemetry Publish & Sync Tooling** — publish/copy + sync към централен staging (локално/S3) с dry-run.
+6. **ST-027 Validate + Metrics Wrapper (validate:metrics)** — validate + telemetry + metrics report + auto-archive.
+7. **ST-028 Pre-push Hook (validate + metrics)** — opt-in pre-push hook (sh/ps1) за DoD gate.
+8. **ST-029 Docs Alignment / MVP Docs Freeze** — синхронизация на MVP docs с реалния CLI/валидатор и drift почистване.
+9. **ST-030 Runtime CLI (load snapshot)** — официален CLI entrypoint `npm run runtime` за зареждане на runtime snapshot и консолен output.
 
 ## Status Legend
 - `ready-for-dev`: Story файлът е завършен и може да бъде стартиран чрез `dev-story`.

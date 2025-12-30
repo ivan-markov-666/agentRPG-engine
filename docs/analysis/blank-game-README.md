@@ -39,18 +39,20 @@
 Диапазоните са примерни; настрой ги според играта.
 ```json
 {
-  "health": {"enabled": true, "desc": "HP", "min": 0},
-  "energy": {"enabled": true, "desc": "Stamina", "min": 0},
-  "mana": {"enabled": true, "desc": "Magic energy", "min": 0, "max": 100},
-  "stamina": {"enabled": true, "desc": "Physical endurance", "min": 0, "max": 100},
-  "hunger": {"enabled": true, "desc": "Hunger level", "min": 0, "max": 100, "note": "below 10 -> penalties"},
-  "thirst": {"enabled": true, "desc": "Thirst level", "min": 0, "max": 100, "note": "below 10 -> penalties"},
-  "reputation": {"enabled": true, "desc": "Faction reps", "range": [-100, 100]},
-  "currency": {"enabled": true, "desc": "Gold", "min": 0},
-  "armor": {"enabled": true, "desc": "Physical damage reduction"},
-  "magic_resist": {"enabled": false, "desc": "Magical damage reduction"},
-  "stealth": {"enabled": true, "desc": "Sneak ability"},
-  "perception": {"enabled": true, "desc": "Detect hidden"}
+  "health": { "enabled": true, "desc": "HP", "min": 0, "max": 100 },
+  "energy": { "enabled": true, "desc": "Stamina", "min": 0, "max": 100 },
+  "mana": { "enabled": true, "desc": "Magic energy", "min": 0, "max": 100 },
+  "stamina": { "enabled": true, "desc": "Physical endurance", "min": 0, "max": 100 },
+  "hunger": { "enabled": true, "desc": "Hunger level", "min": 0, "max": 100 },
+  "thirst": { "enabled": true, "desc": "Thirst level", "min": 0, "max": 100 },
+  "reputation": { "enabled": true, "desc": "Faction reputation per group", "range": [-100, 100] },
+  "currency": { "enabled": true, "desc": "Gold", "min": 0 },
+  "morale": { "enabled": true, "desc": "Party morale", "min": -100, "max": 100 },
+  "armor": { "enabled": true, "desc": "Physical damage reduction", "min": 0, "max": 50 },
+  "stealth": { "enabled": true, "desc": "Sneak ability", "min": 0, "max": 100 },
+  "perception": { "enabled": true, "desc": "Detect hidden", "min": 0, "max": 100 },
+  "crit_chance": { "enabled": true, "desc": "Chance to crit", "min": 0, "max": 1 },
+  "crit_multiplier": { "enabled": true, "desc": "Critical damage multiplier", "min": 1, "max": 3 }
 }
 ```
 
@@ -58,23 +60,24 @@
 ```json
 {
   "stats": {
-    "health": 32,
-    "energy": 12,
+    "health": 50,
+    "energy": 50,
     "mana": 0,
-    "stamina": 18,
-    "morale": 50,
+    "stamina": 50,
+    "morale": 0,
     "hunger": 20,
-    "thirst": 10,
+    "thirst": 20,
     "reputation": {
-      "guild": 15,
-      "village": -5
+      "village": 0
     },
     "currency": {
-      "gold": 120
+      "gold": 50
     },
     "armor": 5,
     "stealth": 8,
-    "perception": 12
+    "perception": 12,
+    "crit_chance": 0.05,
+    "crit_multiplier": 1.5
   }
 }
 ```

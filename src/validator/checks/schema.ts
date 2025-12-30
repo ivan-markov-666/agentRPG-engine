@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { validateFileWithSchema } from '../utils/schema';
+import { resolveCapabilitiesFile } from '../utils/manifest';
 import type { Issue } from '../types';
 import type { ValidatorContext } from '../context';
 import type { RuntimeState } from '../../types/runtime-state';
@@ -32,19 +33,30 @@ export async function checkSchemas(ctx: ValidatorContext): Promise<void> {
   const { base, issues, loadJson } = ctx;
   const schemasDir = repoSchemasDir;
 
-  validateFileWithSchema(
-    base,
-    'config/capabilities.json',
-    path.join(schemasDir, 'capabilities.schema.json'),
-    'CAP',
-    issues,
-  );
+  const capabilitiesFile = resolveCapabilitiesFile(base, issues);
+  if (capabilitiesFile) {
+    validateFileWithSchema(
+      base,
+      capabilitiesFile,
+      path.join(schemasDir, 'capabilities.schema.json'),
+      'CAP',
+      issues,
+    );
+  }
 
   validateFileWithSchema(
     base,
     'player-data/runtime/state.json',
     path.join(schemasDir, 'state.schema.json'),
     'STATE',
+    issues,
+  );
+
+  validateFileWithSchema(
+    base,
+    'player-data/session-init.json',
+    path.join(schemasDir, 'session-init.schema.json'),
+    'SESSION-INIT',
     issues,
   );
 

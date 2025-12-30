@@ -1,0 +1,31 @@
+{
+  "$id": "https://agent-rpg/schemas/ui.actions.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UI Actions",
+  "type": "object",
+  "required": ["schema_version", "actions"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]{1,60}$" },
+          "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "enabled": { "type": "boolean" },
+          "hotkey": { "type": "string", "minLength": 1, "maxLength": 20 },
+          "kind": { "type": "string", "minLength": 1, "maxLength": 40 }
+        }
+      },
+      "maxItems": 50
+    }
+  }
+}

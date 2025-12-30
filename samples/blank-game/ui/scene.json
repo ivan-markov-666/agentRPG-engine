@@ -1,0 +1,10 @@
+{
+  "schema_version": "ui.scene.v1",
+  "scene_id": "scene-001",
+  "title": "Starting Village",
+  "description": "A calm starting point designed to provide a minimal UI contract for the Blank Game skeleton.",
+  "location": "Starting Village",
+  "area_id": "default-area",
+  "npcs_present": [],
+  "timestamp": "2025-12-30T00:00:00.000Z"
+}

@@ -1,0 +1,33 @@
+{
+  "current_area_id": "default-area",
+  "active_quests": [
+    {
+      "quest_id": "main-quest-01",
+      "status": "active",
+      "progress": 0,
+      "current_step_id": "step-1"
+    }
+  ],
+  "stats": {
+    "health": 50,
+    "energy": 50,
+    "mana": 0,
+    "stamina": 50,
+    "morale": 0,
+    "hunger": 20,
+    "thirst": 20,
+    "reputation": {
+      "village": 0
+    },
+    "currency": {
+      "gold": 50
+    },
+    "armor": 5,
+    "stealth": 10,
+    "perception": 10,
+    "crit_chance": 0.05,
+    "crit_multiplier": 1.5
+  },
+  "exploration_enabled": false,
+  "exploration_log_preview": []
+}
