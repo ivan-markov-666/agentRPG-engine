@@ -50,16 +50,23 @@
 
 > Подробният контракт е описан в [`tools/validator/schemas/state.schema.json`]. Validator-ът използва Ajv и ще връща `STATE-SCHEMA` предупреждения, ако `player-data/runtime/state.json` има отрицателни стойности, липсващи ключове или невалидни inventories/flags.
 
-### Диапазони / насоки (примерни, описани в engine docs)
-- health: min 0; при `<=0` герой приключва (load/restart логика зависи от играта).
-- energy/stamina: min 0; при 0 ограничават combat/пътуване (логика на играта).
-- mana: min 0; max по избор (напр. 100).
-- stamina: min 0; max по избор (напр. 100).
-- morale: диапазон примерно [-100..100] (може да се настрои).
-- hunger/thirst: min 0; max по избор (напр. 100). При threshold (напр. <10) → penalties/DoT по избор на играта.
-- reputation: per faction, диапазон по избор (например [-100..100]).
-- currency: без горен лимит (граници по избор).
-- Допълнителни примерни ключове: `mana_regен`, `stamina_regен`, `armor`, `magic_resist`, `stealth`, `perception`.
+### Диапазони / guardrails (синхронизирани със schema)
+
+| Capability        | Guardrail                                 |
+|-------------------|-------------------------------------------|
+| `health`, `energy`, `mana`, `stamina`, `hunger`, `thirst`, `stealth`, `perception` | `min/max` в [0..100] |
+| `morale`          | `min/max` в [-100..100]                   |
+| `armor`           | `min/max` в [0..50]                       |
+| `reputation`      | използва `range: [-100, 100]` (без `min/max`) |
+| `currency`        | само `min >= 0` (без горна граница)       |
+| `crit_chance`     | `min/max` в [0..1]                        |
+| `crit_multiplier` | `min` 1..3, `max` 1..5                    |
+
+- Всяко capability изисква `enabled` (bool) и кратко `desc` (>=3 символа).
+- Използвай **или** `range`, **или** `min/max`. Schema блокира смесица от двете.
+- Custom capabilities наследяват `baseCapability` guardrails – минимум едно числово ограничение (`range`, `min` или `max`).
+- Runtime стойности извън горните граници предизвикват `CAP-RUNTIME-RANGE`.
+- При липсващи `min/max` за числови способности validator връща `CAP-RUNTIME-BOUNDS`.
 
 ### Inventories, flags и exploration
 - `flags`: map от `string -> boolean/number/string`, използван за глобални story тригери. Пример: `"flags": {"tutorial_complete": true, "favor_tokens": 2}`.
