@@ -3,7 +3,15 @@ const fs = require('fs');
 const path = require('path');
 
 function parseArgs(argv) {
-  const args = { history: null, out: null, limit: null, insights: null };
+  const args = {
+    history: null,
+    out: null,
+    limit: null,
+    insights: null,
+    dryRun: false,
+    archiveDir: null,
+    archiveLabel: null,
+  };
   for (let i = 2; i < argv.length; i += 1) {
     const flag = argv[i];
     const next = argv[i + 1];
@@ -16,6 +24,9 @@ function parseArgs(argv) {
       case '-o':
         if (next) args.out = next;
         break;
+      case '--output':
+        if (next) args.out = next;
+        break;
       case '--limit':
       case '-l':
         if (next) args.limit = Number(next);
@@ -23,6 +34,15 @@ function parseArgs(argv) {
       case '--insights':
       case '-i':
         if (next) args.insights = next;
+        break;
+      case '--dry-run':
+        args.dryRun = true;
+        break;
+      case '--archive-dir':
+        if (next) args.archiveDir = next;
+        break;
+      case '--archive-label':
+        if (next) args.archiveLabel = next;
         break;
       default:
         break;
@@ -71,6 +91,23 @@ function toStatus(value, warnThreshold, errorThreshold, format = (v) => v) {
   if (value >= errorThreshold) return { emoji: '❌', text: format(value) };
   if (value >= warnThreshold) return { emoji: '⚠️', text: format(value) };
   return { emoji: '✅', text: format(value) };
+}
+
+function sanitizeLabel(label) {
+  return label ? label.replace(/[^a-z0-9-_]/gi, '').toLowerCase() : null;
+}
+
+function archiveExistingSummary(targetPath, archiveDir, label) {
+  if (!fs.existsSync(targetPath)) return null;
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const safeLabel = sanitizeLabel(label);
+  const archiveName = safeLabel
+    ? `metrics-summary-${timestamp}-${safeLabel}.md`
+    : `metrics-summary-${timestamp}.md`;
+  const archivePath = path.join(archiveDir, archiveName);
+  fs.mkdirSync(archiveDir, { recursive: true });
+  fs.copyFileSync(targetPath, archivePath);
+  return archivePath;
 }
 
 function writeInsights(options) {
@@ -159,6 +196,10 @@ function main() {
   const outPath = path.resolve(
     args.out || path.join(__dirname, '..', '..', 'docs', 'analysis', 'metrics-summary.md')
   );
+  const archiveDir = path.resolve(
+    args.archiveDir || path.join(__dirname, '..', '..', 'docs', 'analysis', 'reports', 'archive')
+  );
+  const dryRun = Boolean(args.dryRun);
 
   if (!fs.existsSync(historyPath)) {
     console.error(`[metrics] History file not found: ${historyPath}`);
@@ -228,25 +269,37 @@ function main() {
     `2. Инсталирай schema dependencies (Ajv + ajv-formats) в нови среди, за да липсват \`SCHEMA\` предупреждения.\n` +
     `3. Архивирай telemetry история при ≥50 run-а или преди release (\`npm run archive:telemetry -- --label <tag>\`).\n`;
 
-  fs.mkdirSync(path.dirname(outPath), { recursive: true });
-  fs.writeFileSync(outPath, md, 'utf8');
-  console.log(`[metrics] Summary written to ${outPath}`);
+  if (dryRun) {
+    console.log('[metrics] --dry-run enabled. Summary will not be written.');
+  } else {
+    const archived = archiveExistingSummary(outPath, archiveDir, args.archiveLabel);
+    if (archived) {
+      console.log(`[metrics] Archived previous summary to ${archived}`);
+    }
+    fs.mkdirSync(path.dirname(outPath), { recursive: true });
+    fs.writeFileSync(outPath, md, 'utf8');
+    console.log(`[metrics] Summary written to ${outPath}`);
+  }
 
   const insightsPath = args.insights
     ? path.resolve(args.insights)
     : null;
   if (insightsPath) {
-    writeInsights({
-      targetPath: insightsPath,
-      recentRuns,
-      avgDuration,
-      avgWarnings,
-      cleanRuns,
-      capHitCount: Object.entries(topCodes)
-        .filter(([code]) => code.startsWith('CAP-'))
-        .reduce((sum, [, count]) => sum + count, 0),
-      topCodesList,
-    });
+    if (dryRun) {
+      console.log(`[metrics] --dry-run enabled. Insights will not be written (${insightsPath}).`);
+    } else {
+      writeInsights({
+        targetPath: insightsPath,
+        recentRuns,
+        avgDuration,
+        avgWarnings,
+        cleanRuns,
+        capHitCount: Object.entries(topCodes)
+          .filter(([code]) => code.startsWith('CAP-'))
+          .reduce((sum, [, count]) => sum + count, 0),
+        topCodesList,
+      });
+    }
   }
 }
 

@@ -1,0 +1,1 @@
+{"version":3,"file":"orphans.d.ts","sourceRoot":"","sources":["../../../src/validator/checks/orphans.ts"],"names":[],"mappings":"AAIA,OAAO,KAAK,EAAE,KAAK,EAAE,MAAM,UAAU,CAAC;AAGtC,UAAU,YAAY;IACpB,IAAI,EAAE,MAAM,CAAC;IACb,MAAM,EAAE,KAAK,EAAE,CAAC;CACjB;AAED,wBAAsB,YAAY,CAAC,GAAG,EAAE,YAAY,GAAG,OAAO,CAAC,IAAI,CAAC,CAqCnE;AAED,eAAe,YAAY,CAAC"}
