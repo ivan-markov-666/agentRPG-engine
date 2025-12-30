@@ -1,0 +1,10 @@
+{
+  "schema_version": "ui.scene.v1",
+  "scene_id": "scene-001",
+  "title": "Village Square",
+  "description": "You stand in the village square, surrounded by hurried villagers and the scent of smoke from distant fields.",
+  "location": "Starting Village",
+  "area_id": "default-area",
+  "npcs_present": ["Elder Maros"],
+  "timestamp": "2025-12-30T00:00:00.000Z"
+}

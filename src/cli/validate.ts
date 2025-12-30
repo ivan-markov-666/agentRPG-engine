@@ -10,6 +10,7 @@ import { checkOrphans } from '../validator/checks/orphans';
 import { checkAreas } from '../validator/checks/areas';
 import { checkQuests } from '../validator/checks/quests';
 import { checkSchemas } from '../validator/checks/schema';
+import { checkRuntimeContracts } from '../validator/checks/runtime-contracts';
 import type { Issue } from '../validator/types';
 
 interface CliArgs {
@@ -131,6 +132,7 @@ async function runChecks(base: string, issues: Issue[]) {
   const context = { base, loadJson, issues };
   await checkRequiredFiles(context);
   await checkSchemas(context);
+  await checkRuntimeContracts(context);
   await checkCapabilities(context);
   await checkOrphans(context);
   await checkAreas(context);

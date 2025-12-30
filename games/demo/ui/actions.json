@@ -1,0 +1,11 @@
+{
+  "schema_version": "ui.actions.v1",
+  "actions": [
+    {
+      "id": "continue",
+      "label": "Continue",
+      "enabled": true,
+      "kind": "chat"
+    }
+  ]
+}

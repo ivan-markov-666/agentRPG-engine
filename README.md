@@ -10,8 +10,19 @@
 - Blank game README (шаблон за игра): `docs/analysis/blank-game-README.md`
 - Валидатор (CLI) README: `docs/analysis/validator-readme.md`
 
+## Quick Start — Blank Game Skeleton
+1. **Копирай скелета** (избери shell):  
+   - PowerShell: `Copy-Item samples/blank-game games/<gameId> -Recurse`  
+   - Bash: `cp -R samples/blank-game games/<gameId>`
+2. **Попълни минималните файлове** според `docs/analysis/blank-game-README.md` (manifest title, quest/area описания, runtime stats).
+3. **Пусни валидатора**:
+   ```bash
+   npm run validate -- --path games/<gameId> --run-id dev-local --summary --strict
+   ```
+4. **Използвай скелета за DoD**: той вече има валидни `capabilities.json`, `state.json`, quest/area файлове и ще мине clean run-ове веднага след копиране.
+
 ## Валидатор (CLI)
-- Пускане директно: `node tools/validator/index.js --path games/<gameId> --run-id <prefix-uuid> [--json out.json] [--debug]`
+- Пускане директно (след `npm run build:ts`): `node dist/cli/validate.js --path games/<gameId> --run-id <prefix-uuid> [--json out.json] [--debug]`
 - NPM script: `npm run validate -- --path games/<gameId> --run-id <prefix-uuid> [--json out.json] [--debug]`
 - `--run-id` е **задължителен**. Използвай helper-ите `tools/scripts/run-id.ps1` и `tools/scripts/run-id.sh`, за да генерираш стойности като `dev-123e4567-e89b-12d3-a456-426614174000`.
 - Проверява: задължителни файлове, CAP-* правила, orphans (quests/areas), quest ID↔title; опционален JSON репорт.
@@ -21,17 +32,17 @@
     ```powershell
     function arpg-validate {
       param([string]$game = "demo")
-      npm run validate -- --path "games/$game" --json reports/last.json --append --snapshot reports/last.json --strict --summary
+      npm run validate -- --path "games/$game" --run-id dev-local --json reports/last.json --append --snapshot reports/last.json --strict --summary
     }
     ```
     ```powershell
-    function arpg-validate {
-      param([string]$game = "demo")
-      npm run validate -- --path "games/$game" --json reports/last.json --append --snapshot reports/last.json --strict --summary
+    function arpg-run-id {
+      param([string]$Prefix = "dev", [switch]$Copy)
+      New-AgentRPGRunId -Prefix $Prefix -Copy:$Copy
     }
     ```
 
-- - ### Exploration log helper (CLI)
+### Exploration log helper (CLI)
 - Скрипт: `npm run exploration:add -- --title "..." [--game demo] [--type area|quest|event] [--area area-id] [--quest quest-id] [--origin player-request|gm-suggested] [--desc "..."] [--tags tag1,tag2] [--notes "..."] [--preview-limit 5] [--preview-mode newest|append]`.
 - Валидира типа срещу guardrails (`area` изисква `--area`, `quest` изисква `--quest`) и проверява дали целевата area/quest markdown съществува.
 - Ако описанието е твърде кратко (<60 символа) добавя подсказки, за да мине `EXPLORATION-DESCRIPTION-SHORT`. Ако не подадеш tags → добавя placeholder/автотагове (по тип + `area:<id>`/`quest:<id>`) за минимум 1 таг. Скриптът поддържа до 10 уникални тага и обновява `state.exploration_log_preview`, като `--preview-limit` и `--preview-mode` контролират подредбата (по подразбиране newest, алтернатива append).
@@ -83,11 +94,11 @@
 - 1) (По нужда) Добави/обнови area: `npm run area:add -- --id <area-id> --title "..." --description "..." --game <gameId>`
 - 2) (По нужда) Добави quest scaffold: `npm run quest:add -- --title "..." --game <gameId>`
 - 3) (По нужда) Добави exploration entry (само ако area файлът вече съществува): `npm run exploration:add -- --title "..." --type poi --area <area-id> --game <gameId>`
-- 4) Пусни валидатор в строг режим: `npm run validate -- --path games/<gameId> --strict --summary`
-- 5) (Препоръчително) Snapshot regression чек: `npm run validate -- --path games/<gameId> --json docs/analysis/reports/latest-run.json --append --snapshot docs/analysis/reports/latest-run.json --strict --summary`
-66- Run ID helper-и:
-67-  - PowerShell (заявете функция в `$PROFILE`):
-68-    ```powershell
+- 4) Пусни валидатор в строг режим: `npm run validate -- --path games/<gameId> --run-id <tag> --strict --summary`
+- 5) (Препоръчително) Snapshot regression чек: `npm run validate -- --path games/<gameId> --run-id <tag> --json docs/analysis/reports/latest-run.json --append --snapshot docs/analysis/reports/latest-run.json --strict --summary`
+ 66- Run ID helper-и:
+ 67-  - PowerShell (заявете функция в `$PROFILE`):
+ 68-    ```powershell
 69-    . "$PSScriptRoot/../scripts/run-id.ps1"
 70-    function arpg-run-id {
 71-      param([string]$Prefix = "dev", [switch]$Copy)
@@ -108,16 +119,17 @@
     ```bash
     arpg_validate() {
       game=${1:-demo}
-      npm run validate -- --path "games/$game" --json reports/last.json --append --snapshot reports/last.json --strict --summary
+      npm run validate -- --path "games/$game" --run-id dev-local --json reports/last.json --append --snapshot reports/last.json --strict --summary
     }
     ```
     game=${1:-demo}
-    npm run validate -- --path "games/$game" --json reports/last.json --append --snapshot reports/last.json --strict --summary
+    npm run validate -- --path "games/$game" --run-id dev-local --json reports/last.json --append --snapshot reports/last.json --strict --summary
   }
   ```
 
 ### Sprint Metrics Workflow
-1. **Локално validate + telemetry:** стартирай `npm run validate:metrics -- --path games/<gameId> --run-id <tag>`, който ще изпълни валидатора и автоматично ще запише telemetry (`docs/analysis/reports/telemetry-history.json`) и регенерира `metrics-summary.md`.
+1. **Локално validate + telemetry:** стартирай `npm run validate:metrics -- --game <gameId> --run-id <tag>`, който ще изпълни валидатора и автоматично ще запише telemetry (`docs/analysis/reports/telemetry-history.json`) и регенерира `metrics-summary.md`.
+   - *Note:* `validate:metrics` also accepts `--path games/<gameId>`; `--game` is the preferred interface.
 2. **Custom history/output (по избор):** `npm run metrics:report -- --history docs/analysis/reports/telemetry-history.json --out docs/analysis/metrics-summary.md --limit 10`.
 3. **Insights dashboard:** добави `--insights docs/analysis/metrics-insights.md`, за да генерираш документ с Summary / KPI Trends / Alerts / Recommended Actions. Емоджитата (✅/⚠️/❌) показват дали KPI пресищат прагoвете (runtime 200/230 ms, warnings 0.5/1, CAP ratio 5%/15%).
 4. **Архив преди release или при ≥50 run-а:** `npm run archive:telemetry -- --label sprint01`.

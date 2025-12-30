@@ -1,0 +1,30 @@
+import type { HostAdapter, ManifestEntry, RuntimeState, SessionInit } from '../types';
+
+export interface GameRuntimeSnapshot {
+  manifest: ManifestEntry;
+  sessionInit: SessionInit | null;
+  state: RuntimeState | null;
+}
+
+async function readJsonOptional<T>(host: HostAdapter, relPath: string): Promise<T | null> {
+  try {
+    const raw = await host.readFile(relPath);
+    return JSON.parse(raw) as T;
+  } catch (err) {
+    const e = err as NodeJS.ErrnoException;
+    if (e && e.code === 'ENOENT') return null;
+    throw err;
+  }
+}
+
+async function readJsonRequired<T>(host: HostAdapter, relPath: string): Promise<T> {
+  const raw = await host.readFile(relPath);
+  return JSON.parse(raw) as T;
+}
+
+export async function loadGameRuntimeSnapshot(host: HostAdapter): Promise<GameRuntimeSnapshot> {
+  const manifest = await readJsonRequired<ManifestEntry>(host, 'manifest/entry.json');
+  const sessionInit = await readJsonOptional<SessionInit>(host, 'player-data/session-init.json');
+  const state = await readJsonOptional<RuntimeState>(host, 'player-data/runtime/state.json');
+  return { manifest, sessionInit, state };
+}

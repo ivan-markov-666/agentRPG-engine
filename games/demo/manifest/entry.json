@@ -5,5 +5,8 @@
   "version": "0.1.0",
   "engine_layers": ["@agentrpg/engine"],
   "capabilities_file": "config/capabilities.json",
-  "scenario_index": "scenario/index.md"
+  "scenario_index": "scenario/index.md",
+  "ui_index": "ui/index.json",
+  "saves_index": "player-data/saves/index.json",
+  "full_history_file": "player-data/runtime/history.full.jsonl"
 }

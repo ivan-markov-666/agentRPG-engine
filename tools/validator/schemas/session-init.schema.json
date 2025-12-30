@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentrpg.dev/schemas/session-init.schema.json",
+  "title": "Session Init (v1)",
+  "type": "object",
+  "properties": {
+    "player_name": { "type": "string", "minLength": 1 },
+    "preferred_language": { "type": "string", "minLength": 1 },
+    "debug": { "type": "boolean" }
+  },
+  "required": ["preferred_language"],
+  "additionalProperties": true
+}

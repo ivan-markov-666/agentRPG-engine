@@ -1,0 +1,39 @@
+{
+  "$id": "https://agent-rpg/schemas/ui.history.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UI History",
+  "type": "object",
+  "required": ["schema_version", "events"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "full_history_file": {
+      "type": "string",
+      "minLength": 1
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "timestamp", "text"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "type": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "text": { "type": "string", "minLength": 1, "maxLength": 5000 }
+        }
+      },
+      "maxItems": 200
+    }
+  }
+}

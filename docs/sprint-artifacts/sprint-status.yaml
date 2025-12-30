@@ -15,8 +15,8 @@ status_definitions:
 
 development_status:
   ST-001: done
-  ST-002: ready-for-dev
-  ST-003: ready-for-dev
+  ST-002: done
+  ST-003: done
   ST-004: done
   ST-005: done
   ST-006: done
@@ -25,4 +25,22 @@ development_status:
   ST-009: done
   ST-010: done
   ST-011: done
-  ST-012: review
+  ST-012: done
+  ST-013: done
+  ST-014: done
+  ST-015: done
+  ST-016: done
+  ST-017: ready-for-dev
+  ST-018: ready-for-dev
+  ST-019: ready-for-dev
+  ST-020: ready-for-dev
+  ST-021: ready-for-dev
+  ST-022: ready-for-dev
+  ST-023: ready-for-dev
+  ST-024: ready-for-dev
+  ST-025: ready-for-dev
+  ST-026: ready-for-dev
+  ST-027: ready-for-dev
+  ST-028: ready-for-dev
+  ST-029: ready-for-dev
+  ST-030: ready-for-dev

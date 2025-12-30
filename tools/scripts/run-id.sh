@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-PREFIX="dev"
-COPY=0
-
 run_id_generate() {
   local prefix=${1:-"dev"}
   local uuid
@@ -14,6 +10,20 @@ run_id_generate() {
   fi
   printf "%s-%s\n" "$prefix" "$uuid"
 }
+
+run_id() {
+  local prefix=${1:-"dev"}
+  run_id_generate "$prefix"
+}
+
+if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
+  export -f run_id_generate
+  export -f run_id
+  return 0
+fi
+
+PREFIX="dev"
+COPY=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -42,12 +52,6 @@ EOF
 done
 
 RUN_ID=$(run_id_generate "$PREFIX")
-
-if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
-  printf "%s" "$RUN_ID"
-  return 0
-fi
-
 echo "$RUN_ID"
 
 if [[ $COPY -eq 1 ]]; then

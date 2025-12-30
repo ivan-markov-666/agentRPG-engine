@@ -1,0 +1,13 @@
+{
+  "schema_version": "ui.index.v1",
+  "files": {
+    "scene": "ui/scene.json",
+    "actions": "ui/actions.json",
+    "hud": "ui/hud.json",
+    "history": "ui/history.json"
+  },
+  "player_data": {
+    "saves_index": "player-data/saves/index.json",
+    "full_history_file": "player-data/runtime/history.full.jsonl"
+  }
+}

@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { add, loadData } from '../utils/io';
+import { resolveCapabilitiesFile, resolveScenarioIndex } from '../utils/manifest';
 import type { Issue } from '../types';
 import type { RuntimeState } from '../../types/runtime-state';
 import type { ExplorationLogEntry } from '../../types/exploration-log';
@@ -17,15 +18,21 @@ function exists(filePath: string): boolean {
 
 export async function checkRequiredFiles(ctx: CheckContext): Promise<void> {
   const { base, issues } = ctx;
+  const scenarioIndex = resolveScenarioIndex(base, issues);
+  const capabilitiesFile = resolveCapabilitiesFile(base, issues);
+
   const required = [
     'manifest/entry.json',
-    'scenario/index.md',
+    scenarioIndex,
     'scenario/quests/available.json',
     'scenario/quests/unlock-triggers.json',
     'player-data/runtime/state.json',
     'player-data/runtime/completed-quests.json',
-    'config/capabilities.json',
   ];
+
+  if (capabilitiesFile) {
+    required.push(capabilitiesFile);
+  }
 
   required.forEach((relPath) => {
     const fp = path.join(base, relPath);
@@ -34,15 +41,22 @@ export async function checkRequiredFiles(ctx: CheckContext): Promise<void> {
     }
   });
 
-  const indexPath = path.join(base, 'scenario/index.md');
+  const indexPath = path.join(base, scenarioIndex);
   if (exists(indexPath)) {
     const stat = fs.statSync(indexPath);
     if (stat.size === 0) {
-      add(issues, 'WARN', 'INDEX-EMPTY', 'scenario/index.md', 'Scenario index is empty', 'Add intro/summary');
+      add(issues, 'WARN', 'INDEX-EMPTY', scenarioIndex, 'Scenario index is empty', 'Add intro/summary');
     } else {
       const content = fs.readFileSync(indexPath, 'utf8').trim();
       if (content.length < 40) {
-        add(issues, 'WARN', 'INDEX-SHORT', 'scenario/index.md', 'Scenario index is very short', 'Expand with overview and starting hook');
+        add(
+          issues,
+          'WARN',
+          'INDEX-SHORT',
+          scenarioIndex,
+          'Scenario index is very short',
+          'Expand with overview and starting hook',
+        );
       }
     }
   }

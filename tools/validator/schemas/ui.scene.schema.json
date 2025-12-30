@@ -1,0 +1,47 @@
+{
+  "$id": "https://agent-rpg/schemas/ui.scene.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UI Scene",
+  "type": "object",
+  "required": ["schema_version", "scene_id", "title", "description", "location", "timestamp"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "scene_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]{1,60}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 5000
+    },
+    "location": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "area_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]{1,60}$"
+    },
+    "npcs_present": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 80 },
+      "maxItems": 50
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

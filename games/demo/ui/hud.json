@@ -1,0 +1,11 @@
+{
+  "schema_version": "ui.hud.v1",
+  "bars": {
+    "health": { "current": 32, "max": 100 },
+    "energy": { "current": 12, "max": 100 },
+    "mana": { "current": 0, "max": 100 }
+  },
+  "reputation": { "guild": 15, "village": -5 },
+  "currency": { "gold": 120 },
+  "needs": { "hunger": 20, "thirst": 10 }
+}

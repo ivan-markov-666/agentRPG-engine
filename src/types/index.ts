@@ -4,3 +4,8 @@ export * from './telemetry';
 export * from './runtime-state';
 export * from './unlock-triggers';
 export * from './exploration-log';
+export * from './manifest';
+export * from './ui';
+export * from './saves';
+export * from './session-init';
+export * from './host-adapter';

@@ -1,6 +1,6 @@
 # ST-003 — Metrics Automation Script
 
-_Status: review_
+_Status: done_
 
 ## Story Overview
 Като QA искам `npm run metrics:report` да генерира автоматично `docs/analysis/metrics-summary.md` от telemetry history, за да следя KPI без ръчни изчисления.
@@ -30,4 +30,4 @@ _Status: review_
 - `docs/sprint-artifacts/sprint-status.yaml`: статусът на ST-003 е обновен.
 
 ## Status
-review
+done
