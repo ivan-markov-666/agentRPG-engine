@@ -570,7 +570,11 @@ The militia prepares a final push to reclaim the watchtower before rival faction
     const out = spawnSync('node', [cliPath, '--path', base, '--run-id', 'summary-1', '--summary'], { encoding: 'utf8' });
     const outCombined = `${out.stdout || ''}${out.stderr || ''}`;
     assert(outCombined.includes('Summary:'), `Summary mode should print summary line\n${outCombined}`);
-    const outIgnore = spawnSync('node', [cliPath, '--path', base, '--run-id', 'summary-2', '--summary', '--ignore', 'CAP-RUNTIME'], { encoding: 'utf8' });
+    const outIgnore = spawnSync(
+      'node',
+      [cliPath, '--path', base, '--run-id', 'summary-2', '--summary', '--ignore', 'CAP-RUNTIME,CAP-SCHEMA'],
+      { encoding: 'utf8' },
+    );
     const outIgnoreCombined = `${outIgnore.stdout || ''}${outIgnore.stderr || ''}`;
     const m = outIgnoreCombined.match(/Summary:\s*(\d+) error\(s\),\s*(\d+) warning\(s\)/);
     assert(m, `Expected Summary line in output\n${outIgnoreCombined}`);

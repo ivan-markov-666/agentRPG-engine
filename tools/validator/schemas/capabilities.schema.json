@@ -8,7 +8,12 @@
     "stamina": { "$ref": "#/definitions/baseStat0100" },
     "hunger": { "$ref": "#/definitions/baseStat0100" },
     "thirst": { "$ref": "#/definitions/baseStat0100" },
-    "morale": { "$ref": "#/definitions/baseStat0100" },
+    "morale": { "$ref": "#/definitions/moraleCapability" },
+    "armor": { "$ref": "#/definitions/baseStat0050" },
+    "stealth": { "$ref": "#/definitions/baseStat0100" },
+    "perception": { "$ref": "#/definitions/baseStat0100" },
+    "crit_chance": { "$ref": "#/definitions/probabilityCapability" },
+    "crit_multiplier": { "$ref": "#/definitions/critMultiplierCapability" },
     "reputation": { "$ref": "#/definitions/reputationCapability" },
     "currency": { "$ref": "#/definitions/currencyCapability" },
     "level": { "$ref": "#/definitions/minOneCapability" },
@@ -18,20 +23,56 @@
   "definitions": {
     "baseCapability": {
       "type": "object",
+      "required": ["enabled", "desc"],
       "properties": {
         "enabled": { "type": "boolean" },
-        "desc": { "type": "string" },
-        "min": { "type": "number", "minimum": 0 },
-        "max": { "type": "number", "minimum": 0 },
+        "desc": { "type": "string", "minLength": 3 },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
         "range": {
           "type": "array",
-          "items": { "type": "number" },
+          "items": [
+            { "type": "number" },
+            { "type": "number" }
+          ],
           "minItems": 2,
           "maxItems": 2
         },
         "note": { "type": "string" }
       },
-      "additionalProperties": true
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": { "required": ["range"] },
+          "then": {
+            "not": {
+              "anyOf": [
+                { "required": ["min"] },
+                { "required": ["max"] }
+              ]
+            }
+          },
+          "else": {
+            "anyOf": [
+              { "required": ["min"] },
+              { "required": ["max"] }
+            ]
+          }
+        }
+      ]
+    },
+    "baseStat0050": {
+      "allOf": [
+        { "$ref": "#/definitions/baseCapability" },
+        {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "minimum": 0, "maximum": 50 },
+            "max": { "type": "number", "minimum": 0, "maximum": 50 }
+          }
+        }
+      ]
     },
     "baseStat0100": {
       "allOf": [
@@ -42,6 +83,19 @@
           "properties": {
             "min": { "type": "number", "minimum": 0, "maximum": 100 },
             "max": { "type": "number", "minimum": 0, "maximum": 100 }
+          }
+        }
+      ]
+    },
+    "moraleCapability": {
+      "allOf": [
+        { "$ref": "#/definitions/baseCapability" },
+        {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "minimum": -100, "maximum": 100 },
+            "max": { "type": "number", "minimum": -100, "maximum": 100 }
           }
         }
       ]
@@ -87,6 +141,32 @@
           "required": ["min"],
           "properties": {
             "min": { "type": "number", "minimum": 1 }
+          }
+        }
+      ]
+    },
+    "probabilityCapability": {
+      "allOf": [
+        { "$ref": "#/definitions/baseCapability" },
+        {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "minimum": 0, "maximum": 1 },
+            "max": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      ]
+    },
+    "critMultiplierCapability": {
+      "allOf": [
+        { "$ref": "#/definitions/baseCapability" },
+        {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "minimum": 1, "maximum": 3 },
+            "max": { "type": "number", "minimum": 1, "maximum": 5 }
           }
         }
       ]
