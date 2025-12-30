@@ -343,6 +343,29 @@ Summary: 1 error(s), 1 warning(s) | Top: QUEST-CONTENT:1, QUEST-LINK:1
   - Snapshot: проверявай, че `New codes: none` преди release.
 - **DoD**: release не минава, докато telemetry файлът няма последен запис с `errors=0`, `warnings=0` (или WARN допустими според екипа).
 
+## Метрики и KPI отчети
+- Скрипт: `npm run metrics:report` (wrapper около `tools/metrics/report.js`).
+- Вход: `docs/analysis/reports/telemetry-history.json` (по подразбиране). Промени с `--history <path>`.
+- Изход: `docs/analysis/metrics-summary.md` (markdown таблици + KPI). Промени с `--output <path>` / `--out`.
+- Архив: преди overwrite се създава копие в `docs/analysis/reports/archive/metrics-summary-<timestamp>-<label>.md`. Можеш да подадеш:
+  - `--archive-dir <dir>` — алтернативна директория за архиви.
+  - `--archive-label release-123` — суфикс към името (алфанумеричен, авто-саниран).
+- Dry run: `npm run metrics:report -- --dry-run` калкулира KPI и логва действията, без да пише summary/insights/архив.
+- Insights: добави `--insights docs/analysis/metrics-insights.md`, за да генерираш втори markdown с KPI статуси и препоръки; honor-ва `--dry-run`.
+- Допълнителни флагове:
+  - `--limit 20` — анализира само последните N run-а.
+  - `--output` е еквивалент на `--out`.
+  - `--history`, `--insights`, `--archive-dir`, `--archive-label` приемат относителни или абсолютни пътища.
+- Пример:
+  ```bash
+  npm run metrics:report -- \
+    --history docs/analysis/reports/telemetry-history.json \
+    --output docs/analysis/metrics-summary.md \
+    --archive-label sprint01 \
+    --insights docs/analysis/metrics-insights.md
+  ```
+- Тестове: `node tools/tests/metrics-report.test.js` валидират архивирането и dry-run режима (част от `npm test`).
+
 ### Архивиране на telemetry
 1. Създай папка `docs/analysis/reports/archive/` (еднократно).
 2. PowerShell:  

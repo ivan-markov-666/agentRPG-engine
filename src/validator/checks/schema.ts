@@ -26,9 +26,11 @@ function isExplorationEnabled(base: string, loadJson?: (filePath: string) => unk
   }
 }
 
+const repoSchemasDir = path.resolve(__dirname, '..', '..', '..', 'tools', 'validator', 'schemas');
+
 export async function checkSchemas(ctx: ValidatorContext): Promise<void> {
   const { base, issues, loadJson } = ctx;
-  const schemasDir = path.join(__dirname, '..', 'schemas');
+  const schemasDir = repoSchemasDir;
 
   validateFileWithSchema(
     base,

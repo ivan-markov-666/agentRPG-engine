@@ -4,7 +4,7 @@ const path = require('path');
 const assert = require('assert');
 const { spawnSync } = require('child_process');
 
-const distValidatorRoot = path.resolve(__dirname, '../../dist/validator');
+const distValidatorRoot = path.resolve(__dirname, '..', '..', '..', 'dist', 'validator');
 const { checkCapabilities } = require(path.join(distValidatorRoot, 'checks', 'capabilities.js'));
 const { checkQuests } = require(path.join(distValidatorRoot, 'checks', 'quests.js'));
 const { checkAreas } = require(path.join(distValidatorRoot, 'checks', 'areas.js'));
@@ -475,7 +475,7 @@ The militia prepares a final push to reclaim the watchtower before rival faction
     'config/capabilities.json': { mana: { enabled: true, min: 0, max: 10 } },
   });
   const snapFile = path.join(base1, 'snap.json');
-  const cliPath = path.resolve(__dirname, '../index.js');
+  const cliPath = path.resolve(__dirname, '..', '..', '..', 'dist', 'cli', 'validate.js');
   // First run produces CAP-RUNTIME (warn) and writes snapshot
   const first = spawnSync('node', [cliPath, '--path', base1, '--run-id', 'snap-1', '--json', snapFile], { encoding: 'utf8' });
   assert.strictEqual(first.status, 0, `First run should exit 0, got ${first.status}\n${first.stdout}\n${first.stderr}`);
@@ -566,7 +566,7 @@ The militia prepares a final push to reclaim the watchtower before rival faction
       'player-data/runtime/completed-quests.json': [],
       'config/capabilities.json': { mana: { enabled: true, min: 0, max: 10 } },
     });
-    const cliPath = path.resolve(__dirname, '../index.js');
+    const cliPath = path.resolve(__dirname, '..', '..', '..', 'dist', 'cli', 'validate.js');
     const out = spawnSync('node', [cliPath, '--path', base, '--run-id', 'summary-1', '--summary'], { encoding: 'utf8' });
     const outCombined = `${out.stdout || ''}${out.stderr || ''}`;
     assert(outCombined.includes('Summary:'), `Summary mode should print summary line\n${outCombined}`);
@@ -589,7 +589,7 @@ The militia prepares a final push to reclaim the watchtower before rival faction
       'player-data/runtime/completed-quests.json': [],
       'config/capabilities.json': {},
     });
-    const cliPath = path.resolve(__dirname, '../index.js');
+    const cliPath = path.resolve(__dirname, '..', '..', '..', 'dist', 'cli', 'validate.js');
     const result = spawnSync('node', [cliPath, '--path', base, '--run-id', 'unknown-flag', '--fake-flag'], { encoding: 'utf8' });
     const output = `${result.stdout || ''}${result.stderr || ''}`;
     assert.strictEqual(result.status, 1, `CLI should exit 1 on unknown flag\n${output}`);
@@ -607,7 +607,7 @@ The militia prepares a final push to reclaim the watchtower before rival faction
       'player-data/runtime/completed-quests.json': [],
       'config/capabilities.json': {},
     });
-    const cliPath = path.resolve(__dirname, '../index.js');
+    const cliPath = path.resolve(__dirname, '..', '..', '..', 'dist', 'cli', 'validate.js');
     const missingSnapshot = path.join(base, 'missing-snapshot.json');
     const result = spawnSync('node', [cliPath, '--path', base, '--run-id', 'snapshot-missing', '--snapshot', missingSnapshot], { encoding: 'utf8' });
     const output = `${result.stdout || ''}${result.stderr || ''}`;
@@ -629,7 +629,7 @@ The militia prepares a final push to reclaim the watchtower before rival faction
       'player-data/runtime/completed-quests.json': [],
       'config/capabilities.json': {}
     });
-    const cliPath = path.resolve(__dirname, '../index.js');
+    const cliPath = path.resolve(__dirname, '..', '..', '..', 'dist', 'cli', 'validate.js');
     const result = spawnSync('node', [cliPath, '--path', base, '--run-id', 'test-run', '--log', base], { encoding: 'utf8' });
     const output = `${result.stdout || ''}${result.stderr || ''}`;
     assert.strictEqual(result.status, 1, `CLI should exit 1 when telemetry log write fails\n${output}`);
@@ -647,7 +647,7 @@ The militia prepares a final push to reclaim the watchtower before rival faction
       'player-data/runtime/completed-quests.json': [],
       'config/capabilities.json': {},
     });
-    const cliPath = path.resolve(__dirname, '../index.js');
+    const cliPath = path.resolve(__dirname, '..', '..', '..', 'dist', 'cli', 'validate.js');
     const result = spawnSync('node', [cliPath, '--path', base], { encoding: 'utf8' });
     const output = `${result.stdout || ''}${result.stderr || ''}`;
     assert.strictEqual(result.status, 1, `CLI should exit 1 when run-id missing\n${output}`);
@@ -665,7 +665,7 @@ The militia prepares a final push to reclaim the watchtower before rival faction
       'player-data/runtime/completed-quests.json': [],
       'config/capabilities.json': {},
     });
-    const cliPath = path.resolve(__dirname, '../index.js');
+    const cliPath = path.resolve(__dirname, '..', '..', '..', 'dist', 'cli', 'validate.js');
     const logFile = path.join(base, 'telemetry.json');
     const result = spawnSync('node', [cliPath, '--path', base, '--run-id', 'test-run', '--log', logFile], { encoding: 'utf8' });
     const output = `${result.stdout || ''}${result.stderr || ''}`;
