@@ -26,7 +26,7 @@ _Status: done_
 ## Dev Agent Record / File List / Change Log
 - `tsconfig.json`, `tsconfig.build.json` — strict Node16 настройка, outDir `dist/`, declarations/source maps.
 - `package.json` — добавени скриптове `typecheck`, `build:ts`, `lint:ts` + devDependencies (TypeScript, ts-node, ESLint + TS плъгини, Prettier, @types пакети).
-- `.eslintrc.cjs`, `.prettierrc.cjs` — lint/format настройка за TS.
+- `.eslintrc.json`, `.prettierrc.json` — lint/format настройка за TS.
 - `src/types/{capabilities,scenario,telemetry}.ts`, `src/types/index.ts` — базовите shared типове за capabilities, scenario контракти и telemetry.
 - README + Architecture blueprint — нова секция „TypeScript Tooling (EP-004)“ и обновени бележки за EP-004 стратегията.
 

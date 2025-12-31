@@ -1,6 +1,6 @@
 # AgentRPG Engine — Story Catalog (Sprint 01)
 
-_Last updated: 2025-12-30_
+_Last updated: 2025-12-31_
 
 ## ST-001 — Validator DoD CLI Enhancements (FR-01)
 Status: done. CLI флагове, telemetry/snapshot DoD поток.
@@ -90,4 +90,7 @@ Status: ready-for-dev. Opt-in pre-push hook скриптове (sh/ps1) за а�
 Status: ready-for-dev. Синхронизация на MVP docs с реалния CLI/валидатор (архивиране на validation-plan, почистване на drift-ове).
 
 ## ST-030 — Runtime CLI (load snapshot)
-Status: ready-for-dev. Официален CLI entrypoint `npm run runtime` за зареждане на runtime snapshot (manifest + session-init + state) и консолен output.
+Status: done. Официален CLI entrypoint `npm run runtime` за зареждане на runtime snapshot (manifest + session-init + state) и консолен output.
+
+## ST-031 — Repo TS-only Policy (no JS sources in git)
+Status: in-progress. `dist/` е build output (не се комитва) + инструмент за inventory/enforcement на `.js` source.

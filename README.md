@@ -127,6 +127,11 @@
   }
   ```
 
+### Runtime CLI
+- **Quick load check:** `npm run runtime -- --path games/<gameId>` зарежда manifest, session-init и state, и извежда кратка информация.
+- **Debug mode:** `npm run runtime -- --path games/<gameId> --debug` извежда пълния JSON snapshot.
+- **Error handling:** CLI връща non-zero exit code при липсващи файлове или невалидни JSON.
+
 ### Sprint Metrics Workflow
 1. **Локално validate + telemetry:** стартирай `npm run validate:metrics -- --game <gameId> --run-id <tag>`, който ще изпълни валидатора и автоматично ще запише telemetry (`docs/analysis/reports/telemetry-history.json`) и регенерира `metrics-summary.md`.
    - *Note:* `validate:metrics` also accepts `--path games/<gameId>`; `--game` is the preferred interface.
@@ -147,8 +152,8 @@
 - **Скриптове:** `npm run typecheck` (строг `tsc --noEmit`), `npm run build:ts` (`tsc -p tsconfig.build.json` → `dist/` с declaration/source maps), `npm run lint:ts` (ESLint + `@typescript-eslint`).
 - **tsconfig структура:** `tsconfig.json` задава strict правила, Node16 module resolution, alias `@types/* → src/types/*`; `tsconfig.build.json` наследява и включва емитване на декларации.
 - **Shared типове:** `src/types/` съдържа `CapabilitiesConfig`, `ScenarioContract`, `TelemetryEntry` и barrel `index.ts`. Може да се импортират чрез `import { TelemetryEntry } from '@types';`.
-- **Миграция:** JS файловете остават валидни; новият TS код живее в `src/` и се компилира към `dist/`. При добавяне на нови типове/контракти обновявай `src/types/` и описвай промяната в архитектурния документ.
-- **Lint & формат:** `.eslintrc.cjs` е настроен за TS; Prettier служи като форматър (по избор `npx prettier --write src/**/*.ts`).
+- **Миграция:** repo policy е TS-only за source code; JS tooling/скриптове се мигрират story-by-story. Новият TS код живее в `src/` и се компилира към `dist/` (build output, не се комитва). При добавяне на нови типове/контракти обновявай `src/types/` и описвай промяната в архитектурния документ.
+- **Lint & формат:** `.eslintrc.json` е настроен за TS; Prettier служи като форматър (по избор `npx prettier --write src/**/*.ts`).
 
 ### Git hook (pre-push validate + metrics)
 1. Скрипт: `scripts/pre-push-validate.sh` приема средата `ARPG_GAME`, `ARPG_RUN_ID`, `ARPG_LIMIT` (по избор) и изпълнява `npm run validate:metrics -- --game <game> --run-id <tag> --auto-archive 50`.
