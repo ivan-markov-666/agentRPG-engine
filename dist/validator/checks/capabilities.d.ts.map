@@ -1,1 +1,0 @@
-{"version":3,"file":"capabilities.d.ts","sourceRoot":"","sources":["../../../src/validator/checks/capabilities.ts"],"names":[],"mappings":"AAIA,OAAO,KAAK,EAAE,KAAK,EAAE,MAAM,UAAU,CAAC;AAetC,UAAU,YAAY;IACpB,IAAI,EAAE,MAAM,CAAC;IACb,MAAM,EAAE,KAAK,EAAE,CAAC;CACjB;AAUD,wBAAsB,iBAAiB,CAAC,GAAG,EAAE,YAAY,GAAG,OAAO,CAAC,IAAI,CAAC,CA+LxE;AAiDD,eAAe,iBAAiB,CAAC"}

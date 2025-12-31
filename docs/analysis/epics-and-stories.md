@@ -1,6 +1,6 @@
 # AgentRPG Engine — Epics & Stories Roadmap (v1)
 
-_Last updated: 2025-12-28_
+_Last updated: 2025-12-31_
 
 ## Overview
 Пълна разбивка на всички планирани епики, user stories и технически задачи преди стартиране на изпълнителните workflows. Всички story файлове ще следват стандартизирания шаблон и ще бъдат маркирани `ready-for-dev`, освен ако изрично е посочено друго.
@@ -14,6 +14,7 @@ _Last updated: 2025-12-28_
 | EP-004 | TypeScript Migration & Tooling | Прехвърляне на core engine и validator към TypeScript с типови договори. | ST-010, ST-011, ST-012 |
 | EP-005 | Runtime Contracts & MVP Closure | File-first runtime contracts + schemas + minimal runtime loader + MVP gap closure. | ST-013, ST-014, ST-015, ST-016, ST-017, ST-018, ST-019, ST-020, ST-021 |
 | EP-006 | Content Tooling & Workflow Glue (MVP) | Official helper tools (README) за authoring/pipelines + repeatable local DoD workflow glue. | ST-022, ST-023, ST-024, ST-025, ST-026, ST-027, ST-028, ST-029, ST-030 |
+| EP-007 | Repo TS-only Policy & Tooling Migration | Премахване на JS source от git + `dist/` като build output (не се комитва) + миграция на tools към TS. | ST-031 |
 
 ## Story Breakdown
 ### EP-001 — Validator Reliability & CLI DoD
@@ -57,6 +58,9 @@ _Last updated: 2025-12-28_
 7. **ST-028 Pre-push Hook (validate + metrics)** — opt-in pre-push hook (sh/ps1) за DoD gate.
 8. **ST-029 Docs Alignment / MVP Docs Freeze** — синхронизация на MVP docs с реалния CLI/валидатор и drift почистване.
 9. **ST-030 Runtime CLI (load snapshot)** — официален CLI entrypoint `npm run runtime` за зареждане на runtime snapshot и консолен output.
+
+### EP-007 — Repo TS-only Policy & Tooling Migration
+1. **ST-031 Repo TS-only Policy (no JS sources in git)** — `dist/` е build output (не се комитва) + инструмент за inventory/enforcement на `.js` source.
 
 ## Status Legend
 - `ready-for-dev`: Story файлът е завършен и може да бъде стартиран чрез `dev-story`.
