@@ -118,6 +118,7 @@ function ensureDefaultArea(areaDir: string, logger: (message: string) => void): 
   ensureDir(areaDir);
   const areaTemplate = createAreaMarkdown({
     game: DEFAULT_GAME,
+    basePath: null,
     id: DEFAULT_AREA_ID,
     title: 'Default Area',
     description: 'Auto-generated placeholder area created by orphan remediation.',

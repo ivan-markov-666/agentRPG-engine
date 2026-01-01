@@ -4,6 +4,7 @@ import path from 'node:path';
 
 interface CliArgs {
   game: string;
+  basePath: string | null;
   id: string | null;
   title: string | null;
   description: string | null;
@@ -14,9 +15,15 @@ interface CliArgs {
   threats: string[];
 }
 
+function listFromArg(value?: string | null): string[] {
+  if (!value) return [];
+  return value.split('|').map((s) => s.trim()).filter(Boolean);
+}
+
 function parseArgs(argv: string[]): CliArgs {
   const args: CliArgs = {
     game: 'demo',
+    basePath: null,
     id: null,
     title: null,
     description: null,
@@ -34,6 +41,10 @@ function parseArgs(argv: string[]): CliArgs {
       case '-g':
         if (next) args.game = next;
         break;
+      case '--path':
+      case '-p':
+        if (next) args.basePath = next;
+        break;
       case '--id':
         if (next) args.id = next;
         break;
@@ -46,19 +57,19 @@ function parseArgs(argv: string[]): CliArgs {
         if (next) args.description = next;
         break;
       case '--points':
-        if (next) args.points = next.split('|').map((s) => s.trim()).filter(Boolean);
+        if (next) args.points = listFromArg(next);
         break;
       case '--connections':
-        if (next) args.connections = next.split('|').map((s) => s.trim()).filter(Boolean);
+        if (next) args.connections = listFromArg(next);
         break;
       case '--notes':
-        if (next) args.notes = next.split('|').map((s) => s.trim()).filter(Boolean);
+        if (next) args.notes = listFromArg(next);
         break;
       case '--conditions':
-        if (next) args.conditions = next.split('|').map((s) => s.trim()).filter(Boolean);
+        if (next) args.conditions = listFromArg(next);
         break;
       case '--threats':
-        if (next) args.threats = next.split('|').map((s) => s.trim()).filter(Boolean);
+        if (next) args.threats = listFromArg(next);
         break;
       default:
         break;
@@ -76,6 +87,19 @@ function slugify(value: string | null): string | null {
     .slice(0, 60);
 }
 
+function humanizeId(id: string): string {
+  return id
+    .split(/[-_]/g)
+    .filter(Boolean)
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(' ');
+}
+
+function formatBulletList(entries: string[], fallback: string[]): string {
+  const list = entries.length ? entries : fallback;
+  return list.map((entry) => (entry.startsWith('-') ? entry : `- ${entry}`)).join('\n');
+}
+
 export function createAreaMarkdown(args: CliArgs): { filePath: string; content: string } {
   const areaId = args.id || slugify(args.title);
   if (!areaId) {
@@ -83,25 +107,31 @@ export function createAreaMarkdown(args: CliArgs): { filePath: string; content: 
       'Usage: npm run area:add -- --id area-slug [--title "..."] [--description "..."] [--points "POI A|POI B"] [--connections "Link A|Link B"] [--notes "NPC: ...|Hook: ..."] [--conditions "Prereq|Timer"] [--threats "Escalation|Fail"] [--game demo]',
     );
   }
-  const title = args.title || areaId;
+  const title = args.title || humanizeId(areaId);
   const description =
-    args.description || 'Describe the vibe, key locations, NPCs, constraints and hooks (2-6 sentences).';
+    args.description ||
+    'Describe the vibe, key locations, NPCs, constraints and hooks (2–6 sentences) so the section easily clears 60+ characters.';
 
-  const pointsSection = args.points.length
-    ? args.points.map((poi) => `- ${poi}`).join('\n')
-    : '- (poi-id) Name — short hook or gameplay affordance';
-  const connectionsSection = args.connections.length
-    ? args.connections.map((link) => `- ${link}`).join('\n')
-    : '- [[default-area]] main route into the region';
-  const notesSection = args.notes.length
-    ? args.notes.map((note) => `- ${note}`).join('\n')
-    : '- NPCs: Who runs this place?\n- Threats: Hazards, timers, or faction stakes.';
-  const conditionsSection = args.conditions.length
-    ? args.conditions.map((cond) => `- ${cond}`).join('\n')
-    : '- Entry condition: Friendly reputation with the guard.\n- Timer: Clear within two in-game days.';
-  const threatsSection = args.threats.length
-    ? args.threats.map((threat) => `- ${threat}`).join('\n')
-    : '- Escalation: Rival squad seizes control if ignored.\n- Fail Hook: Prices increase for supplies.';
+  const pointsSection = formatBulletList(args.points, [
+    '- (poi-id) Name — short hook or gameplay affordance',
+    '- (poi-id-2) Backup POI with narrative payoff',
+  ]);
+  const connectionsSection = formatBulletList(args.connections, [
+    '- [[default-area]] main route into the region',
+    '- [[nearby-outpost]] optional flank or fallback camp',
+  ]);
+  const notesSection = formatBulletList(args.notes, [
+    '- NPCs: Who runs this place?',
+    '- Threats: Hazards, timers, or faction stakes.',
+  ]);
+  const conditionsSection = formatBulletList(args.conditions, [
+    '- Entry condition: Friendly reputation with the guard.',
+    '- Timer: Clear within two in-game days.',
+  ]);
+  const threatsSection = formatBulletList(args.threats, [
+    '- Escalation: Rival squad seizes control if ignored.',
+    '- Fail Hook: Prices increase for supplies.',
+  ]);
 
   const content = `# ${title}
 
@@ -137,7 +167,10 @@ export function main(argv: string[] = process.argv): void {
     process.exit(1);
   }
 
-  const gameBase = path.join(__dirname, '..', '..', 'games', args.game);
+  const gameBase =
+    args.basePath && args.basePath.trim()
+      ? path.resolve(args.basePath)
+      : path.join(__dirname, '..', '..', 'games', args.game);
   if (!fs.existsSync(gameBase)) {
     console.error(`[ERROR] Game folder not found: ${gameBase}`);
     process.exit(1);
