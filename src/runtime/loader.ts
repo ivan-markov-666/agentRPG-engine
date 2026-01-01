@@ -1,4 +1,11 @@
-import type { HostAdapter, ManifestEntry, RuntimeState, SessionInit, SaveFile } from '../types';
+import type {
+  HostAdapter,
+  ManifestEntry,
+  RuntimeState,
+  SessionInit,
+  SaveFile,
+  SaveIndexEntry,
+} from '../types';
 
 export interface GameRuntimeSnapshot {
   manifest: ManifestEntry;
@@ -32,4 +39,16 @@ export async function loadGameRuntimeSnapshot(host: HostAdapter): Promise<GameRu
 export async function loadSaveFile(host: HostAdapter, savePath: string): Promise<SaveFile> {
   const raw = await host.readFile(savePath);
   return JSON.parse(raw) as SaveFile;
+}
+
+export async function loadSaveIndex(
+  host: HostAdapter,
+  indexPath = 'player-data/saves/index.json',
+): Promise<SaveIndexEntry[]> {
+  const entries = await readJsonOptional<SaveIndexEntry[]>(host, indexPath);
+  if (!entries) return [];
+  if (!Array.isArray(entries)) {
+    throw new Error(`Invalid save index format at ${indexPath} (expected array).`);
+  }
+  return entries;
 }

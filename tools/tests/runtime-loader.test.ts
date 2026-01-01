@@ -6,7 +6,10 @@ import path from 'node:path';
 
 const distRuntimeRoot = path.resolve(__dirname, '..', '..', 'dist', 'runtime');
 const { LocalFsHostAdapter } = require(path.join(distRuntimeRoot, 'local-fs-host-adapter.js') as string);
-const { loadGameRuntimeSnapshot } = require(path.join(distRuntimeRoot, 'loader.js') as string);
+const { loadGameRuntimeSnapshot, loadSaveFile, loadSaveIndex } = require(path.join(
+  distRuntimeRoot,
+  'loader.js',
+) as string);
 
 type FileMap = Record<string, object | string>;
 
@@ -51,6 +54,41 @@ function setupGame(files: FileMap): string {
     assert.strictEqual(snapshot.manifest.id, 'game-2');
     assert.strictEqual(snapshot.sessionInit, null);
     assert.strictEqual(snapshot.state, null);
+  }
+
+  {
+    const base = setupGame({
+      'manifest/entry.json': { id: 'game-save', title: 'Game Save', version: '1.0.0' },
+      'player-data/saves/index.json': [
+        {
+          save_id: 'save-1',
+          created_at: '2025-01-01T10:00:00Z',
+          scene_id: 'default-area',
+          summary: 'First save',
+          file_path: 'player-data/saves/save-1.json',
+        },
+      ],
+      'player-data/saves/save-1.json': {
+        schema_version: '1.0',
+        save_id: 'save-1',
+        created_at: '2025-01-01T10:00:00Z',
+        scene_id: 'default-area',
+        summary: 'First save',
+        cursor: { scene_id: 'default-area', depth: 1 },
+        state: { current_area_id: 'default-area', stats: { health: 50 } },
+      },
+    });
+
+    const host = new LocalFsHostAdapter(base);
+    const index = await loadSaveIndex(host);
+    assert.strictEqual(index.length, 1, 'Expected one save entry');
+    assert.strictEqual(index[0].save_id, 'save-1');
+
+    const saveFile = await loadSaveFile(host, index[0].file_path);
+    assert.strictEqual(saveFile.save_id, 'save-1');
+    assert.strictEqual(saveFile.cursor.scene_id, 'default-area');
+    assert.strictEqual(saveFile.cursor.depth, 1);
+    assert.strictEqual(saveFile.state.stats.health, 50);
   }
 
   console.log('runtime-loader tests passed.');
