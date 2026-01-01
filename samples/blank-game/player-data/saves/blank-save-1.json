@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "save_id": "blank-save-1",
+  "created_at": "2025-01-01T12:00:00Z",
+  "scene_id": "default-area",
+  "summary": "Blank game initial save",
+  "cursor": {
+    "scene_id": "default-area"
+  },
+  "state": {
+    "current_area_id": "default-area",
+    "active_quests": [],
+    "stats": {
+      "health": 50,
+      "energy": 40,
+      "mana": 10,
+      "stamina": 30,
+      "morale": 0,
+      "hunger": 10,
+      "thirst": 10,
+      "reputation": {
+        "settlers": 0
+      },
+      "currency": {
+        "gold": 0
+      }
+    },
+    "exploration_enabled": false,
+    "exploration_log_preview": []
+  }
+}

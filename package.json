@@ -12,7 +12,7 @@
     "test:validator": "npm run build:ts && ts-node --project tsconfig.json tools/validator/tests/validator.test.ts",
     "test": "ts-node --project tsconfig.json tools/validator/tests/validator.test.ts && ts-node --project tsconfig.json tools/tests/archive-telemetry.test.ts && ts-node --project tsconfig.json tools/tests/metrics-report.test.ts && ts-node --project tsconfig.json tools/tests/runtime-loader.test.ts && ts-node --project tsconfig.json tools/tests/auto-remedy.test.ts",
     "typecheck": "tsc --noEmit",
-    "build:ts": "tsc -p tsconfig.tools.json",
+    "build:ts": "tsc -p tsconfig.json && tsc -p tsconfig.tools.json",
     "lint:ts": "eslint \"src/**/*.ts\"",
     "pretest": "npm run build:ts",
     "check:no-js": "npm run build:ts && node dist/cli/check-no-js.js",
