@@ -8,6 +8,7 @@ const DEFAULT_REWARD_TIER: keyof typeof REWARD_TIER_MULTIPLIERS = 'standard';
 
 interface QuestCliArgs {
   game: string;
+  basePath: string | null;
   id: string | null;
   title: string | null;
   summary: string;
@@ -79,6 +80,7 @@ function listFromArg(value?: string | null): string[] {
 export function parseArgs(argv: string[]): QuestCliArgs {
   const args: QuestCliArgs = {
     game: 'demo',
+    basePath: null,
     id: null,
     title: null,
     summary: DEFAULT_SUMMARY,
@@ -118,6 +120,13 @@ export function parseArgs(argv: string[]): QuestCliArgs {
       case '-g':
         if (next) {
           args.game = next;
+          i += 1;
+        }
+        break;
+      case '--path':
+      case '-p':
+        if (next) {
+          args.basePath = next;
           i += 1;
         }
         break;
@@ -774,7 +783,10 @@ export function main(argv: string[] = process.argv): void {
     console.error('Unable to derive quest_id from title; provide --id explicitly.');
     process.exit(1);
   }
-  const gameBase = path.join(__dirname, '..', '..', 'games', args.game);
+  const gameBase =
+    args.basePath && args.basePath.trim()
+      ? path.resolve(args.basePath)
+      : path.join(__dirname, '..', '..', 'games', args.game);
   if (!fs.existsSync(gameBase)) {
     console.error(`[ERROR] Game folder not found: ${gameBase}`);
     process.exit(1);
