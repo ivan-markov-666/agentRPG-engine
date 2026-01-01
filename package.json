@@ -10,7 +10,7 @@
     "runtime": "node dist/cli/runtime.js",
     "runtime:dev": "ts-node --project tsconfig.json src/cli/runtime.ts",
     "test:validator": "npm run build:ts && ts-node --project tsconfig.json tools/validator/tests/validator.test.ts",
-    "test": "ts-node --project tsconfig.json tools/validator/tests/validator.test.ts && ts-node --project tsconfig.json tools/tests/archive-telemetry.test.ts && ts-node --project tsconfig.json tools/tests/metrics-report.test.ts && ts-node --project tsconfig.json tools/tests/runtime-loader.test.ts && ts-node --project tsconfig.json tools/tests/auto-remedy.test.ts",
+    "test": "ts-node --project tsconfig.json tools/validator/tests/validator.test.ts && ts-node --project tsconfig.json tools/tests/archive-telemetry.test.ts && ts-node --project tsconfig.json tools/tests/metrics-report.test.ts && ts-node --project tsconfig.json tools/tests/runtime-loader.test.ts && ts-node --project tsconfig.json tools/tests/quest-add.test.ts && ts-node --project tsconfig.json tools/tests/auto-remedy.test.ts",
     "typecheck": "tsc --noEmit",
     "build:ts": "tsc -p tsconfig.json && tsc -p tsconfig.tools.json",
     "lint:ts": "eslint \"src/**/*.ts\"",
