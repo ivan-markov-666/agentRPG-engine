@@ -122,7 +122,12 @@ export function archiveTelemetry(options: ArchiveTelemetryOptions = {}): Archive
 
   const archiveDir = path.resolve(cwd, archive);
   if (!dryRun) {
-    fsModule.mkdirSync(archiveDir, { recursive: true });
+    try {
+      fsModule.mkdirSync(archiveDir, { recursive: true });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new Error(`[ARCHIVE][ERROR] Cannot access archive directory: ${archiveDir} (${message})`);
+    }
   }
   const archiveName = `${formatTimestamp()}-${sanitizeLabel(label)}.json`;
   const archivePath = path.join(archiveDir, archiveName);

@@ -47,7 +47,7 @@ function createHistoryEntries(): HistoryEntry[] {
   fs.writeFileSync(historyPath, JSON.stringify(createHistoryEntries(), null, 2), 'utf8');
   fs.writeFileSync(summaryPath, '# old summary\n', 'utf8');
 
-  const scriptPath = path.join(__dirname, '..', 'metrics', 'report.js');
+  const scriptPath = path.resolve(__dirname, '..', '..', 'dist', 'tools', 'metrics', 'report.js');
   const result = spawnSync(
     'node',
     [

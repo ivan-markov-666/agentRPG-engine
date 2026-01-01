@@ -34,6 +34,69 @@ export async function checkRequiredFiles(ctx: CheckContext): Promise<void> {
     required.push(capabilitiesFile);
   }
 
+  const manifestPath = path.join(base, 'manifest/entry.json');
+  let manifestData: Record<string, unknown> | null = null;
+  if (exists(manifestPath)) {
+    manifestData = loadData(manifestPath, issues) as Record<string, unknown> | null;
+    if (manifestData && typeof manifestData === 'object') {
+      ['id', 'title', 'version'].forEach((field) => {
+        if (!manifestData?.[field]) {
+          add(issues, 'WARN', 'MANIFEST-FIELD', 'manifest/entry.json', `Missing '${field}'`, 'Add required manifest fields');
+        }
+      });
+    }
+  }
+
+  const defaultWorldIndex = 'scenario/world/index.md';
+  let worldIndex = defaultWorldIndex;
+  let worldPointerSource: 'manifest' | 'default' = 'default';
+  if (manifestData && typeof manifestData === 'object') {
+    const manifestWorld = manifestData.world_index;
+    if (typeof manifestWorld === 'string' && manifestWorld.trim().length > 0) {
+      worldIndex = manifestWorld;
+      worldPointerSource = 'manifest';
+    }
+  }
+  const worldPath = path.join(base, worldIndex);
+  if (exists(worldPath)) {
+    const content = fs.readFileSync(worldPath, 'utf8');
+    const trimmed = content.trim();
+    if (!trimmed) {
+      add(issues, 'WARN', 'WORLD-FRAME-EMPTY', worldIndex, 'World frame file is empty', 'Add setting overview, themes, tone');
+    } else {
+      if (!/^#\s+.+/m.test(content)) {
+        add(
+          issues,
+          'WARN',
+          'WORLD-FRAME-HEADING',
+          worldIndex,
+          'World frame file is missing an H1 heading',
+          'Start the file with "# <World Name>"',
+        );
+      }
+      const normalizedLength = trimmed.replace(/\s+/g, ' ').length;
+      if (normalizedLength < 120) {
+        add(
+          issues,
+          'WARN',
+          'WORLD-FRAME-SHORT',
+          worldIndex,
+          'World frame content is very short',
+          'Describe the epoch, scope, factions, or tone in more detail (≥120 chars)',
+        );
+      }
+    }
+  } else if (worldPointerSource === 'manifest') {
+    add(
+      issues,
+      'ERROR',
+      'WORLD-FRAME-MISSING',
+      worldIndex,
+      'Manifest world_index points to a missing file',
+      'Create the referenced world frame markdown file',
+    );
+  }
+
   required.forEach((relPath) => {
     const fp = path.join(base, relPath);
     if (!exists(fp)) {
@@ -62,18 +125,6 @@ export async function checkRequiredFiles(ctx: CheckContext): Promise<void> {
   }
 
   const statePath = path.join(base, 'player-data/runtime/state.json');
-  const manifestPath = path.join(base, 'manifest/entry.json');
-
-  if (exists(manifestPath)) {
-    const manifest = loadData(manifestPath, issues) as Record<string, unknown> | null;
-    if (manifest && typeof manifest === 'object') {
-      ['id', 'title', 'version'].forEach((field) => {
-        if (!manifest[field]) {
-          add(issues, 'WARN', 'MANIFEST-FIELD', 'manifest/entry.json', `Missing '${field}'`, 'Add required manifest fields');
-        }
-      });
-    }
-  }
 
   if (exists(statePath)) {
     const state = loadData(statePath, issues) as RuntimeState | null;

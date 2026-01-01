@@ -43,6 +43,15 @@
   - `UNLOCK-UNKNOWN`, `UNLOCK-DEPENDENCY-UNKNOWN`, `UNLOCK-FORMAT`, `UNLOCK-DUPLICATE` — виж `scenario/quests/unlock-triggers.json`.
 - Quest markdown файловете се проверяват за broken `[[links]]`, липсващи секции и reward формати (`QUEST-LINK`, `QUEST-AREA-BACKLINK`, `QUEST-REWARDS-*`, и др.).
 
+#### Remediation helper (ST-021)
+- Валидаторът остава строг и при `QUEST-ORPHAN` / `AREA-ORPHAN`, но вече има CLI за бърза поправка:  
+  `npm run remedy:orphans -- --path games/<gameId>` (или `--game demo`).  
+  Скриптът:
+  1. Преглежда `player-data/runtime/state.json` и scaffold-ва липсващи quest файлове за всеки активен `quest_id` (използва същия шаблон като `quest:scaffold`).
+  2. Проверява `current_area_id` и ако area файлът липсва → гарантира, че съществува `default-area.md` (автоматично го създава при нужда) и обновява state да сочи към него.
+  3. Не трие / презаписва съществуващи файлове; единствената промяна в state е fallback към `default-area`.
+- Използвай този helper, за да възстановиш бързо playable състояние преди повторно пускане на валидатора.
+
 ### Exploration logging контрол (ST-008)
 - Активирай exploration режима чрез `player-data/runtime/state.json` (`"exploration_enabled": true` или `state.exploration.enabled = true`). При активен режим:
   - Липсващ лог → `EXPLORATION-LOG-MISSING` (ERROR). Създай `player-data/runtime/exploration-log.json` и започни с `[]`.

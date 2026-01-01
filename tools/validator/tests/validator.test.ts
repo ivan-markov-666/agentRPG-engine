@@ -48,7 +48,7 @@ async function runCheck(
   // EXPLORATION description/tags minimum and preview mismatch
   {
     const issues = await runCheck(checkRequiredFiles, {
-      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1', engine_compat: '1.0.0' },
       'scenario/index.md': '# Index\nLong enough text to pass validation.',
       'scenario/quests/available.json': [],
       'scenario/quests/unlock-triggers.json': {},
@@ -502,7 +502,7 @@ The militia prepares a final push to reclaim the watchtower before rival faction
   const base = setupGame({
     'config/capabilities.yml': 'mana:\n  enabled: true\n',
   });
-  const issues = [];
+  const issues: Issues = [];
   const ctx = { base, loadJson, issues };
   await checkCapabilities(ctx);
   const hasYamlWarn = issues.some((i) => i.code === 'YAML-NOT-AVAILABLE' || i.code === 'YAML-PARSE');
@@ -560,7 +560,7 @@ The militia prepares a final push to reclaim the watchtower before rival faction
 // Summary-only and ignore codes
 {
     const base = setupGame({
-      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1', engine_compat: '1.0.0' },
       'scenario/index.md': '# Intro\nThis index is long enough to pass the minimum length.',
       'scenario/quests/available.json': [{ quest_id: 'q1', title: 'Quest One' }],
       'scenario/quests/q1.md': '# Quest One\n## Summary\nThis summary contains enough descriptive text to pass validation.\n## Story\nA short story explaining how the elder needs help securing both the square and the training grounds.\n## Hooks\n- Speak with locals in the [[default-area]] to discover the militia shortage.\n- Follow rumors at the [[training-grounds]] that hint at sabotage.\n## Encounters\n- A staged duel that turns deadly when saboteurs interfere.\n- Wilderness ambush near the training trail.\n## Steps\n- Visit the [[default-area]] to meet the elder\n- Investigate the [[training-grounds]] beyond the hill\n## Rewards\n- XP: 200 XP from the guard captain\n- Gold: 80 gold coins for equipment repairs\n- Loot: Enchanted wolf fang amulet recovered near the [[training-grounds]].\n- Social: Reputation boost with the militia council.\n## Notes\n- NPCs: Elder, militia sergeant Isla.\n- Hooks: Unlocks access to advanced drills upon success.\n## Outcome\n- The militia regains control of the outskirts.\n- New training options open for vetted squads.\n## Aftermath\n- Merchants unlock rare gear.\n- Follow-up quest: Patrol the watchtower ruins.\n## Outcome Hooks\n- [[default-area]] NPC response: Elder offers a diplomacy mission.\n- [[training-grounds]] escalation hook: Saboteur cells regroup for revenge.\n## Conditions\n- Reputation at least Friendly with the guard.\n- Finish within two in-game days.\n## Fail State\n- Merchants increase prices by 20%.\n- Rival squad claims the reward and blocks future access.\n',
@@ -685,8 +685,96 @@ The militia prepares a final push to reclaim the watchtower before rival faction
     assert.strictEqual(logged.runId, 'test-run', 'Telemetry log should include runId field');
   }
 
-  console.log('All validator tests passed.');
-})().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+  // Manifest schema validation
+  {
+    const issues = await runCheck(checkSchemas, {
+      'manifest/entry.json': {
+        id: 'test-game',
+        title: 'Test Game',
+        version: '1.0.0',
+        engine_compat: '1.0.0',
+        saves_index: 42
+      }
+    });
+    assert(issues.some((i) => i.code === 'MANIFEST-SCHEMA'), 'Expected MANIFEST-SCHEMA');
+  }
+
+  // Manifest missing required fields
+  {
+    const issues = await runCheck(checkSchemas, {
+      'manifest/entry.json': {
+        title: 'Test Game',
+        version: '1.0.0',
+        engine_compat: '1.0.0'
+      }
+    });
+    assert(issues.some((i) => i.code === 'MANIFEST-SCHEMA'), 'Expected MANIFEST-SCHEMA for missing id');
+  }
+
+  // Manifest invalid engine_layers type
+  {
+    const issues = await runCheck(checkSchemas, {
+      'manifest/entry.json': {
+        id: 'test-game',
+        title: 'Test Game',
+        version: '1.0.0',
+        engine_compat: '1.0.0',
+        engine_layers: 'not-an-array'
+      }
+    });
+    assert(issues.some((i) => i.code === 'MANIFEST-SCHEMA'), 'Expected MANIFEST-SCHEMA for invalid engine_layers');
+  }
+
+  // Manifest invalid pointers type
+  {
+    const issues = await runCheck(checkSchemas, {
+      'manifest/entry.json': {
+        id: 'test-game',
+        title: 'Test Game',
+        version: '1.0.0',
+        engine_compat: '1.0.0',
+        capabilities_file: 123
+      }
+    });
+    assert(issues.some((i) => i.code === 'MANIFEST-SCHEMA'), 'Expected MANIFEST-SCHEMA for invalid capabilities_file type');
+  }
+
+  // World frame missing when manifest pointer set
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.1.0',
+        engine_compat: '1.0.0',
+        world_index: 'scenario/world/custom.md'
+      },
+      'scenario/index.md': '# Index\nThis overview contains more than forty characters to pass validation.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(issues.some((i) => i.code === 'WORLD-FRAME-MISSING'), 'Expected WORLD-FRAME-MISSING when pointer file absent');
+  }
+
+  // World frame formatting warnings
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.1.0',
+        engine_compat: '1.0.0'
+      },
+      'scenario/index.md': '# Index\nThis overview contains more than forty characters to pass validation.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'scenario/world/index.md': 'World frame content without heading but still quite short description for testing.',
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(issues.some((i) => i.code === 'WORLD-FRAME-HEADING'), 'Expected WORLD-FRAME-HEADING warning');
+    assert(issues.some((i) => i.code === 'WORLD-FRAME-SHORT'), 'Expected WORLD-FRAME-SHORT warning');
+  }
+})();

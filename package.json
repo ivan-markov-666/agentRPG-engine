@@ -12,7 +12,7 @@
     "test:validator": "npm run build:ts && ts-node --project tsconfig.json tools/validator/tests/validator.test.ts",
     "test": "ts-node --project tsconfig.json tools/validator/tests/validator.test.ts && ts-node --project tsconfig.json tools/tests/archive-telemetry.test.ts && ts-node --project tsconfig.json tools/tests/metrics-report.test.ts && ts-node --project tsconfig.json tools/tests/runtime-loader.test.ts && ts-node --project tsconfig.json tools/tests/auto-remedy.test.ts",
     "typecheck": "tsc --noEmit",
-    "build:ts": "tsc -p tsconfig.build.json",
+    "build:ts": "tsc -p tsconfig.tools.json",
     "lint:ts": "eslint \"src/**/*.ts\"",
     "pretest": "npm run build:ts",
     "check:no-js": "npm run build:ts && node dist/cli/check-no-js.js",
@@ -29,7 +29,8 @@
     "scenario:index": "ts-node --project tsconfig.json tools/scenario/update-index.ts",
     "quest:add": "ts-node --project tsconfig.json tools/quests/add-quest.ts",
     "quest:scaffold": "ts-node --project tsconfig.json tools/quests/scaffold-quest.ts",
-    "area:add": "ts-node --project tsconfig.json tools/areas/add-area.ts"
+    "area:add": "ts-node --project tsconfig.json tools/areas/add-area.ts",
+    "remedy:orphans": "ts-node --project tsconfig.json tools/remedy/orphans.ts"
   },
   "dependencies": {
     "ajv": "^8.17.1",

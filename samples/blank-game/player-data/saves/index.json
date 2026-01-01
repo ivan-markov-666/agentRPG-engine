@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "save_id": "blank-save-1",
+    "created_at": "2025-01-01T12:00:00Z",
+    "scene_id": "default-area",
+    "summary": "Blank game initial save",
+    "file_path": "player-data/saves/blank-save-1.json"
+  }
+]

@@ -29,8 +29,22 @@ export function validateFileWithSchema(
   const data = loadData(filePath, issues);
   if (!data) return;
 
-  const schema = loadData(schemaPath, issues);
+  const schema = loadData(schemaPath, issues) as Record<string, unknown> | null;
   if (!schema) return;
+
+  const schemaId =
+    schema && typeof schema === 'object' && typeof (schema as { $id?: unknown }).$id === 'string'
+      ? ((schema as { $id: string }).$id)
+      : null;
+  try {
+    if (schemaId) {
+      ajvInstance.removeSchema(schemaId);
+    } else {
+      ajvInstance.removeSchema(schemaPath);
+    }
+  } catch {
+    // ignore if schema not previously added
+  }
 
   const validate = ajvInstance.compile(schema);
   const ok = validate(data);

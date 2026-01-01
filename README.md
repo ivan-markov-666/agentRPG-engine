@@ -90,6 +90,14 @@
 - Генерира slug за файл `scenario/areas/<id>.md`, проверява дали не съществува и scaffold-ва секции `Description / Points of interest / Connections / Notes`.
 - Ако не подадеш стойности → описанието получава 2-6 изречения placeholder; POI/Connections се попълват с примерни bullet-и, Notes съдържа NPC/Threat подсказки, а Conditions/Threats добавят изисквания/ескалации. Така новите area файлове покриват `AREA-POINTS-*`, `AREA-CONNECTIONS-*`, `AREA-NOTES-*`, `AREA-CONDITIONS-*`, `AREA-THREATS-*` guardrails по подразбиране.
 
+### Orphan remediation helper (CLI)
+- Скрипт: `npm run remedy:orphans -- --path games/<gameId>` (или `--game demo` по подразбиране ако не подадеш `--path`).
+- Логика:
+  - Проверява `player-data/runtime/state.json` за активни куестове (`active_quests`) и `current_area_id`.
+  - Ако липсва quest файл за някой активен quest → scaffold-ва минимален Markdown чрез същия шаблон като `quest:scaffold`.
+  - Ако `current_area_id` сочи към липсваща area → гарантира, че съществува `default-area.md` (създава placeholder при нужда) и обновява `state.current_area_id = "default-area"`.
+- CLI-то не трие/презаписва съществуващи файлове (освен да обнови state с fallback). Валидаторът продължава да репортва `QUEST-ORPHAN` / `AREA-ORPHAN`; remediation е само спомагателна стъпка.
+
 ### Release checklist (преди GM session / pre-release)
 - 1) (По нужда) Добави/обнови area: `npm run area:add -- --id <area-id> --title "..." --description "..." --game <gameId>`
 - 2) (По нужда) Добави quest scaffold: `npm run quest:add -- --title "..." --game <gameId>`
