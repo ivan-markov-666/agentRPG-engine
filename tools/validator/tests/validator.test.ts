@@ -33,6 +33,36 @@ function loadJson<T>(filePath: string): T {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
+const SAMPLE_QUEST_MARKDOWN = `# Quest Known
+## Summary
+Detailed summary describing the stakes and motivations to satisfy guardrails.
+## Story
+The militia prepares a final push to reclaim the watchtower before rival factions intervene.
+## Hooks
+- Rally point announced at the [[default-area]].
+## Encounters
+- Siege the outer wall.
+## Steps
+- Establish supply lines.
+- Assault the watchtower.
+## Rewards
+- XP: 180 XP for leadership.
+- Gold: 90 gold coins funded by the council.
+- Loot: Banner recovered from the battlements.
+- Social: Influence gain with the militia commanders.
+## Notes
+- NPCs: Commander Aeris coordinates the strike.
+## Outcome
+- Watchtower secured and signaling restored.
+## Aftermath
+- Follow-up scouting missions unlock.
+## Outcome Hooks
+- Hook: Diplomats request protection during negotiations.
+## Conditions
+- Reputation Friendly with militia.
+## Fail State
+- Rival faction captures the watchtower and hinders trade.`;
+
 async function runCheck(
   checkFn: (ctx: { base: string; loadJson: typeof loadJson; issues: Issues }) => Promise<void> | void,
   files: FileMap,
@@ -414,45 +444,23 @@ Explain the factions rallying around the quest target and how success changes th
     assert(issues.some((i) => i.code === 'QUEST-REWARDS-SHORT'), 'Expected QUEST-REWARDS-SHORT');
   }
 
-// COMPLETED-QUEST-UNKNOWN
-{
-  const questContent = `# Quest Known
-## Summary
-Detailed summary describing the stakes and motivations to satisfy guardrails.
-## Story
-The militia prepares a final push to reclaim the watchtower before rival factions intervene.
-## Hooks
-- Rally point announced at the [[default-area]].
-## Encounters
-- Siege the outer wall.
-## Steps
-- Establish supply lines.
-- Assault the watchtower.
-## Rewards
-- XP: 180 XP for leadership.
-- Gold: 90 gold coins funded by the council.
-- Loot: Banner recovered from the battlements.
-- Social: Influence gain with the militia commanders.
-## Notes
-- NPCs: Commander Aeris coordinates the strike.
-## Outcome
-- Watchtower secured and signaling restored.
-## Aftermath
-- Follow-up scouting missions unlock.
-## Outcome Hooks
-- Hook: Diplomats request protection during negotiations.
-## Conditions
-- Reputation Friendly with militia.
-## Fail State
-- Rival faction captures the watchtower and hinders trade.`;
-  const issues = await runCheck(checkQuests, {
-    'scenario/quests/available.json': [{ quest_id: 'quest-known', title: 'Quest Known' }],
-    'scenario/quests/quest-known.md': questContent,
-    'scenario/quests/unlock-triggers.json': { 'quest-known': 'always' },
-    'player-data/runtime/completed-quests.json': [{ quest_id: 'quest-missing', completed_at: '2025-01-01T00:00:00Z' }],
-  });
-  assert(issues.some((i) => i.code === 'COMPLETED-QUEST-UNKNOWN'), 'Expected COMPLETED-QUEST-UNKNOWN');
-}
+  // COMPLETED-QUEST validation matrix: schema, missing fields, unknown quest
+  {
+    const issues = await runCheck(checkQuests, {
+      'scenario/quests/available.json': [{ quest_id: 'quest-known', title: 'Quest Known' }],
+      'scenario/quests/quest-known.md': SAMPLE_QUEST_MARKDOWN,
+      'scenario/quests/unlock-triggers.json': { 'quest-known': 'always' },
+      'player-data/runtime/completed-quests.json': [
+        { quest_id: 'quest-missing', title: 'Unknown Quest', completed_at: '2025-01-01T00:00:00Z' },
+        { quest_id: 'quest-known', title: '', completed_at: 'invalid' },
+        {},
+      ],
+    });
+    assert(issues.some((i) => i.code === 'COMPLETED-QUEST-UNKNOWN'), 'Expected COMPLETED-QUEST-UNKNOWN');
+    assert(issues.some((i) => i.code === 'COMPLETED-TITLE'), 'Expected COMPLETED-TITLE when title empty');
+    assert(issues.some((i) => i.code === 'COMPLETED-TIMESTAMP'), 'Expected COMPLETED-TIMESTAMP for invalid ISO');
+    assert(issues.some((i) => i.code === 'COMPLETED-ENTRY'), 'Expected COMPLETED-ENTRY when quest_id missing');
+  }
 
 // INDEX-EMPTY and MANIFEST-FIELD
 {

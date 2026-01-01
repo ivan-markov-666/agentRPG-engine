@@ -80,6 +80,14 @@ export async function checkSchemas(ctx: ValidatorContext): Promise<void> {
 
   validateFileWithSchema(
     base,
+    'player-data/runtime/completed-quests.json',
+    path.join(schemasDir, 'completed-quests.schema.json'),
+    'COMPLETED',
+    issues,
+  );
+
+  validateFileWithSchema(
+    base,
     'player-data/saves/index.json',
     path.join(schemasDir, 'saves.index.schema.json'),
     'SAVES-INDEX',
