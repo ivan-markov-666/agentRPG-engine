@@ -88,6 +88,7 @@ interface AvailableQuestEntry {
 
 interface CompletedQuestEntry {
   quest_id?: string;
+  title?: string;
   completed_at?: string;
 }
 
@@ -165,7 +166,28 @@ export async function checkQuests(ctx: BasicContext): Promise<void> {
         } else {
           completedSet.add(questId);
         }
-        if (entry.completed_at && !isIsoDateString(entry.completed_at)) {
+        const title = typeof entry.title === 'string' ? entry.title.trim() : '';
+        if (!title) {
+          add(
+            issues,
+            'WARN',
+            'COMPLETED-TITLE',
+            completedPath,
+            `Completed quest '${questId}' is missing title`,
+            'Populate title to align with completed quest contract',
+          );
+        }
+        const completedAt = entry.completed_at;
+        if (!completedAt || typeof completedAt !== 'string') {
+          add(
+            issues,
+            'WARN',
+            'COMPLETED-TIMESTAMP',
+            completedPath,
+            `Completed quest '${questId}' is missing completed_at timestamp`,
+            'Populate completed_at with ISO timestamp, e.g. 2025-01-03T18:45:00Z',
+          );
+        } else if (!isIsoDateString(completedAt)) {
           add(
             issues,
             'WARN',
