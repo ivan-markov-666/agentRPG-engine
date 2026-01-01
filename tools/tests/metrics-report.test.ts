@@ -11,6 +11,7 @@ interface HistoryEntry {
   errors: number;
   warnings: number;
   issues: Array<Record<string, unknown>>;
+  metrics?: Record<string, unknown>;
 }
 
 function createHistoryEntries(): HistoryEntry[] {
@@ -23,6 +24,14 @@ function createHistoryEntries(): HistoryEntry[] {
       errors: 0,
       warnings: 0,
       issues: [],
+      metrics: {
+        firstActiveQuestMs: 60000,
+        refusalAttempts: 2,
+        refusalSuccesses: 1,
+        completedQuests: 1,
+        debugEnabled: true,
+        validationAttempts: 2,
+      },
     },
     {
       run_id: 'test-run-2',
@@ -33,6 +42,14 @@ function createHistoryEntries(): HistoryEntry[] {
       issues: [
         { level: 'WARN', code: 'QUEST-AREA-BACKLINK', file: 'scenario/quests/demo.md', message: 'missing link', fix: 'add [[quest]]' },
       ],
+      metrics: {
+        firstActiveQuestMs: 120000,
+        refusalAttempts: 1,
+        refusalSuccesses: 1,
+        completedQuests: 0,
+        debugEnabled: false,
+        validationAttempts: 3,
+      },
     },
   ];
 }
@@ -72,6 +89,8 @@ function createHistoryEntries(): HistoryEntry[] {
   const summary = fs.readFileSync(summaryPath, 'utf8');
   assert(summary.includes('# Validator Metrics Summary'), 'Summary header missing');
   assert(summary.includes('## Run история'), 'Summary table missing');
+  assert(summary.includes('## KPI Metrics'), 'Summary KPI section missing');
+  assert(summary.includes('Avg time to first active quest'), 'Summary should include first quest KPI');
   const archives = fs.readdirSync(archiveDir);
   assert.strictEqual(archives.length, 1, 'Archive dir should contain previous summary copy');
   const archivedContents = fs.readFileSync(path.join(archiveDir, archives[0]), 'utf8');
@@ -81,6 +100,7 @@ function createHistoryEntries(): HistoryEntry[] {
   assert(insights.includes('Validator Metrics Insights'), 'Insights header missing');
   assert(insights.includes('## KPI Trends'), 'Insights KPI section missing');
   assert(/\| Avg runtime/.test(insights), 'Insights KPI table should list Avg runtime row');
+  assert(/\| Refusal success rate/.test(insights), 'Insights KPI table should include refusal metric');
   assert(insights.includes('## Alerts'), 'Insights alerts section missing');
 
   const drySummaryPath = path.join(tmp, 'dry-summary.md');

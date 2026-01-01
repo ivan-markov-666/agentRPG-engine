@@ -3,6 +3,9 @@
 ## Purpose
 Проверява файловите договори на игра върху AgentRPG Engine: задължителни файлове, CAP-* правила, orphans, quest ID↔title. Опционално генерира JSON репорт за telemetry.
 
+## Свързани документи
+- How to create a new game: `docs/analysis/how-to-create-a-new-game.md`
+
 ## Използване
 - Build-вариант: `npm run validate -- --path games/<gameId> --run-id <id> [--json out.json] [--append] [--debug] [--strict] [--summary] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2] [--auto-archive 50]`. Скриптът автоматично стартира `npm run build:ts` преди да извика `node dist/cli/validate.js`.
 - Dev-вариант (без предварителен build): `npm run validate:dev -- --path games/<gameId> --run-id <id> ...` (ts-node върху `src/cli/validate.ts` — полезно при промени по CLI-то).
@@ -55,9 +58,9 @@
 ### Exploration logging контрол (ST-008)
 - Активирай exploration режима чрез `player-data/runtime/state.json` (`"exploration_enabled": true` или `state.exploration.enabled = true`). При активен режим:
   - Липсващ лог → `EXPLORATION-LOG-MISSING` (ERROR). Създай `player-data/runtime/exploration-log.json` и започни с `[]`.
-  - Schema нарушения → `EXPLORATION-SCHEMA` (ERROR). JSON Schema изисква `id`, `title`, `type (area|quest|event)`, `added_at` (ISO), `origin`, ≥60 символа `description`, 1–10 уникални тагове и условно `area_id` (за `area`) или `quest_id` (за `quest`).
+  - Schema нарушения → `EXPLORATION-SCHEMA` (ERROR). JSON Schema изисква `id`, `title`, **`type` ∈ {`area`,`quest`,`event`}**, `added_at` (ISO), `origin`, ≥60 символа `description`, 1–10 уникални тагове и условно `area_id` (за `area`) или `quest_id` (за `quest`).
 - Независимо от режима, се изпълняват и допълнителните guardrails от `checkRequiredFiles`: `EXPLORATION-DESCRIPTION-SHORT`, `EXPLORATION-TAGS-MIN`, `EXPLORATION-DUPLICATE-ID/TITLE`, `EXPLORATION-AREA-MISSING`, `EXPLORATION-PREVIEW-MISMATCH`.
-- `npm run exploration:add ...` помага за scaffold на валидни записи (виж README секцията „Exploration log helper“).
+- `npm run exploration:add ...` помага за scaffold на валидни записи (виж README секцията „Exploration log helper“). Скриптът приема legacy aliases (`poi`, `landmark`, `event-hook`) и ги мапва към позволените schema стойности **преди** да запише JSON-а, така че финалните файлове винаги използват `area`/`quest`/`event`.
 
 ### Бързи alias-и (по избор)
 - PowerShell (добави в `$PROFILE`):
@@ -116,6 +119,8 @@
   Out-File docs/analysis/reports/telemetry-history.json -Encoding utf8 -InputObject "[]"
   ```
   - Очакван изход: `Summary: 0 error(s), 0 warning(s)` и `[INFO][SNAPSHOT] New codes: none`.
+> ⚠️ GitHub Actions / CI automation е **по избор** и не е част от MVP local-only workflow. Използвай примерите по-долу само като reference.
+
 4. **CI gating & архив** (optional/out of scope for MVP local-only workflow):
    - Fail the pipeline ако exit code != 0 (CAP errors, WARN при strict, snapshot/log guardrail fail).
    - След clean run (0 errors/0 warnings) стартирай `npm run archive:telemetry -- --label <build-id>` за да нулираш локалния history и качи архивния файл като artifact.

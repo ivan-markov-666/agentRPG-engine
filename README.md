@@ -4,22 +4,58 @@
 
 # AgentRPG Engine — Workspace Guide
 
-## Основни документи
-- Product brief: `docs/analysis/product-brief-A RPG game engine for LLM models.-2025-12-19.md`
-- Capabilities каталог: `docs/analysis/capabilities-catalog.md`
-- Blank game README (шаблон за игра): `docs/analysis/blank-game-README.md`
-- Валидатор (CLI) README: `docs/analysis/validator-readme.md`
+## Документация – входна точка
+
+### Продукт и roadmap
+- **Product brief:** `docs/analysis/product-brief-A RPG game engine for LLM models.-2025-12-19.md` — визия, core контракти (manifest, runtime, UI), Definition of Done.
+- **PRD / Backlog extract:** `docs/analysis/prd-backlog.md` — таблица с FR/T backlog, метрики и open questions.
+- **Epics & stories roadmap:** `docs/analysis/epics-and-stories.md` — mapping EP-xxx ↔ ST-xxx + статуси.
+- **Story catalog:** `docs/stories/story-catalog.md` — индексира всички story файлове (статус, epic връзки, DoD бележки).
+
+### Ръководства и процеси
+- **How to create a new game:** `docs/analysis/how-to-create-a-new-game.md` — end-to-end workflow (копиране на скелет, authoring, validate/runtime, telemetry/KPI).
+- **Blank game README:** `docs/analysis/blank-game-README.md` — детайлен walkthrough на файловете в samples/blank-game + contract guardrails.
+- **Validator (CLI) README:** `docs/analysis/validator-readme.md` — всички CLI флагове, snapshots, telemetry append, auto-archive.
+- **Capabilities catalog:** `docs/analysis/capabilities-catalog.md` — пълен списък от способности, диапазони и schema guardrails.
+- **Validation plan (активна):** `docs/analysis/validation-plan.md` — тестов обхват, роли и gating; архивната версия остава в `docs/analysis/validation-plan-archived.md`.
+- **Test design (Sprint01):** `docs/analysis/test-design-epic-sprint01.md` — покритие на unit/integration тестове спрямо епик цели.
+
+### Анализи, метрики и telemetry
+- **Build Focus — Sprint 01:** `docs/analysis/build-focus-2025-12-sprint01.md` — цел, KPI и deliverables за спринта.
+- **Metrics summary:** `docs/analysis/metrics-summary.md` — автоматично генериран KPI/guardrail отчет (изход от `npm run metrics:report`).
+- **Metrics insights dashboard:** `docs/analysis/metrics-insights.md` — trend таблици, alerts и recommended actions.
+- **Telemetry history & архиви:** `docs/analysis/reports/` — `telemetry-history.json`, `metrics-summary.md`, `metrics-insights.md`, `archive/*.json` (необходими за publish/sync tooling).
+
+### Research & discovery
+- **Brainstorming session log:** `docs/analysis/brainstorming-session-2025-12-14T16-45-00+0200.md` — invariants за capability модела и следващи стъпки.
+- **Comparative research:** `docs/analysis/research/domain-similar-open-source-llm-rpg-engines-and-if-frameworks-research-2025-12-19.md` — анализ на подобни LLM RPG/IF платформи.
+
+### Истории и sprint артефакти
+- **Individual story документи:** `docs/stories/XX-*.md` — приемни критерии + Dev Agent Record (ST-001 … ST-035).
+- **Sprint artifacts / status:** `docs/sprint-artifacts/` (напр. `sprint-status.yaml`) — прогрес по DoD tasks и release readiness.
 
 ## Quick Start — Blank Game Skeleton
-1. **Копирай скелета** (избери shell):  
-   - PowerShell: `Copy-Item samples/blank-game games/<gameId> -Recurse`  
-   - Bash: `cp -R samples/blank-game games/<gameId>`
-2. **Попълни минималните файлове** според `docs/analysis/blank-game-README.md` (manifest title, quest/area описания, runtime stats).
-3. **Пусни валидатора**:
+1. **Копирай скелета**:
+   - CLI helper: `npm run blank:copy -- --dest games/<gameId>`
+   - Ръчно (ако предпочиташ): `cp -R samples/blank-game games/<gameId>` (Bash) / `Copy-Item samples/blank-game games\<gameId> -Recurse` (PowerShell)
+2. **Задай език/дебъг режим (по избор):**
+   ```bash
+   npm run lang:set -- --game <gameId> --language bg --debug true
+   ```
+   Това обновява `player-data/session-init.json` и гарантира, че GM ще започне на избрания език/стил.
+3. **Прочети `samples/blank-game/README.md`** – описва структурата на скелета, кои файлове да актуализираш и как да стартираш validate/runtime цикъла.
+4. **Попълни файловете** според Product Brief (manifest, quests, areas, runtime state, UI).
+5. **(По избор) Запази KPI измервания**  
+   - Създай `games/<gameId>/telemetry/kpi.json` (има шаблон в `samples/blank-game/telemetry/kpi.sample.json`).  
+   - По време на validator-run подай файла:  
+     ```bash
+     npm run validate -- --path games/<gameId> --run-id dev-local --log docs/analysis/reports/telemetry-history.json --kpi games/<gameId>/telemetry/kpi.json
+     ```
+6. **Пусни валидатора**:
    ```bash
    npm run validate -- --path games/<gameId> --run-id dev-local --summary --strict
    ```
-4. **Използвай скелета за DoD**: той вече има валидни `capabilities.json`, `state.json`, quest/area файлове и ще мине clean run-ове веднага след копиране.
+7. **Използвай скелета за DoD**: той има валидни `capabilities.json`, `state.json`, quest/area файлове и clean UI/runtime артефакти, така че веднага след копиране + минимални промени ще минава валидатора.
 
 ## Валидатор (CLI)
 - Пускане директно (след `npm run build:ts`): `node dist/cli/validate.js --path games/<gameId> --run-id <prefix-uuid> [--json out.json] [--debug]`
@@ -142,11 +178,20 @@
 
 ### Sprint Metrics Workflow
 1. **Локално validate + telemetry:** стартирай `npm run validate:metrics -- --game <gameId> --run-id <tag>`, който ще изпълни валидатора и автоматично ще запише telemetry (`docs/analysis/reports/telemetry-history.json`) и регенерира `metrics-summary.md`.
-   - *Note:* `validate:metrics` also accepts `--path games/<gameId>`; `--game` is the preferred interface.
+   - *Note:* `validate:metrics` also accepts `--path games/<gameId>`; `--game` е препоръчителният интерфейс.
 2. **Custom history/output (по избор):** `npm run metrics:report -- --history docs/analysis/reports/telemetry-history.json --out docs/analysis/metrics-summary.md --limit 10`.
 3. **Insights dashboard:** добави `--insights docs/analysis/metrics-insights.md`, за да генерираш документ с Summary / KPI Trends / Alerts / Recommended Actions. Емоджитата (✅/⚠️/❌) показват дали KPI пресищат прагoвете (runtime 200/230 ms, warnings 0.5/1, CAP ratio 5%/15%).
-4. **Архив преди release или при ≥50 run-а:** `npm run archive:telemetry -- --label sprint01`.
+4. **Архивирай telemetry при ≥50 run-а или преди release:** `npm run archive:telemetry -- --label sprint01` (рестартира history след като запише `docs/analysis/reports/archive/<timestamp>-sprint01.json`).
 5. **Definition of Done:** следи `docs/analysis/metrics-summary.md` и `metrics-insights.md` да показват ≥3 поредни clean run-а, avg duration <200 ms, snapshot `New codes = none`.
+
+#### Telemetry transfer flow (archive → publish → sync)
+| Step | Command | Какво прави |
+|------|---------|-------------|
+| 1. Archive | `npm run archive:telemetry -- --label sprint01` | Прехвърля `telemetry-history.json` в `docs/analysis/reports/archive/<timestamp>-sprint01.json` и ресетва history. |
+| 2. Publish bundle | `npm run publish:telemetry -- --source docs/analysis/reports/archive --dest docs/analysis/reports/central-upload --all --include-history docs/analysis/reports/telemetry-history.json` | Копира последния (или всички при `--all`) архиви и, по избор, текущия history файл в “central upload” директорията. Използвай `--dry-run`, за да видиш списъка без да копираш. |
+| 3. Sync to target | `npm run sync:telemetry -- --dest s3://my-bucket/telemetry` **или** `npm run sync:telemetry -- --dest ../shared/telemetry` | Синхронизира `docs/analysis/reports/central-upload` към целта. Поддържа локални директории (recursive copy) и `aws s3 sync` ако `--dest` е `s3://...`. AWS CLI + credentials са задължителни за S3 сценарий; ползвай `--dry-run`, за да валидираш командата. |
+
+> **Tip:** Ако работиш офлайн, можеш да спреш след Step 2 и да предоставиш съдържанието на `docs/analysis/reports/central-upload/` като zip. При екипен sync винаги минавай през archive → publish → sync, за да няма drift между локалните telemetry истории.
 
 #### Metrics Insights Dashboard
 - Файл: `docs/analysis/metrics-insights.md` (генерира се чрез `npm run metrics:report -- --insights docs/analysis/metrics-insights.md`).
@@ -164,7 +209,7 @@
 - **Lint & формат:** `.eslintrc.json` е настроен за TS; Prettier служи като форматър (по избор `npx prettier --write src/**/*.ts`).
 
 ### Git hook (pre-push validate + metrics)
-1. Скрипт: `scripts/pre-push-validate.sh` приема средата `ARPG_GAME`, `ARPG_RUN_ID`, `ARPG_LIMIT` (по избор) и изпълнява `npm run validate:metrics -- --game <game> --run-id <tag> --auto-archive 50`.
+1. Скрипт: `scripts/pre-push-validate.sh` приема средата `ARPG_GAME`, `ARPG_RUN_ID`, `ARPG_LIMIT` (по избор) и `ARPG_AUTO_ARCHIVE` (default 50), след което изпълнява `npm run validate:metrics -- --game <game> --run-id <tag> --auto-archive <value>`.
 2. Инсталация:
    ```bash
    cp scripts/pre-push-validate.sh .git/hooks/pre-push
@@ -184,7 +229,7 @@
 
 ## Sprint 01 — Validator Reliability
 - **Schema guardrails:** `config/capabilities.*` и `player-data/runtime/state.json` вече се валидират чрез JSON Schema + Ajv (вкл. `ajv-formats`). Валидацията следи вложени стойности (`reputation.*`, `currency.*`, `status_effects.*.stack>=0`) и връща `CAP-RUNTIME-RANGE` / `CAP-STATUS-STACK` при отклонения.
-- **Exploration log schema:** `player-data/runtime/exploration-log.json` минава през `EXPLORATION-SCHEМА` guardrail (slug `id`, тип от {`city`,`landmark`,`dungeon`,`mcp`,`side-quest-hook`,`poi`}, `added_at` ISO8601, `origin` = `player-request`/`gm-suggested`, описания ≥60 символа, `tags` 1–10 уникални записа). Липсващ/празен лог при включено exploration води до `FILE-MISSING-OPTIONAL` / `EXPLORATION-EMPTY`. Допълнителни проверки: `EXPLORATION-DESCRIPTION-SHORT`, `EXPLORATION-TAGS-MIN`, `EXPLORATION-DUPLICATE-*`, `EXPLORATION-AREA-MISSING`, както и `EXPLORATION-PREVIEW-MISMATCH` когато `state.json` съдържа preview ID-та без реални записи.
+- **Exploration log schema:** `player-data/runtime/exploration-log.json` минава през `EXPLORATION-СХЕМА` guardrail (slug `id`, тип от {`area`,`quest`,`event`}, `added_at` ISO8601, `origin` = `player-request`/`gm-suggested`, описания ≥60 символа, `tags` 1–10 уникални записа). Липсващ/празен лог при включено exploration води до `FILE-MISSING-OPTIONAL` / `EXPLORATION-EMPTY`. Допълнителни проверки: `EXPLORATION-DESCRIPTION-SHORT`, `EXPLORATION-TAGS-MIN`, `EXPLORATION-DUPLICATE-*`, `EXPLORATION-AREA-MISSING`, както и `EXPLORATION-PREVIEW-MISMATCH` когато `state.json` съдържа preview ID-та без реални записи. CLI helper-ът `npm run exploration:add` приема legacy aliases (`poi`, `landmark`, и др.) и ги мапва към тези три допустими стойности преди да запише JSON-а.
 - **Unit & integration tests:** `tools/validator/tests/validator.test.js` покрива SCHEMA guardrails, YAML fallback, snapshot/ignore сценарий и изисква чист `scenario/index.md`.
 - **Quest / area guardrails:** `available.json` засича `QUEST-ID-DUPLICATE`, заглавия под 5 символа (`QUEST-TITLE-SHORT`) и липсващи unlock политики (`UNLOCK-MISSING`). Unlock стойностите проверяват празни/дублирани условия (`UNLOCK-EMPTY`, `UNLOCK-DUPLICATE`, `UNLOCK-VALUE-TYPE`). Линковете към `[[areas]]` искат двупосочни връзки (`QUEST-AREA-BACKLINK`). Quest файловете задължително съдържат `Summary`, `Story`, `Hooks`, `Encounters`, `Steps`, `Rewards` и `Notes` секции (Steps ≥2 entries, Rewards/Hooks/Encounters/Notes ≥1). Area файловете следят за `Description` ≥60 символа, списъци в `Points of interest` и `Connections`, плюс `Notes` bullet list за NPC hooks/заплахи (`AREA-NOTES-*`). Guardrail-ите `AREA-LINK` и `AREA-QUEST-BACKLINK` гарантират, че връзките към quests са реални и двупосочни.
 - **Telemetry отчети:** пусни `npm run metrics:report` (по избор с `--history <file> --out <file> --limit <N>`), за да регенерираш `docs/analysis/metrics-summary.md` от `docs/analysis/reports/telemetry-history.json`.

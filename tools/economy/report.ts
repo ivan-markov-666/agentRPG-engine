@@ -5,6 +5,7 @@ import path from 'node:path';
 interface CliArgs {
   game: string;
   json: string | null;
+  basePath: string | null;
 }
 
 interface QuestSummaryRow {
@@ -37,7 +38,7 @@ interface Report {
 }
 
 export function parseArgs(argv: string[]): CliArgs {
-  const args: CliArgs = { game: 'demo', json: null };
+  const args: CliArgs = { game: 'demo', json: null, basePath: null };
   for (let i = 2; i < argv.length; i += 1) {
     const flag = argv[i];
     const next = argv[i + 1];
@@ -45,6 +46,10 @@ export function parseArgs(argv: string[]): CliArgs {
       case '--game':
       case '-g':
         if (next) args.game = next;
+        break;
+      case '--path':
+      case '-p':
+        if (next) args.basePath = next;
         break;
       case '--json':
         if (next) args.json = next;
@@ -168,7 +173,10 @@ export function buildReport(gameBase: string, game: string): Report {
 
 export function main(argv: string[] = process.argv): void {
   const args = parseArgs(argv);
-  const gameBase = path.join(__dirname, '..', '..', 'games', args.game);
+  const gameBase =
+    args.basePath && args.basePath.trim()
+      ? path.resolve(args.basePath)
+      : path.join(__dirname, '..', '..', 'games', args.game);
   if (!fs.existsSync(gameBase)) {
     console.error(`[ERROR] Game folder not found: ${gameBase}`);
     process.exit(1);

@@ -1,13 +1,13 @@
 # ST-031 — Repo TS-only Policy (no JS sources in git)
 
-_Status: in-progress_
+_Status: done_
 
 ## Story Overview
 Като техничен лидер искам репото да бъде TS-first/TS-only за source code (никакви `*.js` source файлове в git), а `dist/` да е чист build output (не-версиониран), за да имаме единна типизирана код база и предвидим build/run pipeline.
 
 ## Acceptance Criteria
 - [x] `dist/` е build output и е в `.gitignore` (не се комитва).
-- [ ] Няма JS source файлове в git (извън `dist/` и `node_modules/`).
+- [x] Няма JS source файлове в git (извън `dist/` и `node_modules/`). (`npm run check:no-js` → clean report, `find` inventory = 0.)
 - [x] Добавен е скрипт за проверка/инвентар на JS файлове (и strict режим за бъдеща enforcement).
 - [x] `package.json` има скрипт за проверка (напр. `npm run check:no-js`).
 - [x] TS-only компилация: `tsconfig.json` е с `allowJs: false`.
@@ -25,13 +25,14 @@ _Status: in-progress_
 
 ## Dev Agent Record / File List / Change Log
 - `.gitignore`
-- `src/cli/check-no-js.ts`
+- `src/cli/check-no-js.ts` (inventory + strict mode)
 - `package.json`
 - `tsconfig.json`
 - `.eslintrc.json`, `.prettierrc.json`
 - `docs/analysis/epics-and-stories.md`
 - `docs/stories/story-catalog.md`
 - `docs/sprint-artifacts/sprint-status.yaml`
+- ✅ Verification log: `npm run check:no-js` and manual `find` confirm 0 `.js` sources checked into git.
 
 ## Status
-in-progress
+done

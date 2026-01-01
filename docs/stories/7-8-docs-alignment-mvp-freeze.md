@@ -1,33 +1,30 @@
 # ST-029 — Docs Alignment / MVP Docs Freeze
 
-_Status: ready-for-dev_
+_Status: done_
 
 ## Story Overview
 Като dev/QA искам MVP документацията да е в синхрон с реалния код и CLI интерфейси, за да избегнем drift-ове между docs, validator и tooling и да имаме “source of truth” за MVP.
 
 ## Acceptance Criteria
-- [ ] `docs/analysis/validation-plan.md` е архивиран или обновен да отразява реалния CLI contract:
-  - [ ] премахнати са остарели флагове като `--no-telemetry`;
-  - [ ] актуални флагове (`--path`, `--run-id`, `--json`, `--append`, `--log`, `--snapshot`, `--ignore`, `--auto-archive`, `--strict`, `--summary`) са описани коректно.
-- [ ] `docs/analysis/validator-readme.md` е почиствен от drift-ове:
-  - [ ] exploration log примери използват само `type: area|quest|event` (или ясно е отбелязано, че legacy типове се мапнат от CLI към schema);
-  - [ ] GitHub Actions CI пример е маркиран като “optional/out of scope” или премахнат, за да е в съответствие с “local-only” NFR.
-- [ ] `README.md` (Sprint Metrics Workflow) е уеднаквен за `validate:metrics` usage:
-  - [ ] предпочитаният интерфейс е `--game` (както в `tools/scripts/validate-metrics.js`);
-  - [ ] ако се поддържа и `--path`, е отбелязано, че `--game` е препоръчителен.
-- [ ] Всички промени са направени без да се променя MVP scope или deliverables — само alignment.
+- [x] `docs/analysis/validation-plan.md` отразява реалния CLI contract (`--path`, `--run-id`, `--json`, `--append`, `--log`, `--snapshot`, `--ignore`, `--auto-archive`, `--strict`, `--summary`, `--debug`) и отбелязва, че `--no-telemetry` е депрекиран.
+- [x] `docs/analysis/validator-readme.md` е синхронизиран:
+  - [x] exploration log секцията и примерите използват само schema типовете `area|quest|event`, като е пояснено как legacy aliases се мапват.
+  - [x] CI секцията е маркирана като optional/out of scope за MVP local-only режима.
+- [x] `README.md` описва `validate:metrics` с предпочитан `--game` интерфейс и актуализира Git hook / exploration guardrails със същата терминология.
+- [x] Промените не разширяват MVP scope — само документационен alignment.
 
 ## Tasks / Subtasks
-- [ ] Архивирай `validation-plan.md` като исторически draft или го обнови до текущия CLI contract.
-- [ ] Провери и коригирай exploration type примери в `validator-readme.md`.
-- [ ] Провери CI примери и ги маркирай като optional или премахни.
-- [ ] Уеднакви `validate:metrics` usage в README.
-- [ ] Минимален тест: пусни `npm run validate --help` и провери, че описаните флагове съвпадат.
+- [x] Обнови `validation-plan.md` с текущия contract и explicit deprecation note.
+- [x] Коригирай exploration type референциите в `validator-readme.md`, добави бележка за legacy aliases и маркирай CI примерите като optional.
+- [x] Уеднакви `validate:metrics` usage и hook описанията в `README.md`, включително новата env променлива `ARPG_AUTO_ARCHIVE`.
+- [x] Smoke тест: `npm run validate -- --help` за валидация на поддържаните флагове.
+
 
 ## Dev Agent Record / File List / Change Log
-- `docs/analysis/validation-plan.md`
-- `docs/analysis/validator-readme.md`
-- `README.md`
+- `docs/analysis/validation-plan.md` — обновен с актуалните задължителни/опционални флагове и препратка към validate:metrics workflow.
+- `docs/analysis/validator-readme.md` — синхронизиран exploration раздел + CI секцията маркирана като optional.
+- `README.md` — Git hook и Sprint Metrics описанията вече съвпадат с реалния validate:metrics contract.
+- Smoke тест: `npm run validate -- --help`.
 
 ## Status
-ready-for-dev
+done

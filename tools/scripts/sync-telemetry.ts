@@ -7,12 +7,21 @@ const DEFAULT_SOURCE = 'docs/analysis/reports/central-upload';
 
 interface CliArgs {
   source: string;
-  dest: string | null;
+  dest: string;
   dryRun: boolean;
 }
 
+export interface SyncTelemetryOptions {
+  cwd?: string;
+  sourceDir?: string;
+  dest: string;
+  dryRun?: boolean;
+  spawnFn?: typeof spawnSync;
+  logger?: Pick<typeof console, 'log' | 'error'>;
+}
+
 export function parseArgs(argv: string[]): CliArgs {
-  const args: CliArgs = { source: DEFAULT_SOURCE, dest: null, dryRun: false };
+  const args: CliArgs = { source: DEFAULT_SOURCE, dest: '', dryRun: false };
   for (let i = 2; i < argv.length; i += 1) {
     const flag = argv[i];
     if (flag === '--source' && argv[i + 1]) {
@@ -31,7 +40,12 @@ export function parseArgs(argv: string[]): CliArgs {
   return args;
 }
 
-function copyRecursive(srcDir: string, destDir: string, dryRun: boolean): void {
+function copyRecursive(
+  srcDir: string,
+  destDir: string,
+  dryRun: boolean,
+  logger: Pick<typeof console, 'log'>
+): void {
   if (!dryRun) {
     fs.mkdirSync(destDir, { recursive: true });
   }
@@ -40,45 +54,59 @@ function copyRecursive(srcDir: string, destDir: string, dryRun: boolean): void {
     const srcPath = path.join(srcDir, entry.name);
     const destPath = path.join(destDir, entry.name);
     if (entry.isDirectory()) {
-      copyRecursive(srcPath, destPath, dryRun);
+      copyRecursive(srcPath, destPath, dryRun, logger);
     } else if (dryRun) {
-      console.log(`[SYNC][DRY-RUN] ${srcPath} -> ${destPath}`);
+      logger.log(`[SYNC][DRY-RUN] ${srcPath} -> ${destPath}`);
     } else {
       fs.copyFileSync(srcPath, destPath);
     }
   });
 }
 
+export function syncTelemetry(options: SyncTelemetryOptions): void {
+  const {
+    cwd = path.resolve(__dirname, '..', '..'),
+    sourceDir = DEFAULT_SOURCE,
+    dest,
+    dryRun = false,
+    spawnFn = spawnSync,
+    logger = console,
+  } = options;
+
+  const sourceDirAbs = path.resolve(cwd, sourceDir);
+
+  if (!fs.existsSync(sourceDirAbs)) {
+    throw new Error(`Source directory not found: ${sourceDirAbs}`);
+  }
+
+  const sourceStats = fs.readdirSync(sourceDirAbs);
+  if (!sourceStats.length) {
+    logger.log('[SYNC][SKIP] Source directory is empty.');
+    return;
+  }
+
+  if (dest.startsWith('s3://')) {
+    const args = ['s3', 'sync', sourceDirAbs, dest, '--delete'];
+    if (dryRun) {
+      args.push('--dryrun');
+    }
+    const aws = spawnFn('aws', args, { stdio: 'inherit' });
+    if (aws.status !== 0) {
+      throw new Error(`aws s3 sync failed with code ${aws.status}`);
+    }
+    logger.log(`[SYNC] Uploaded telemetry bundle to ${dest}${dryRun ? ' (dry-run)' : ''}`);
+    return;
+  }
+
+  const destDir = path.isAbsolute(dest) ? dest : path.resolve(cwd, dest);
+  copyRecursive(sourceDirAbs, destDir, dryRun, logger);
+  logger.log(`[SYNC] Files copied to ${destDir}${dryRun ? ' (dry-run)' : ''}`);
+}
+
 export function main(argv: string[] = process.argv): void {
   try {
     const args = parseArgs(argv);
-    const root = path.resolve(__dirname, '..', '..');
-    const sourceDir = path.resolve(root, args.source);
-
-    if (!fs.existsSync(sourceDir)) {
-      throw new Error(`Source directory not found: ${sourceDir}`);
-    }
-
-    const sourceStats = fs.readdirSync(sourceDir);
-    if (!sourceStats.length) {
-      console.log('[SYNC][SKIP] Source directory is empty.');
-      return;
-    }
-
-    const dest = args.dest as string;
-
-    if (dest.startsWith('s3://')) {
-      const aws = spawnSync('aws', ['s3', 'sync', sourceDir, dest, '--delete'], { stdio: 'inherit' });
-      if (aws.status !== 0) {
-        throw new Error(`aws s3 sync failed with code ${aws.status}`);
-      }
-      console.log(`[SYNC] Uploaded telemetry bundle to ${args.dest}`);
-      return;
-    }
-
-    const destDir = path.isAbsolute(dest) ? dest : path.resolve(root, dest);
-    copyRecursive(sourceDir, destDir, args.dryRun);
-    console.log(`[SYNC] Files copied to ${destDir}${args.dryRun ? ' (dry-run)' : ''}`);
+    syncTelemetry({ sourceDir: args.source, dest: args.dest, dryRun: args.dryRun });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error('[SYNC][ERROR]', message);
