@@ -4,6 +4,7 @@ import path from 'node:path';
 
 interface CliArgs {
   game: string;
+  basePath: string | null;
 }
 
 interface QuestRow {
@@ -26,7 +27,7 @@ type AvailableData = AvailableEntry[] | Record<string, string>;
 type UnlocksData = Record<string, string | string[]>;
 
 function parseArgs(argv: string[]): CliArgs {
-  const args: CliArgs = { game: 'demo' };
+  const args: CliArgs = { game: 'demo', basePath: null };
   for (let i = 2; i < argv.length; i += 1) {
     const flag = argv[i];
     const next = argv[i + 1];
@@ -35,6 +36,13 @@ function parseArgs(argv: string[]): CliArgs {
       case '-g':
         if (next) {
           args.game = next;
+          i += 1;
+        }
+        break;
+      case '--path':
+      case '-p':
+        if (next) {
+          args.basePath = next;
           i += 1;
         }
         break;
@@ -88,20 +96,19 @@ function buildQuestRows(gameBase: string): QuestRow[] {
   const unlocks = readJson<UnlocksData>(unlockPath, {});
   const quests = normalizeAvailable(availableRaw);
 
-  return quests.map(({ quest_id, title }) => {
+  const rows = quests.map(({ quest_id, title }) => {
     const questFile = path.join(questDir, `${quest_id}.md`);
-    let summaryText = 'Summary missing.';
+    if (!fs.existsSync(questFile)) {
+      throw new Error(
+        `Quest markdown missing for '${quest_id}'. Expected file at ${questFile}. Use quest:add or remedy tooling to scaffold it.`,
+      );
+    }
+    const content = fs.readFileSync(questFile, 'utf8');
+    const summaryText = compactSummary(extractSection(content, 'Summary')) || 'Summary missing.';
     let resolvedTitle = title;
-    let pathLabel = 'missing';
-
-    if (fs.existsSync(questFile)) {
-      const content = fs.readFileSync(questFile, 'utf8');
-      summaryText = compactSummary(extractSection(content, 'Summary'));
-      const headerTitle = extractTitle(content);
-      if (!resolvedTitle && headerTitle) {
-        resolvedTitle = headerTitle;
-      }
-      pathLabel = `scenario/quests/${quest_id}.md`;
+    const headerTitle = extractTitle(content);
+    if (!resolvedTitle && headerTitle) {
+      resolvedTitle = headerTitle;
     }
 
     const unlockValue = unlocks[quest_id] ?? 'always';
@@ -110,11 +117,13 @@ function buildQuestRows(gameBase: string): QuestRow[] {
     return {
       quest_id,
       title: resolvedTitle || quest_id,
-      summary: pathLabel === 'missing' ? 'Quest file missing.' : summaryText,
+      summary: summaryText,
       unlock: unlockLabel || 'always',
-      path: pathLabel,
+      path: `scenario/quests/${quest_id}.md`,
     };
   });
+
+  return rows.sort((a, b) => a.quest_id.localeCompare(b.quest_id, 'en'));
 }
 
 function buildAreaRows(gameBase: string): AreaRow[] {
@@ -134,15 +143,15 @@ function buildAreaRows(gameBase: string): AreaRow[] {
         description: description || 'Description missing.',
         path: `scenario/areas/${file}`,
       };
-    });
+    })
+    .sort((a, b) => a.id.localeCompare(b.id, 'en'));
 }
 
 function buildMarkdown(gameName: string, quests: QuestRow[], areas: AreaRow[]): string {
-  const generatedAt = new Date().toISOString();
   const questTableHeader = '| Quest | Unlock | Summary |\n| --- | --- | --- |';
   const questTableRows = quests
     .map((quest) => {
-      const link = quest.path !== 'missing' ? `[${quest.title}](${quest.path})` : `${quest.title} _(missing file)_`;
+      const link = `[${quest.title}](${quest.path})`;
       return `| ${link} | ${quest.unlock || 'always'} | ${quest.summary} |`;
     })
     .join('\n');
@@ -151,7 +160,7 @@ function buildMarkdown(gameName: string, quests: QuestRow[], areas: AreaRow[]): 
 
   return `# ${gameName} — Scenario Overview
 
-_Generated on ${generatedAt}. Keep this file synchronized via \`npm run scenario:index -- --game ${gameName}\`._
+_Regenerate via \`npm run scenario:index -- --game ${gameName}\`._
 
 ## Quest Overview
 ${quests.length ? `${questTableHeader}\n${questTableRows}` : '_No quests listed in scenario/quests/available.json._'}
@@ -165,18 +174,22 @@ export function main(argv: string[] = process.argv): void {
   let args: CliArgs;
   try {
     args = parseArgs(argv);
-    const gameBase = path.join(__dirname, '..', '..', 'games', args.game);
+    const gameBase =
+      args.basePath && args.basePath.trim()
+        ? path.resolve(args.basePath)
+        : path.join(__dirname, '..', '..', 'games', args.game);
     if (!fs.existsSync(gameBase)) {
       console.error(`[ERROR] Game folder not found: ${gameBase}`);
       process.exit(1);
     }
-    const indexPath = path.join(gameBase, 'scenario', 'index.md');
+    const scenarioDir = path.join(gameBase, 'scenario');
+    fs.mkdirSync(scenarioDir, { recursive: true });
+    const indexPath = path.join(scenarioDir, 'index.md');
     const quests = buildQuestRows(gameBase);
     const areas = buildAreaRows(gameBase);
     const content = buildMarkdown(args.game, quests, areas);
-    fs.mkdirSync(path.dirname(indexPath), { recursive: true });
-    fs.writeFileSync(indexPath, `${content.trim()}\n`, 'utf8');
-    console.log(`[OK] Updated ${path.relative(process.cwd(), indexPath)} with ${quests.length} quests and ${areas.length} areas.`);
+    fs.writeFileSync(indexPath, `${content}\n`, 'utf8');
+    console.log(`[SCENARIO] index regenerated at ${path.relative(gameBase, indexPath)}`);
   } catch (err) {
     console.error('[SCENARIO][ERROR]', err instanceof Error ? err.message : String(err));
     process.exit(1);
