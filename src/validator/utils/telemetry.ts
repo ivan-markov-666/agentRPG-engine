@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import type { TelemetryIssue } from '@types';
+import type { TelemetryIssue, TelemetryKpiMetrics } from '@types';
 
 export interface WriteLogOptions {
   runId?: string | null;
@@ -9,6 +9,7 @@ export interface WriteLogOptions {
   issues: TelemetryIssue[];
   startTime: number;
   gameId?: string | null;
+  metrics?: TelemetryKpiMetrics;
 }
 
 interface TelemetryEntry {
@@ -21,6 +22,7 @@ interface TelemetryEntry {
   warnings: number;
   issues: TelemetryIssue[];
   game?: string;
+  metrics?: TelemetryKpiMetrics;
 }
 
 function toTelemetryEntry(options: WriteLogOptions): TelemetryEntry {
@@ -39,6 +41,7 @@ function toTelemetryEntry(options: WriteLogOptions): TelemetryEntry {
     warnings,
     issues: options.issues,
     game: options.gameId || undefined,
+    metrics: options.metrics,
   };
 }
 

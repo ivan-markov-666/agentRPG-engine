@@ -6,6 +6,15 @@ export interface TelemetryIssue {
   fix?: string;
 }
 
+export interface TelemetryKpiMetrics {
+  firstActiveQuestMs?: number;
+  refusalAttempts?: number;
+  refusalSuccesses?: number;
+  validationAttempts?: number;
+  completedQuests?: number;
+  debugEnabled?: boolean;
+}
+
 export interface TelemetryEntry {
   runId: string;
   run_id?: string;
@@ -17,4 +26,5 @@ export interface TelemetryEntry {
   issues: TelemetryIssue[];
   game?: string;
   metadata?: Record<string, unknown>;
+  metrics?: TelemetryKpiMetrics;
 }

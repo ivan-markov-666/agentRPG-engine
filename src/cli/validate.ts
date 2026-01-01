@@ -12,6 +12,7 @@ import { checkQuests } from '../validator/checks/quests';
 import { checkSchemas } from '../validator/checks/schema';
 import { checkRuntimeContracts } from '../validator/checks/runtime-contracts';
 import type { Issue } from '../validator/types';
+import type { TelemetryKpiMetrics } from '../types/telemetry';
 
 interface CliArgs {
   path: string | null;
@@ -25,6 +26,7 @@ interface CliArgs {
   summary: boolean;
   ignore: string[];
   autoArchive: number | null;
+  kpiPath: string | null;
 }
 
 const ARCHIVE_SCRIPT = path.resolve(__dirname, '..', '..', 'dist', 'tools', 'archive-telemetry.js');
@@ -65,6 +67,7 @@ function parseArgs(argv: string[]): CliArgs {
     summary: false,
     ignore: [],
     autoArchive: null,
+    kpiPath: null,
   };
 
   const valueFlags = new Set([
@@ -76,6 +79,7 @@ function parseArgs(argv: string[]): CliArgs {
     '--snapshot',
     '--ignore',
     '--auto-archive',
+    '--kpi',
   ]);
 
   for (let i = 2; i < argv.length; i += 1) {
@@ -127,6 +131,9 @@ function parseArgs(argv: string[]): CliArgs {
       case '--auto-archive':
         args.autoArchive = Number(argv[++i]);
         break;
+      case '--kpi':
+        args.kpiPath = argv[++i];
+        break;
       default:
         if (flag.startsWith('-')) {
           throw new Error(`Unknown flag: ${flag}`);
@@ -147,6 +154,65 @@ function loadJson(filePath: string) {
 function requireSnapshot(filePath: string) {
   const snapRaw = fs.readFileSync(path.resolve(filePath), 'utf8');
   return JSON.parse(snapRaw);
+}
+
+function parseNumber(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const parsed = Number(trimmed);
+    if (!Number.isNaN(parsed)) return parsed;
+  }
+  return null;
+}
+
+function parseBoolean(value: unknown): boolean | null {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (['true', '1', 'yes', 'on'].includes(normalized)) return true;
+    if (['false', '0', 'no', 'off'].includes(normalized)) return false;
+  }
+  return null;
+}
+
+function loadKpiMetricsFromFile(filePath: string | null | undefined): TelemetryKpiMetrics | null {
+  if (!filePath) return null;
+  const resolved = path.resolve(filePath);
+  if (!fs.existsSync(resolved)) {
+    console.warn(`[WARN][KPI] KPI file not found: ${filePath}`);
+    return null;
+  }
+
+  try {
+    const raw = fs.readFileSync(resolved, 'utf8');
+    const data = JSON.parse(raw);
+    if (!data || typeof data !== 'object') {
+      console.warn('[WARN][KPI] KPI file must contain an object with numeric fields.');
+      return null;
+    }
+
+    const metrics: TelemetryKpiMetrics = {};
+    const firstQuest = parseNumber((data as Record<string, unknown>).firstActiveQuestMs ?? (data as Record<string, unknown>).first_active_quest_ms);
+    if (firstQuest !== null) metrics.firstActiveQuestMs = firstQuest;
+    const refusalAttempts = parseNumber((data as Record<string, unknown>).refusalAttempts ?? (data as Record<string, unknown>).refusal_attempts);
+    if (refusalAttempts !== null) metrics.refusalAttempts = refusalAttempts;
+    const refusalSuccesses = parseNumber((data as Record<string, unknown>).refusalSuccesses ?? (data as Record<string, unknown>).refusal_successes);
+    if (refusalSuccesses !== null) metrics.refusalSuccesses = refusalSuccesses;
+    const validationAttempts = parseNumber((data as Record<string, unknown>).validationAttempts ?? (data as Record<string, unknown>).validation_attempts);
+    if (validationAttempts !== null) metrics.validationAttempts = validationAttempts;
+    const completedQuests = parseNumber((data as Record<string, unknown>).completedQuests ?? (data as Record<string, unknown>).completed_quests);
+    if (completedQuests !== null) metrics.completedQuests = completedQuests;
+    const debugEnabled = parseBoolean((data as Record<string, unknown>).debugEnabled ?? (data as Record<string, unknown>).debug_enabled);
+    if (debugEnabled !== null) metrics.debugEnabled = debugEnabled;
+
+    return Object.keys(metrics).length ? metrics : null;
+  } catch (err) {
+    const error = err as Error;
+    console.warn(`[WARN][KPI] Failed to parse KPI file (${filePath}): ${error.message}`);
+    return null;
+  }
 }
 
 async function runChecks(base: string, issues: Issue[]) {
@@ -252,12 +318,14 @@ async function main() {
   const hasError = issues.some((issue) => issue.level === 'ERROR');
 
   if (args.log) {
+    const telemetryMetrics = loadKpiMetricsFromFile(args.kpiPath);
     try {
       writeLog({
         runId: args.runId,
         logPath: args.log,
         issues,
         startTime,
+        metrics: telemetryMetrics || undefined,
       });
     } catch (err) {
       const error = err as Error;

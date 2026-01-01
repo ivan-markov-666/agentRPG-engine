@@ -2,6 +2,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import type { TelemetryKpiMetrics } from '../../src/types/telemetry';
+
 interface CliArgs {
   history: string | null;
   out: string | null;
@@ -24,6 +26,7 @@ interface MetricsRun {
   errors?: number;
   warnings?: number;
   issues?: MetricsIssue[];
+  metrics?: TelemetryKpiMetrics;
   [key: string]: unknown;
 }
 
@@ -40,6 +43,20 @@ interface InsightsOptions {
   cleanRuns: number;
   capHitCount: number;
   topCodesList: string;
+  kpiSummary: KpiSummary;
+}
+
+interface KpiSummary {
+  metricsSessions: number;
+  avgFirstQuestMinutes: number | null;
+  refusalAttempts: number;
+  refusalSuccesses: number;
+  refusalSuccessRate: number | null;
+  debugSessions: number;
+  debugPercent: number | null;
+  completedSessions: number;
+  completedPercent: number | null;
+  avgValidationAttempts: number | null;
 }
 
 function isNumberValue(value: unknown): value is number {
@@ -156,7 +173,7 @@ export function archiveExistingSummary(targetPath: string, archiveDir: string, l
 }
 
 export function writeInsights(options: InsightsOptions): void {
-  const { targetPath, recentRuns, avgDuration, avgWarnings, cleanRuns, capHitCount, topCodesList } = options;
+  const { targetPath, recentRuns, avgDuration, avgWarnings, cleanRuns, capHitCount, topCodesList, kpiSummary } = options;
   if (!targetPath || !recentRuns.length) return;
   const totalRuns = recentRuns.length;
   const lastRun = recentRuns[totalRuns - 1];
@@ -189,6 +206,23 @@ export function writeInsights(options: InsightsOptions): void {
     recommendedActions.unshift('1. Разгледай последните run-ове за скъпи проверки или I/O и планирай оптимизация.');
   }
 
+  const firstQuestText =
+    kpiSummary.avgFirstQuestMinutes !== null ? `${kpiSummary.avgFirstQuestMinutes.toFixed(2)} min` : 'n/a';
+  const refusalText =
+    kpiSummary.refusalSuccessRate !== null
+      ? `${(kpiSummary.refusalSuccessRate * 100).toFixed(1)}% (${kpiSummary.refusalSuccesses}/${kpiSummary.refusalAttempts})`
+      : 'n/a';
+  const debugText =
+    kpiSummary.debugPercent !== null
+      ? `${(kpiSummary.debugPercent * 100).toFixed(1)}% (${kpiSummary.debugSessions}/${kpiSummary.metricsSessions})`
+      : 'n/a';
+  const completedText =
+    kpiSummary.completedPercent !== null
+      ? `${(kpiSummary.completedPercent * 100).toFixed(1)}% (${kpiSummary.completedSessions}/${kpiSummary.metricsSessions})`
+      : 'n/a';
+  const validationAttemptsText =
+    kpiSummary.avgValidationAttempts !== null ? kpiSummary.avgValidationAttempts.toFixed(2) : 'n/a';
+
   const kpiTable = [
     `| KPI | Стойност | Статус |`,
     `| --- | --- | --- |`,
@@ -197,6 +231,13 @@ export function writeInsights(options: InsightsOptions): void {
     `| CAP alerts ratio | ${capStatus.text} | ${capStatus.emoji} |`,
     `| Clean run ratio | ${cleanRuns}/${totalRuns} | ${cleanRuns === totalRuns ? '✅' : cleanRuns >= totalRuns - 1 ? '⚠️' : '❌'} |`,
     `| Latest warnings | ${lastWarnings} | ${lastWarnings === 0 ? '✅' : '⚠️'} |`,
+    `| Avg time to first active quest | ${firstQuestText} | ${firstQuestText === 'n/a' ? '⚠️' : '✅'} |`,
+    `| Refusal success rate | ${refusalText} | ${refusalText === 'n/a' ? '⚠️' : '✅'} |`,
+    `| Avg validation attempts | ${validationAttemptsText} | ${
+      validationAttemptsText === 'n/a' ? '⚠️' : '✅'
+    } |`,
+    `| Sessions with debug | ${debugText} | ${debugText === 'n/a' ? '⚠️' : '✅'} |`,
+    `| Sessions with ≥1 completed quest | ${completedText} | ${completedText === 'n/a' ? '⚠️' : '✅'} |`,
   ].join('\n');
 
   const md = `# Validator Metrics Insights — ${dateLabel}
@@ -257,6 +298,7 @@ export function renderSummaryMarkdown(
   avgRetries: number,
   retriesSamples: number,
   topCodesList: string,
+  kpiSummary: KpiSummary,
 ): string {
   const generatedAt = new Date();
   const bgDate = generatedAt.toLocaleDateString('bg-BG', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -266,6 +308,23 @@ export function renderSummaryMarkdown(
         `| ${run.run_id} | ${run.timestamp} | ${isNumberValue(run.duration_ms) ? run.duration_ms : 'n/a'} | ${run.errors ?? 0} | ${run.warnings ?? 0} | ${formatNotes(run)} |`,
     )
     .join('\n');
+
+  const firstQuestText =
+    kpiSummary.avgFirstQuestMinutes !== null ? `${kpiSummary.avgFirstQuestMinutes.toFixed(2)} min` : 'n/a';
+  const refusalText =
+    kpiSummary.refusalSuccessRate !== null
+      ? `${(kpiSummary.refusalSuccessRate * 100).toFixed(1)}% (${kpiSummary.refusalSuccesses}/${kpiSummary.refusalAttempts})`
+      : 'n/a';
+  const debugText =
+    kpiSummary.debugPercent !== null
+      ? `${(kpiSummary.debugPercent * 100).toFixed(1)}% (${kpiSummary.debugSessions}/${kpiSummary.metricsSessions})`
+      : 'n/a';
+  const completedText =
+    kpiSummary.completedPercent !== null
+      ? `${(kpiSummary.completedPercent * 100).toFixed(1)}% (${kpiSummary.completedSessions}/${kpiSummary.metricsSessions})`
+      : 'n/a';
+  const validationAttemptsText =
+    kpiSummary.avgValidationAttempts !== null ? kpiSummary.avgValidationAttempts.toFixed(2) : 'n/a';
 
   return `# Validator Metrics Summary — ${bgDate}
 
@@ -283,11 +342,81 @@ ${tableRows}
 - Avg retries до зелен статус: **${avgRetries.toFixed(2)}** (по ${retriesSamples} clean run-а)
 - Top codes: ${topCodesList || 'n/a'}
 
+## KPI Metrics
+- Avg time to first active quest: **${firstQuestText}**
+- Refusal success rate: **${refusalText}**
+- Avg validation attempts/session: **${validationAttemptsText}**
+- Sessions with debug enabled: **${debugText}**
+- Sessions with ≥1 completed quest: **${completedText}**
+
 ## Препоръки
 1. Поддържай Definition of Done: ≥3 последователни run-а без warnings/errors и snapshot \`New codes = none\`.
 2. Инсталирай schema dependencies (Ajv + ajv-formats) в нови среди, за да липсват \`SCHEMA\` предупреждения.
 3. Архивирай telemetry история при ≥50 run-а или преди release (\`npm run archive:telemetry -- --label <tag>\`).
 `;
+}
+
+function computeKpiSummary(runs: MetricsRun[]): KpiSummary {
+  let metricsSessions = 0;
+  let firstQuestTotal = 0;
+  let firstQuestCount = 0;
+  let refusalAttempts = 0;
+  let refusalSuccesses = 0;
+  let debugSessions = 0;
+  let completedSessions = 0;
+  let validationAttemptsTotal = 0;
+  let validationAttemptsCount = 0;
+
+  runs.forEach((run) => {
+    const metrics = run.metrics;
+    if (!metrics) return;
+    metricsSessions += 1;
+
+    if (typeof metrics.firstActiveQuestMs === 'number' && Number.isFinite(metrics.firstActiveQuestMs)) {
+      firstQuestTotal += metrics.firstActiveQuestMs;
+      firstQuestCount += 1;
+    }
+
+    if (typeof metrics.refusalAttempts === 'number' && metrics.refusalAttempts > 0) {
+      refusalAttempts += metrics.refusalAttempts;
+    }
+
+    if (typeof metrics.refusalSuccesses === 'number' && metrics.refusalSuccesses > 0) {
+      refusalSuccesses += metrics.refusalSuccesses;
+    }
+
+    if (typeof metrics.completedQuests === 'number' && metrics.completedQuests > 0) {
+      completedSessions += 1;
+    }
+
+    if (typeof metrics.debugEnabled === 'boolean' && metrics.debugEnabled) {
+      debugSessions += 1;
+    }
+
+    if (typeof metrics.validationAttempts === 'number' && metrics.validationAttempts >= 0) {
+      validationAttemptsTotal += metrics.validationAttempts;
+      validationAttemptsCount += 1;
+    }
+  });
+
+  const avgFirstQuestMinutes = firstQuestCount ? firstQuestTotal / firstQuestCount / 60000 : null;
+  const refusalSuccessRate = refusalAttempts > 0 ? refusalSuccesses / refusalAttempts : null;
+  const debugPercent = metricsSessions > 0 ? debugSessions / metricsSessions : null;
+  const completedPercent = metricsSessions > 0 ? completedSessions / metricsSessions : null;
+  const avgValidationAttempts = validationAttemptsCount ? validationAttemptsTotal / validationAttemptsCount : null;
+
+  return {
+    metricsSessions,
+    avgFirstQuestMinutes,
+    refusalAttempts,
+    refusalSuccesses,
+    refusalSuccessRate,
+    debugSessions,
+    debugPercent,
+    completedSessions,
+    completedPercent,
+    avgValidationAttempts,
+  };
 }
 
 export function main(argv: string[] = process.argv): void {
@@ -340,7 +469,17 @@ export function main(argv: string[] = process.argv): void {
     .join(', ');
 
   const { avgRetries, retriesSamples } = computeRetries(sorted);
-  const markdown = renderSummaryMarkdown(recentRuns, avgDuration, avgWarnings, cleanRuns, avgRetries, retriesSamples, topCodesList);
+  const kpiSummary = computeKpiSummary(recentRuns);
+  const markdown = renderSummaryMarkdown(
+    recentRuns,
+    avgDuration,
+    avgWarnings,
+    cleanRuns,
+    avgRetries,
+    retriesSamples,
+    topCodesList,
+    kpiSummary,
+  );
 
   if (dryRun) {
     console.log('[metrics] --dry-run enabled. Summary will not be written.');
@@ -370,6 +509,7 @@ export function main(argv: string[] = process.argv): void {
         cleanRuns,
         capHitCount,
         topCodesList,
+        kpiSummary,
       });
     }
   }

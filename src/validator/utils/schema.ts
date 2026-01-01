@@ -1,14 +1,58 @@
 import fs from 'fs';
 import path from 'path';
 
-import Ajv from 'ajv';
+import Ajv, { Options as AjvOptions } from 'ajv';
 import addFormats from 'ajv-formats';
 
 import { add, loadData } from './io';
 import type { Issue } from '../types';
 
-const ajvInstance = new Ajv({ allErrors: true, strict: false });
+const ajvOptions: AjvOptions = {
+  allErrors: true,
+  strict: false,
+};
+
+const ajvInstance = new Ajv(ajvOptions);
 addFormats(ajvInstance);
+
+const loadedSchemaDirs = new Set<string>();
+
+function preloadSchemaDir(schemaDir: string, issues: Issue[]) {
+  if (loadedSchemaDirs.has(schemaDir)) return;
+
+  let files: string[];
+  try {
+    files = fs.readdirSync(schemaDir);
+  } catch {
+    loadedSchemaDirs.add(schemaDir);
+    return;
+  }
+
+  files
+    .filter((f) => f.endsWith('.schema.json'))
+    .forEach((fileName) => {
+      const fullPath = path.join(schemaDir, fileName);
+      const schema = loadData(fullPath, issues) as Record<string, unknown> | null;
+      if (!schema || typeof schema !== 'object') return;
+
+      const schemaId =
+        typeof (schema as { $id?: unknown }).$id === 'string'
+          ? ((schema as { $id: string }).$id)
+          : null;
+
+      try {
+        ajvInstance.addSchema(schema, schemaId || fullPath);
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('already exists')) {
+          // ignore duplicates
+        } else {
+          throw error;
+        }
+      }
+    });
+
+  loadedSchemaDirs.add(schemaDir);
+}
 
 export interface SchemaOptions {
   level?: Issue['level'];
@@ -31,6 +75,8 @@ export function validateFileWithSchema(
 
   const schema = loadData(schemaPath, issues) as Record<string, unknown> | null;
   if (!schema) return;
+
+  preloadSchemaDir(path.dirname(schemaPath), issues);
 
   const schemaId =
     schema && typeof schema === 'object' && typeof (schema as { $id?: unknown }).$id === 'string'
