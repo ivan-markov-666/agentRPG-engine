@@ -27,9 +27,30 @@ interface CliArgs {
   autoArchive: number | null;
 }
 
-const ARCHIVE_SCRIPT = path.resolve(__dirname, '..', '..', 'tools', 'archive-telemetry.js');
-// eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
-const { archiveTelemetry } = require(ARCHIVE_SCRIPT);
+const ARCHIVE_SCRIPT = path.resolve(__dirname, '..', '..', 'dist', 'tools', 'archive-telemetry.js');
+interface ArchiveTelemetryResult {
+  skipped: boolean;
+  count?: number;
+  archivePath?: string;
+  historyPath?: string;
+}
+type ArchiveTelemetryFn = (options?: Record<string, unknown>) => ArchiveTelemetryResult;
+let archiveTelemetry: ArchiveTelemetryFn | null = null;
+
+function loadArchiveTelemetry(): ArchiveTelemetryFn | null {
+  if (archiveTelemetry) return archiveTelemetry;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
+    const moduleExports = require(ARCHIVE_SCRIPT);
+    if (moduleExports && typeof moduleExports.archiveTelemetry === 'function') {
+      archiveTelemetry = moduleExports.archiveTelemetry as ArchiveTelemetryFn;
+      return archiveTelemetry;
+    }
+  } catch {
+    // No-op: dist script not available (e.g., dev-mode)
+  }
+  return null;
+}
 
 function parseArgs(argv: string[]): CliArgs {
   const args: CliArgs = {
@@ -246,21 +267,26 @@ async function main() {
 
     if (args.autoArchive && Number.isFinite(args.autoArchive)) {
       try {
-        const archiveResult = archiveTelemetry({
-          label: args.runId || 'auto',
-          history: args.log,
-          archive: 'docs/analysis/reports/archive',
-          min: args.autoArchive,
-          cwd: process.cwd(),
-        });
-        if (!archiveResult.skipped) {
-          console.log(
-            `[AUTO-ARCHIVE] Archived ${archiveResult.count} run(s) to ${archiveResult.archivePath}`,
-          );
+        const archiveFn = loadArchiveTelemetry();
+        if (!archiveFn) {
+          console.log('[AUTO-ARCHIVE][SKIP] Archive helper not available in dev mode.');
         } else {
-          console.log(
-            `[AUTO-ARCHIVE][SKIP] History size below ${args.autoArchive} run threshold.`,
-          );
+          const archiveResult = archiveFn({
+            label: args.runId || 'auto',
+            history: args.log,
+            archive: 'docs/analysis/reports/archive',
+            min: args.autoArchive,
+            cwd: process.cwd(),
+          });
+          if (!archiveResult.skipped) {
+            console.log(
+              `[AUTO-ARCHIVE] Archived ${archiveResult.count || 0} run(s) to ${archiveResult.archivePath || ''}`,
+            );
+          } else {
+            console.log(
+              `[AUTO-ARCHIVE][SKIP] History size below ${args.autoArchive} run threshold.`,
+            );
+          }
         }
       } catch (err) {
         const error = err as Error;

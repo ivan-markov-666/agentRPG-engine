@@ -3,6 +3,7 @@ export interface ManifestEntry {
   game_id?: string;
   title: string;
   version: string;
+  engine_compat: string;
   engine_layers?: string[];
 
   capabilities_file?: string;
@@ -11,4 +12,5 @@ export interface ManifestEntry {
   ui_index?: string;
   saves_index?: string;
   full_history_file?: string;
+  world_index?: string;
 }

@@ -1,4 +1,4 @@
-import type { HostAdapter, ManifestEntry, RuntimeState, SessionInit } from '../types';
+import type { HostAdapter, ManifestEntry, RuntimeState, SessionInit, SaveFile } from '../types';
 
 export interface GameRuntimeSnapshot {
   manifest: ManifestEntry;
@@ -27,4 +27,9 @@ export async function loadGameRuntimeSnapshot(host: HostAdapter): Promise<GameRu
   const sessionInit = await readJsonOptional<SessionInit>(host, 'player-data/session-init.json');
   const state = await readJsonOptional<RuntimeState>(host, 'player-data/runtime/state.json');
   return { manifest, sessionInit, state };
+}
+
+export async function loadSaveFile(host: HostAdapter, savePath: string): Promise<SaveFile> {
+  const raw = await host.readFile(savePath);
+  return JSON.parse(raw) as SaveFile;
 }

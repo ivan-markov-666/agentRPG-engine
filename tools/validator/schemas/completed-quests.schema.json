@@ -1,0 +1,26 @@
+{
+  "$id": "https://agent-rpg/schemas/completed-quests.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Completed Quests",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["quest_id", "title", "completed_at"],
+    "additionalProperties": false,
+    "properties": {
+      "quest_id": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]{3,60}$"
+      },
+      "title": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "completed_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  }
+}

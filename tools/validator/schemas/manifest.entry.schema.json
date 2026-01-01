@@ -1,0 +1,69 @@
+{
+  "$id": "https://agent-rpg/schemas/manifest.entry.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Manifest Entry",
+  "type": "object",
+  "required": ["id", "title", "version", "engine_compat"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]{3,60}$"
+    },
+    "game_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]{3,60}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "engine_compat": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "engine_layers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "capabilities_file": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "scenario_index": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "ui_index": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "saves_index": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "full_history_file": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "world_index": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    }
+  }
+}

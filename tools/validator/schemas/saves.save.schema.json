@@ -1,0 +1,45 @@
+{
+  "$id": "https://agent-rpg/schemas/saves.save.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Save File",
+  "type": "object",
+  "required": ["schema_version", "save_id", "created_at", "scene_id", "summary", "cursor", "state"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "save_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]{3,60}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scene_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]{1,60}$"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "cursor": {
+      "type": "object",
+      "required": ["scene_id"],
+      "additionalProperties": true,
+      "properties": {
+        "scene_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]{1,60}$"
+        }
+      }
+    },
+    "state": {
+      "$ref": "state.schema.json"
+    }
+  }
+}

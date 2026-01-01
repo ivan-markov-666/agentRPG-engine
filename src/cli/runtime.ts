@@ -1,15 +1,16 @@
 import path from 'path';
 
-import { LocalFsHostAdapter, loadGameRuntimeSnapshot } from '../runtime';
+import { LocalFsHostAdapter, loadGameRuntimeSnapshot, loadSaveFile } from '../runtime';
 
 interface CliArgs {
   path: string | null;
   debug: boolean;
+  save: string | null;
 }
 
 function parseArgs(argv: string[]): CliArgs {
-  const args: CliArgs = { path: null, debug: false };
-  const valueFlags = new Set(['--path', '-p']);
+  const args: CliArgs = { path: null, debug: false, save: null };
+  const valueFlags = new Set(['--path', '-p', '--save']);
 
   for (let i = 2; i < argv.length; i += 1) {
     const flag = argv[i];
@@ -27,6 +28,9 @@ function parseArgs(argv: string[]): CliArgs {
       case '-p':
         args.path = argv[++i];
         break;
+      case '--save':
+        args.save = argv[++i];
+        break;
       case '--debug':
         args.debug = true;
         break;
@@ -41,8 +45,23 @@ function parseArgs(argv: string[]): CliArgs {
 
 async function main() {
   const args = parseArgs(process.argv);
+
+  if (args.save) {
+    const base = args.path ? path.resolve(args.path) : path.dirname(path.resolve(args.save));
+    const host = new LocalFsHostAdapter(base);
+    const saveFile = await loadSaveFile(host, args.save);
+
+    console.log(`Save ID: ${saveFile.save_id}`);
+    console.log(`Summary: ${saveFile.summary}`);
+    console.log(`Cursor Scene: ${saveFile.cursor.scene_id}`);
+    if (args.debug) {
+      console.log(JSON.stringify(saveFile, null, 2));
+    }
+    return;
+  }
+
   if (!args.path) {
-    console.error('Usage: npm run runtime -- --path games/<gameId> [--debug]');
+    console.error('Usage: npm run runtime -- --path games/<gameId> [--debug] | --save <saveFilePath> [--path <baseDir>] [--debug]');
     process.exit(1);
     return;
   }
