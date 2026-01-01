@@ -1,76 +1,76 @@
 # AgentRPG Validator CLI (draft)
 
 ## Purpose
-Проверява файловите договори на игра върху AgentRPG Engine: задължителни файлове, CAP-* правила, orphans, quest ID↔title. Опционално генерира JSON репорт за telemetry.
+Validates the file contracts of a game built on AgentRPG Engine: required files, CAP-* rules, orphans, quest ID↔title. Optionally generates a JSON report for telemetry.
 
-## Свързани документи
+## Related documents
 - How to create a new game: `docs/analysis/how-to-create-a-new-game.md`
 
-## Използване
-- Build-вариант: `npm run validate -- --path games/<gameId> --run-id <id> [--json out.json] [--append] [--debug] [--strict] [--summary] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2] [--auto-archive 50]`. Скриптът автоматично стартира `npm run build:ts` преди да извика `node dist/cli/validate.js`.
-- Dev-вариант (без предварителен build): `npm run validate:dev -- --path games/<gameId> --run-id <id> ...` (ts-node върху `src/cli/validate.ts` — полезно при промени по CLI-то).
-- Без `--run-id` CLI прекратява изпълнение (`[ERROR][RUN-ID] Missing required --run-id <value>`). Използвай helper скриптовете `tools/scripts/run-id.(ps1|sh)` за генерация.
-- `--append` (с `--json out.json`): апендва новия резултат в масив, ако файлът е масив; иначе overwrite.
-- `--strict`: treat WARN като ERROR.
-- `--summary`: показва само обобщение (удобно за CI или бърз lint pass).
-- `--snapshot prev.json`: сравнява текущия run с предишен JSON (показва нови/решени кодове).
-- `--ignore CODE1,CODE2`: временно скрива изброените кодове от отчета (само за локални експерименти).
+## Usage
+- Build variant: `npm run validate -- --path games/<gameId> --run-id <id> [--json out.json] [--append] [--debug] [--strict] [--summary] [--log telemetry.json] [--snapshot prev.json] [--ignore CODE1,CODE2] [--auto-archive 50]`. The script automatically runs `npm run build:ts` before calling `node dist/cli/validate.js`.
+- Dev variant (no pre-build): `npm run validate:dev -- --path games/<gameId> --run-id <id> ...` (ts-node on `src/cli/validate.ts` — useful while developing the CLI).
+- Without `--run-id`, the CLI terminates (`[ERROR][RUN-ID] Missing required --run-id <value>`). Use the helper scripts `tools/scripts/run-id.(ps1|sh)` for generation.
+- `--append` (with `--json out.json`): appends the new result to an array if the file is an array; otherwise overwrites.
+- `--strict`: treat WARN as ERROR.
+- `--summary`: prints summary only (useful for CI or a quick lint pass).
+- `--snapshot prev.json`: compares the current run with a previous JSON (shows new/resolved codes).
+- `--ignore CODE1,CODE2`: temporarily hides the listed codes from the report (local experiments only).
 
-### Примерни команди
-- Базова проверка (build output): `npm run validate -- --path games/demo --run-id dev-local`
-- Dev run без build: `npm run validate:dev -- --path games/demo --run-id dev-local`
-- Запис в JSON + append: `npm run validate -- --path games/demo --run-id dev-local --json reports/last.json --append`
-- Строг режим: `npm run validate -- --path games/demo --run-id dev-local --strict`
-- Snapshot срещу предишен отчет: `npm run validate -- --path games/demo --run-id dev-local --json reports/last.json --append --snapshot reports/last.json`
+### Example commands
+- Basic check (build output): `npm run validate -- --path games/demo --run-id dev-local`
+- Dev run (no build): `npm run validate:dev -- --path games/demo --run-id dev-local`
+- Write JSON + append: `npm run validate -- --path games/demo --run-id dev-local --json reports/last.json --append`
+- Strict mode: `npm run validate -- --path games/demo --run-id dev-local --strict`
+- Snapshot against a previous report: `npm run validate -- --path games/demo --run-id dev-local --json reports/last.json --append --snapshot reports/last.json`
 - Telemetry + log: `npm run validate -- --path games/demo --run-id dev-001 --log docs/analysis/reports/telemetry-history.json`
-- Debug (показва INFO): `npm run validate -- --path games/demo --run-id dev-local --debug`
-- Snapshot пример (2 run-а, append):  
+- Debug (prints INFO): `npm run validate -- --path games/demo --run-id dev-local --debug`
+- Snapshot example (2 runs, append):  
   1) `npm run validate -- --path games/demo --run-id dev-001 --json reports/last.json --append`  
-  2) оправяш данните, после: `npm run validate -- --path games/demo --run-id dev-002 --json reports/last.json --append --snapshot reports/last.json`  
-  Конзолата ще покаже `[INFO][SNAPSHOT] New codes: ... | Resolved: ...`
-- Локален “pre-release” чек (без CI): `npm run validate -- --path games/demo --run-id dev-local --json reports/last.json --append --snapshot reports/last.json --strict --summary`
+  2) fix the data, then run: `npm run validate -- --path games/demo --run-id dev-002 --json reports/last.json --append --snapshot reports/last.json`  
+  The console will show `[INFO][SNAPSHOT] New codes: ... | Resolved: ...`
+- Local “pre-release” check (no CI): `npm run validate -- --path games/demo --run-id dev-local --json reports/last.json --append --snapshot reports/last.json --strict --summary`
 
-### State schema контрол
-- `player-data/runtime/state.json` се валидира срещу [`tools/validator/schemas/state.schema.json`]. Schema-та описва очакваните полета (`stats`, `flags`, `inventories`, `exploration_*`) и налага неотрицателни стойности, валидни `status_effects` stack-ове и структури за инвентари.
-- Нарушенията се маркират като `STATE-SCHEMA` предупреждения/грешки. Примери:
+### State schema control
+- `player-data/runtime/state.json` is validated against [`tools/validator/schemas/state.schema.json`]. The schema describes expected fields (`stats`, `flags`, `inventories`, `exploration_*`) and enforces non-negative values, valid `status_effects` stacks, and inventory structures.
+- Violations are reported as `STATE-SCHEMA` warnings/errors. Examples:
   - `[/current_day] must be >= 0`
   - `[/inventories/0/items/0/qty] must be >= 0`
   - `[/stats/status_effects/poison/stack] must be >= 0`
-- Добави нови ключове чрез `genericStat` секцията на schema файла или разшири `definitions`, за да избегнеш `STATE-SCHEMA` нарушения.
+- Add new keys via the `genericStat` section of the schema file or extend `definitions` to avoid `STATE-SCHEMA` violations.
 
-### Quest & Scenario contract контрол (ST-007)
-- `scenario/quests/available.json` се сверява срещу `scenario/index.md` и `scenario/quests/unlock-triggers.json`, за да няма orphan-и или несъответствия:
-  - `INDEX-QUEST-MISSING` — quest в available.json липсва от таблицата в index.md → пусни `npm run scenario:index` или добави реда ръчно.
-  - `INDEX-QUEST-UNKNOWN` — index съдържа quest, който липсва в available.json → изтрий реда или върни quest-а.
-  - `QUEST-ORPHAN` — quest файл липсва → създай markdown файла или премахни записа.
-  - `UNLOCK-UNKNOWN`, `UNLOCK-DEPENDENCY-UNKNOWN`, `UNLOCK-FORMAT`, `UNLOCK-DUPLICATE` — виж `scenario/quests/unlock-triggers.json`.
-- Quest markdown файловете се проверяват за broken `[[links]]`, липсващи секции и reward формати (`QUEST-LINK`, `QUEST-AREA-BACKLINK`, `QUEST-REWARDS-*`, и др.).
+### Quest & Scenario contract control (ST-007)
+- `scenario/quests/available.json` is compared against `scenario/index.md` and `scenario/quests/unlock-triggers.json` to avoid orphans or inconsistencies:
+  - `INDEX-QUEST-MISSING` — quest in available.json is missing from the table in index.md → run `npm run scenario:index` or add the row manually.
+  - `INDEX-QUEST-UNKNOWN` — index contains a quest that is missing in available.json → delete the row or restore the quest.
+  - `QUEST-ORPHAN` — quest file is missing → create the markdown file or remove the entry.
+  - `UNLOCK-UNKNOWN`, `UNLOCK-DEPENDENCY-UNKNOWN`, `UNLOCK-FORMAT`, `UNLOCK-DUPLICATE` — see `scenario/quests/unlock-triggers.json`.
+- Quest markdown files are checked for broken `[[links]]`, missing sections, and reward formats (`QUEST-LINK`, `QUEST-AREA-BACKLINK`, `QUEST-REWARDS-*`, etc.).
 
 #### Remediation helper (ST-021)
-- Валидаторът остава строг и при `QUEST-ORPHAN` / `AREA-ORPHAN`, но вече има CLI за бърза поправка:  
-  `npm run remedy:orphans -- --path games/<gameId>` (или `--game demo`).  
-  Скриптът:
-  1. Преглежда `player-data/runtime/state.json` и scaffold-ва липсващи quest файлове за всеки активен `quest_id` (използва същия шаблон като `quest:scaffold`).
-  2. Проверява `current_area_id` и ако area файлът липсва → гарантира, че съществува `default-area.md` (автоматично го създава при нужда) и обновява state да сочи към него.
-  3. Не трие / презаписва съществуващи файлове; единствената промяна в state е fallback към `default-area`.
-- Използвай този helper, за да възстановиш бързо playable състояние преди повторно пускане на валидатора.
+- The validator stays strict for `QUEST-ORPHAN` / `AREA-ORPHAN`, but there is a CLI for quick remediation:  
+  `npm run remedy:orphans -- --path games/<gameId>` (or `--game demo`).  
+  The script:
+  1. Reads `player-data/runtime/state.json` and scaffolds missing quest files for every active `quest_id` (using the same template as `quest:scaffold`).
+  2. Checks `current_area_id` and if the area file is missing → ensures `default-area.md` exists (auto-creates it if needed) and updates state to point to it.
+  3. Does not delete/overwrite existing files; the only state change is a fallback to `default-area`.
+- Use this helper to quickly restore a playable state before running the validator again.
 
-### Exploration logging контрол (ST-008)
-- Активирай exploration режима чрез `player-data/runtime/state.json` (`"exploration_enabled": true` или `state.exploration.enabled = true`). При активен режим:
-  - Липсващ лог → `EXPLORATION-LOG-MISSING` (ERROR). Създай `player-data/runtime/exploration-log.json` и започни с `[]`.
-  - Schema нарушения → `EXPLORATION-SCHEMA` (ERROR). JSON Schema изисква `id`, `title`, **`type` ∈ {`area`,`quest`,`event`}**, `added_at` (ISO), `origin`, ≥60 символа `description`, 1–10 уникални тагове и условно `area_id` (за `area`) или `quest_id` (за `quest`).
-- Независимо от режима, се изпълняват и допълнителните guardrails от `checkRequiredFiles`: `EXPLORATION-DESCRIPTION-SHORT`, `EXPLORATION-TAGS-MIN`, `EXPLORATION-DUPLICATE-ID/TITLE`, `EXPLORATION-AREA-MISSING`, `EXPLORATION-PREVIEW-MISMATCH`.
-- `npm run exploration:add ...` помага за scaffold на валидни записи (виж README секцията „Exploration log helper“). Скриптът приема legacy aliases (`poi`, `landmark`, `event-hook`) и ги мапва към позволените schema стойности **преди** да запише JSON-а, така че финалните файлове винаги използват `area`/`quest`/`event`.
+### Exploration logging control (ST-008)
+- Enable exploration mode via `player-data/runtime/state.json` (`"exploration_enabled": true` or `state.exploration.enabled = true`). When enabled:
+  - Missing log → `EXPLORATION-LOG-MISSING` (ERROR). Create `player-data/runtime/exploration-log.json` and start with `[]`.
+  - Schema violations → `EXPLORATION-SCHEMA` (ERROR). JSON Schema requires `id`, `title`, **`type` ∈ {`area`,`quest`,`event`}**, `added_at` (ISO), `origin`, ≥60 chars `description`, 1–10 unique tags, and conditional `area_id` (for `area`) or `quest_id` (for `quest`).
+- Regardless of mode, additional guardrails from `checkRequiredFiles` also run: `EXPLORATION-DESCRIPTION-SHORT`, `EXPLORATION-TAGS-MIN`, `EXPLORATION-DUPLICATE-ID/TITLE`, `EXPLORATION-AREA-MISSING`, `EXPLORATION-PREVIEW-MISMATCH`.
+- `npm run exploration:add ...` helps scaffold valid entries (see the README section “Exploration log helper”). The script accepts legacy aliases (`poi`, `landmark`, `event-hook`) and maps them to allowed schema values **before** writing JSON, so final files always use `area`/`quest`/`event`.
 
-### Бързи alias-и (по избор)
-- PowerShell (добави в `$PROFILE`):
+### Quick aliases (optional)
+- PowerShell (add to `$PROFILE`):
   ```powershell
  function arpg-validate {
    param([string]$game = "demo")
    npm run validate -- --path "games/$game" --run-id dev-local --json reports/last.json --append --snapshot reports/last.json --strict --summary
  }
  ```
-  Изпълнение: `arpg-validate demo`
+  Run: `arpg-validate demo`
 - Bash/Zsh:
   ```bash
  arpg_validate() {
@@ -78,90 +78,90 @@
    npm run validate -- --path "games/$game" --run-id dev-local --json reports/last.json --append --snapshot reports/last.json --strict --summary
  }
  ```
-  Изпълнение: `arpg_validate demo`
+  Run: `arpg_validate demo`
 
-## Изход
-- Конзола: `[LEVEL][CODE] file:message (suggested fix)`
-- Exit code: 1 ако:
-  - има поне един `ERROR` (или предупреждение, което е ескалирано чрез `--strict`);
-  - guardrail операции (`--snapshot`, `--log`) се провалят (валидаторът отпечатва `[ERROR][SNAPSHOT]...`/`[ERROR][LOG]...`).
-- `--auto-archive <N>` (по избор): след успешен telemetry лог автоматично извиква архивиращия скрипт, ако историята има ≥N записи. При skip отпечатва `[AUTO-ARCHIVE][SKIP]`, при успех `[AUTO-ARCHIVE] Archived ...` и рестартира history файла.
-- Exit code: 0 само когато няма ERRORS и guardrail side-effects са успешни.
-- JSON (ако `--json out.json`): `{ errors, warnings, cap_errors, issues: [...] }`
-- Telemetry лог (изисква `--run-id` + `--log`): `{ runId, run_id, timestamp, duration_ms, errors, warnings, issues }`
+## Output
+- Console: `[LEVEL][CODE] file:message (suggested fix)`
+- Exit code: 1 if:
+  - there is at least one `ERROR` (or a warning escalated via `--strict`);
+  - guardrail operations (`--snapshot`, `--log`) fail (the validator prints `[ERROR][SNAPSHOT]...`/`[ERROR][LOG]...`).
+- `--auto-archive <N>` (optional): after a successful telemetry log, automatically invokes the archiving script if the history has ≥N entries. On skip it prints `[AUTO-ARCHIVE][SKIP]`, on success `[AUTO-ARCHIVE] Archived ...` and resets the history file.
+- Exit code: 0 only when there are no ERRORS and guardrail side-effects succeed.
+- JSON (with `--json out.json`): `{ errors, warnings, cap_errors, issues: [...] }`
+- Telemetry log (requires `--run-id` + `--log`): `{ runId, run_id, timestamp, duration_ms, errors, warnings, issues }`
 
 ### Troubleshooting (guards)
-- `[ERROR][SNAPSHOT] ENOENT ...` — провери, че файлът, подаден към `--snapshot`, съществува (или махни флага). Провалът е блокиращ → CLI връща 1.
-- `[ERROR][SNAPSHOT] Unexpected token ...` — JSON е повреден; отвори файла и поправи синтаксиса или изтрий последния run, след което пусни валидатора отново.
-- `[ERROR][LOG] EISDIR ...` — `--log` сочи към директория/невалиден път. Задай валиден `.json` файл (примерно `docs/analysis/reports/telemetry-history.json`).
-- `[ERROR][LOG] EACCES ...` — липсват права за писане. Смени локацията или дай write permission преди повторен run.
+- `[ERROR][SNAPSHOT] ENOENT ...` — verify that the file passed to `--snapshot` exists (or remove the flag). This failure is blocking → CLI returns 1.
+- `[ERROR][SNAPSHOT] Unexpected token ...` — JSON is corrupted; open the file and fix the syntax or delete the last run, then run the validator again.
+- `[ERROR][LOG] EISDIR ...` — `--log` points to a directory/invalid path. Provide a valid `.json` file (e.g. `docs/analysis/reports/telemetry-history.json`).
+- `[ERROR][LOG] EACCES ...` — missing write permissions. Change location or grant write permission before re-running.
 
-### Архивиране чрез скрипт
-- Съществува helper `npm run validate -- --path games/<gameId> --run-id <tag> --log docs/analysis/reports/telemetry-history.json --auto-archive 50` (опционално) → автоматично тригърва архивиране, когато telemetry историята стигне ≥50 записа.
-- `npm run archive:telemetry -- --label sprint01` (при нужда) → прехвърля историята в `docs/analysis/reports/archive/`.
-- `npm run publish:telemetry -- --dest docs/analysis/reports/central-upload --history --all` → подготвя bundle за централен storage.
+### Archiving via script
+- There is a helper `npm run validate -- --path games/<gameId> --run-id <tag> --log docs/analysis/reports/telemetry-history.json --auto-archive 50` (optional) → automatically triggers archiving when telemetry history reaches ≥50 entries.
+- `npm run archive:telemetry -- --label sprint01` (as needed) → moves history into `docs/analysis/reports/archive/`.
+- `npm run publish:telemetry -- --dest docs/analysis/reports/central-upload --history --all` → prepares a bundle for central storage.
 
-- Скриптът:
-  1. Проверява дали history файлът съществува и има съдържание (не празен масив).
-  2. Създава `docs/analysis/reports/archive/<timestamp>-<label>.json`.
-  3. Нулира history файла до `[]`.
-- Използвай го след release или когато telemetry логът достигне лимита от retention политиката.
-- За автоматизация (без npm): ползвай shell/PwSh wrapper-ите:
+- The script:
+  1. Checks if the history file exists and has content (not an empty array).
+  2. Creates `docs/analysis/reports/archive/<timestamp>-<label>.json`.
+  3. Resets the history file to `[]`.
+- Use it after a release or when the telemetry log reaches the retention limit.
+- For automation (without npm), use the shell/PwSh wrappers:
   - PowerShell: `powershell -ExecutionPolicy Bypass -File tools/scripts/archive-telemetry.ps1 -Label nightly -History docs/analysis/reports/telemetry-history.json`
   - Bash: `bash tools/scripts/archive-telemetry.sh --label nightly --history docs/analysis/reports/telemetry-history.json`
 
-### Периодично архивиране (локално)
+### Periodic archiving (local)
 - **PowerShell task (Windows)**:
   ```powershell
-  $stamp = Get-Date -Format 'yyyy-MM-dd'
-  $archive = "docs/analysis/reports/archive/$stamp-telemetry.json"
-  Move-Item docs/analysis/reports/telemetry-history.json $archive
-  Out-File docs/analysis/reports/telemetry-history.json -Encoding utf8 -InputObject "[]"
-  ```
-  - Очакван изход: `Summary: 0 error(s), 0 warning(s)` и `[INFO][SNAPSHOT] New codes: none`.
-> ⚠️ GitHub Actions / CI automation е **по избор** и не е част от MVP local-only workflow. Използвай примерите по-долу само като reference.
+$stamp = Get-Date -Format 'yyyy-MM-dd'
+$archive = "docs/analysis/reports/archive/$stamp-telemetry.json"
+Move-Item docs/analysis/reports/telemetry-history.json $archive
+Out-File docs/analysis/reports/telemetry-history.json -Encoding utf8 -InputObject "[]"
+```
+  - Expected output: `Summary: 0 error(s), 0 warning(s)` and `[INFO][SNAPSHOT] New codes: none`.
+> ⚠️ GitHub Actions / CI automation is **optional** and not part of the MVP local-only workflow. Use the examples below as reference only.
 
-4. **CI gating & архив** (optional/out of scope for MVP local-only workflow):
-   - Fail the pipeline ако exit code != 0 (CAP errors, WARN при strict, snapshot/log guardrail fail).
-   - След clean run (0 errors/0 warnings) стартирай `npm run archive:telemetry -- --label <build-id>` за да нулираш локалния history и качи архивния файл като artifact.
-   - Архивирай `docs/analysis/reports/latest-run.json` / `telemetry-history.json` като build artifacts (или snapshot JSON + archive резултата).
-   - Example (for reference only, not part of MVP local-only workflow):
-     ```yaml
-     jobs:
-       validator:
-         runs-on: ubuntu-latest
-         steps:
-           - uses: actions/checkout@v4
-           - uses: actions/setup-node@v4
-             with:
-               node-version: 20
-           - run: npm ci
-           - run: npm run validate -- --path games/demo --json docs/analysis/reports/latest-run.json --append --snapshot docs/analysis/reports/latest-run.json --strict --summary --run-id "${{ github.run_id }}" --log docs/analysis/reports/telemetry-history.json
-           - run: npm run archive:telemetry -- --label github-${{ github.run_number }}
-           - run: npm run publish:telemetry -- --dest docs/analysis/reports/central-upload --history --all
-           - uses: actions/upload-artifact@v4
-             with:
-               name: validator-artifacts
-               path: |
-                 docs/analysis/reports/latest-run.json
-                 docs/analysis/reports/archive/*.json
-                 docs/analysis/reports/central-upload
-     ```
-5. **Before merge**: прегледай telemetry файла за последния run_id и запази clean state в репото (опция: комитни отчетите или ги качи като CI артефакти).
+4. **CI gating & archiving** (optional/out of scope for MVP local-only workflow):
+   - Fail the pipeline if exit code != 0 (CAP errors, WARN under strict, snapshot/log guardrail failures).
+   - After a clean run (0 errors/0 warnings), run `npm run archive:telemetry -- --label <build-id>` to reset local history and upload the archive file as an artifact.
+   - Archive `docs/analysis/reports/latest-run.json` / `telemetry-history.json` as build artifacts (or snapshot JSON + archive output).
+  - Example (for reference only, not part of MVP local-only workflow):
+    ```yaml
+jobs:
+  validator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run validate -- --path games/demo --json docs/analysis/reports/latest-run.json --append --snapshot docs/analysis/reports/latest-run.json --strict --summary --run-id "${{ github.run_id }}" --log docs/analysis/reports/telemetry-history.json
+      - run: npm run archive:telemetry -- --label github-${{ github.run_number }}
+      - run: npm run publish:telemetry -- --dest docs/analysis/reports/central-upload --history --all
+      - uses: actions/upload-artifact@v4
+        with:
+          name: validator-artifacts
+          path: |
+            docs/analysis/reports/latest-run.json
+            docs/analysis/reports/archive/*.json
+            docs/analysis/reports/central-upload
+```
+5. **Before merge**: review the telemetry file for the latest run_id and keep a clean state in the repo (option: commit reports or publish them as CI artifacts).
 
-## Ограничения / TODO
-- YAML поддръжка: налична ако е инсталиран `yaml` пакет; иначе WARN.
-- Схеми (JSON Schema): валидира `capabilities.json`, `state.json` и `exploration-log.json` чрез AJV (кодове `CAP-SCHEMA`, `STATE-SCHEMA`, `EXPLORATION-SCHEMA`).
-- Телеметрия: `--run-id` + `--log` записва JSON (timestamp, duration, errors/warns, issues).
+## Limitations / TODO
+- YAML support: available if the `yaml` package is installed; otherwise WARN.
+- Schemas (JSON Schema): validates `capabilities.json`, `state.json` and `exploration-log.json` via AJV (codes `CAP-SCHEMA`, `STATE-SCHEMA`, `EXPLORATION-SCHEMA`).
+- Telemetry: `--run-id` + `--log` writes JSON (timestamp, duration, errors/warns, issues).
 
-## Примерен изход (конзола)
+## Example output (console)
 ```
 [ERROR][FILE-MISSING] manifest/entry.json: Missing required file (Create file or fix path)
 [WARN][CAP-RUNTIME] player-data/runtime/state.json: Missing runtime values: mana (Add to stats or disable in capabilities.json)
 Summary: 1 error(s), 1 warning(s)
 ```
 
-## Примерен JSON (report)
+## Example JSON (report)
 ```json
 {
   "errors": 1,
@@ -191,7 +191,7 @@ Summary: 1 error(s), 1 warning(s)
 }
 ```
 
-## Примерен telemetry log (append)
+## Example telemetry log (append)
 ```json
 [
   {
@@ -213,7 +213,7 @@ Summary: 1 error(s), 1 warning(s)
 ]
 ```
 
-## Snapshot пример (JSON)
+## Snapshot example (JSON)
 ```json
 [
   {
@@ -231,9 +231,9 @@ Summary: 1 error(s), 1 warning(s)
   }
 ]
 ```
-Конзола при втория run: `[INFO][SNAPSHOT] New codes: none | Resolved: FILE-MISSING, CAP-RUNTIME`
+Console on the second run: `[INFO][SNAPSHOT] New codes: none | Resolved: FILE-MISSING, CAP-RUNTIME`
 
-## Примерен snapshot diff (конзола)
+## Example snapshot diff (console)
 ```
 [INFO][SNAPSHOT] Comparing current run with reports/last.json
 [INFO][SNAPSHOT] New codes: QUEST-CONTENT (1), QUEST-LINK (1)
@@ -241,9 +241,9 @@ Summary: 1 error(s), 1 warning(s)
 [INFO][SNAPSHOT] Regression score: +2 new / -2 resolved
 Summary: 1 error(s), 1 warning(s) | Top: QUEST-CONTENT:1, QUEST-LINK:1
 ```
-Интерпретация: появили са се нови QUEST проблеми; старите FILE/CAP са решени. Продължи с фиксове докато New codes = none и errors=0.
+Interpretation: new QUEST problems have appeared; the old FILE/CAP issues were resolved. Keep fixing until New codes = none and errors=0.
 
-## Примерен telemetry log (JSON ред)
+## Example telemetry log (JSON line)
 ```json
 {
   "run_id": "release-001",
@@ -265,125 +265,125 @@ Summary: 1 error(s), 1 warning(s) | Top: QUEST-CONTENT:1, QUEST-LINK:1
   ]
 }
 ```
-Интерпретация: runът е минал без грешки, но с 1 предупреждение. Ако държиш strict release, оправи QUEST-CONTENT и пусни пак — телеметрията ще има втори ред с errors=warnings=0.
-📁 Пълен пример (append история): `docs/analysis/reports/telemetry-example.json`
+Interpretation: the run passed with no errors, but with 1 warning. If you require strict releases, fix QUEST-CONTENT and run again — telemetry will have a second entry with errors=warnings=0.
+📁 Full example (append history): `docs/analysis/reports/telemetry-example.json`
 
-## Telemetry retention и анализ
-- **Локация**: по подразбиране записваме в `docs/analysis/reports/telemetry-history.json`. Ползвай `--log docs/analysis/reports/telemetry-history.json --append`, за да пазиш история.
-- **Retention политика**:
-  1. Пази максимум ~50 run-а или ~2 седмици локално (според екипа).
-  2. Когато лимитът бъде надхвърлен, архивирай:
-     ```bash
-     stamp=$(date +%Y-%m-%d)
-     mkdir -p docs/analysis/reports/archive
-     mv docs/analysis/reports/telemetry-history.json "docs/analysis/reports/archive/${stamp}-telemetry.json"
-     printf "[]\n" > docs/analysis/reports/telemetry-history.json
-     ```
-  3. Опция: качи архивния файл като CI artifact или в централен storage.
-- **run_id naming**: `persona-iteration` (напр. `dev-01`, `gm-release-3`) или `<branch>-<timestamp>`. Помага при групиране по човек/фаза/feature.
-- **Метрики за проследяване**:
-  - `avg retries to clean run`: колко run-а с ERROR/WARN има преди `errors=warnings=0`.
-  - `mean time to green`: разлика между timestamp на първия run с грешки и последния clean run.
+## Telemetry retention and analysis
+- **Location**: by default we write to `docs/analysis/reports/telemetry-history.json`. Use `--log docs/analysis/reports/telemetry-history.json --append` to keep history.
+- **Retention policy**:
+  1. Keep at most ~50 runs or ~2 weeks locally (team-dependent).
+  2. When the limit is exceeded, archive:
+    ```bash
+stamp=$(date +%Y-%m-%d)
+mkdir -p docs/analysis/reports/archive
+mv docs/analysis/reports/telemetry-history.json "docs/analysis/reports/archive/${stamp}-telemetry.json"
+printf "[]\n" > docs/analysis/reports/telemetry-history.json
+```
+  3. Option: upload the archive file as a CI artifact or to central storage.
+- **run_id naming**: `persona-iteration` (e.g. `dev-01`, `gm-release-3`) or `<branch>-<timestamp>`. Helps grouping by person/phase/feature.
+- **Metrics to track**:
+  - `avg retries to clean run`: how many ERROR/WARN runs occur before `errors=warnings=0`.
+  - `mean time to green`: time between the first failing run and the final clean run.
   - `% CAP errors`: `cap_errors / errors`.
-- **Бърз анализ**:
-  - Конзола: `npm run validate -- --path games/demo --run-id dev-local --summary --snapshot docs/analysis/reports/snapshot-example.json`.
-  - JSON: `jq '[.[].errors]' docs/analysis/reports/telemetry-example.json` за тренд.
-  - Snapshot: проверявай, че `New codes: none` преди release.
-- **DoD**: release не минава, докато telemetry файлът няма последен запис с `errors=0`, `warnings=0` (или WARN допустими според екипа).
+- **Quick analysis**:
+  - Console: `npm run validate -- --path games/demo --run-id dev-local --summary --snapshot docs/analysis/reports/snapshot-example.json`.
+  - JSON: `jq '[.[].errors]' docs/analysis/reports/telemetry-example.json` for trend.
+  - Snapshot: verify `New codes: none` before release.
+- **DoD**: a release does not pass until the telemetry file has a last entry with `errors=0`, `warnings=0` (or WARNs allowed by the team).
 
-## Метрики и KPI отчети
-- Скрипт: `npm run metrics:report` (wrapper около `tools/metrics/report.js`).
-- Вход: `docs/analysis/reports/telemetry-history.json` (по подразбиране). Промени с `--history <path>`.
-- Изход: `docs/analysis/metrics-summary.md` (markdown таблици + KPI). Промени с `--output <path>` / `--out`.
-- Архив: преди overwrite се създава копие в `docs/analysis/reports/archive/metrics-summary-<timestamp>-<label>.md`. Можеш да подадеш:
-  - `--archive-dir <dir>` — алтернативна директория за архиви.
-  - `--archive-label release-123` — суфикс към името (алфанумеричен, авто-саниран).
-- Dry run: `npm run metrics:report -- --dry-run` калкулира KPI и логва действията, без да пише summary/insights/архив.
-- Insights: добави `--insights docs/analysis/metrics-insights.md`, за да генерираш втори markdown с KPI статуси и препоръки; honor-ва `--dry-run`.
-- Допълнителни флагове:
-  - `--limit 20` — анализира само последните N run-а.
-  - `--output` е еквивалент на `--out`.
-  - `--history`, `--insights`, `--archive-dir`, `--archive-label` приемат относителни или абсолютни пътища.
-- Пример:
+## Metrics and KPI reports
+- Script: `npm run metrics:report` (wrapper around `tools/metrics/report.js`).
+- Input: `docs/analysis/reports/telemetry-history.json` (default). Override via `--history <path>`.
+- Output: `docs/analysis/metrics-summary.md` (markdown tables + KPIs). Override via `--output <path>` / `--out`.
+- Archive: before overwrite, a copy is created in `docs/analysis/reports/archive/metrics-summary-<timestamp>-<label>.md`. You can pass:
+  - `--archive-dir <dir>` — alternative archive directory.
+  - `--archive-label release-123` — suffix for the name (alphanumeric, auto-sanitized).
+- Dry run: `npm run metrics:report -- --dry-run` computes KPIs and logs actions without writing summary/insights/archive.
+- Insights: add `--insights docs/analysis/metrics-insights.md` to generate a second markdown with KPI statuses and recommendations; honors `--dry-run`.
+- Additional flags:
+  - `--limit 20` — analyze only the last N runs.
+  - `--output` is equivalent to `--out`.
+  - `--history`, `--insights`, `--archive-dir`, `--archive-label` accept relative or absolute paths.
+- Example:
   ```bash
-  npm run metrics:report -- \
-    --history docs/analysis/reports/telemetry-history.json \
-    --output docs/analysis/metrics-summary.md \
-    --archive-label sprint01 \
-    --insights docs/analysis/metrics-insights.md
-  ```
-- Тестове: `node tools/tests/metrics-report.test.js` валидират архивирането и dry-run режима (част от `npm test`).
+npm run metrics:report -- \
+  --history docs/analysis/reports/telemetry-history.json \
+  --output docs/analysis/metrics-summary.md \
+  --archive-label sprint01 \
+  --insights docs/analysis/metrics-insights.md
+```
+- Tests: `node tools/tests/metrics-report.test.js` validates archiving and dry-run mode (part of `npm test`).
 
-### Архивиране на telemetry
-1. Създай папка `docs/analysis/reports/archive/` (еднократно).
+### Archiving telemetry
+1. Create the folder `docs/analysis/reports/archive/` (one-time).
 2. PowerShell:  
-   ```powershell
-   $stamp = Get-Date -Format 'yyyy-MM-dd'
-   $archive = "docs/analysis/reports/archive/$stamp-telemetry.json"
-   Move-Item docs/analysis/reports/telemetry-history.json $archive
-   Out-File docs/analysis/reports/telemetry-history.json -Encoding utf8 -InputObject "[]"
-   ```
+  ```powershell
+$stamp = Get-Date -Format 'yyyy-MM-dd'
+$archive = "docs/analysis/reports/archive/$stamp-telemetry.json"
+Move-Item docs/analysis/reports/telemetry-history.json $archive
+Out-File docs/analysis/reports/telemetry-history.json -Encoding utf8 -InputObject "[]"
+```
 3. Bash:  
-   ```bash
-   stamp=$(date +%Y-%m-%d)
-   archive="docs/analysis/reports/archive/${stamp}-telemetry.json"
-   mv docs/analysis/reports/telemetry-history.json "$archive"
-   printf "[]\n" > docs/analysis/reports/telemetry-history.json
-   ```
-4. (Опция) качи архивите в artifact storage или Git LFS.
+  ```bash
+stamp=$(date +%Y-%m-%d)
+archive="docs/analysis/reports/archive/${stamp}-telemetry.json"
+mv docs/analysis/reports/telemetry-history.json "$archive"
+printf "[]\n" > docs/analysis/reports/telemetry-history.json
+```
+4. (Optional) upload archives to artifact storage or Git LFS.
 
-### Автоматично генериране на run_id
+### Automatic run_id generation
 - PowerShell helper:
   ```powershell
-  function new-run-id {
-    param([string]$persona = "dev")
-    $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-    return "$persona-$stamp"
-  }
-  ```
-  Използване: `npm run validate -- --run-id (new-run-id -persona 'gm') ...`
+function new-run-id {
+  param([string]$persona = "dev")
+  $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+  return "$persona-$stamp"
+}
+```
+  Usage: `npm run validate -- --run-id (new-run-id -persona 'gm') ...`
 - Bash helper:
   ```bash
-  run_id() {
-    persona=${1:-dev}
-    printf "%s-%s\n" "$persona" "$(date +%Y%m%d-%H%M%S)"
-  }
-  ```
-  Използване: `npm run validate -- --run-id "$(run_id gm)" ...`
-- За branch-базирани ID добави `git rev-parse --abbrev-ref HEAD`:
+run_id() {
+  persona=${1:-dev}
+  printf "%s-%s\n" "$persona" "$(date +%Y%m%d-%H%M%S)"
+}
+```
+  Usage: `npm run validate -- --run-id "$(run_id gm)" ...`
+- For branch-based IDs, add `git rev-parse --abbrev-ref HEAD`:
   ```powershell
-  function run-id-branch {
-    $branch = (git rev-parse --abbrev-ref HEAD)
-    "$($branch)-$(Get-Date -Format 'HHmmss')"
-  }
-  ```
+function run-id-branch {
+  $branch = (git rev-parse --abbrev-ref HEAD)
+  "$($branch)-$(Get-Date -Format 'HHmmss')"
+}
+```
 
-## Screenshots (описание)
-- Конзола (summary-only): редове като  
+## Screenshots (description)
+- Console (summary-only): lines like  
   `Summary: 0 error(s), 1 warning(s) | Top: CAP-RUNTIME:1`  
   `CAP errors: 0`
-- JSON report (в редактор): ключове `errors`, `warnings`, `top_codes`, `issues`.
-- Telemetry лог (append масив): няколко обекта с `run_id`, `timestamp`, `errors`, `warnings`.
+- JSON report (in an editor): keys `errors`, `warnings`, `top_codes`, `issues`.
+- Telemetry log (append array): multiple objects with `run_id`, `timestamp`, `errors`, `warnings`.
 
-## Как да четем отчетите (локално)
-- `Summary: X error(s), Y warning(s) | Top: CODE1:cnt, CODE2:cnt`: ако има errors>0 → поправи и пусни пак; top_codes помагат да видиш най-честите проблеми.
-- `CAP errors: N`: ако N>0, поправи capabilities/state (blocking).
-- JSON report: `top_codes` е масив `{code,count}` по честота; `issues` съдържа файлове и suggested fix.
-- Telemetry log (append): масив от run-ове; виж `errors/warnings`, `duration_ms`, `run_id` за ретроспекция.
-- Snapshot: `[INFO][SNAPSHOT] New codes: ... | Resolved: ...` — ако новите са празни и errors=0 → готов си.
-- `--summary` скрива детайлните редове и оставя само summary (удобно за бърз чек).
-- `--ignore CODE1,CODE2` временно скрива изброените кодове (не ползвай в release).
+## How to read the reports (local)
+- `Summary: X error(s), Y warning(s) | Top: CODE1:cnt, CODE2:cnt`: if errors>0 → fix and run again; top_codes help you identify the most frequent problems.
+- `CAP errors: N`: if N>0, fix capabilities/state (blocking).
+- JSON report: `top_codes` is an array of `{code,count}` by frequency; `issues` contains files and suggested fixes.
+- Telemetry log (append): array of runs; see `errors/warnings`, `duration_ms`, `run_id` for retrospectives.
+- Snapshot: `[INFO][SNAPSHOT] New codes: ... | Resolved: ...` — if new codes are empty and errors=0 → you are done.
+- `--summary` hides detailed lines and prints only summary (useful for a quick check).
+- `--ignore CODE1,CODE2` temporarily hides codes (do not use for release).
 
-### Top codes → следващи стъпки
-| Категория | Примерни кодове | Какво да направиш |
+### Top codes → next steps
+| Category | Example codes | What to do |
 |-----------|-----------------|-------------------|
-| **CAP** | CAP-RUNTIME, CAP-RUNTIME-RANGE, CAP-UNKNOWN-RUNTIME, CAP-DISABLED-RANGE | Прегледай `config/capabilities.json` и `player-data/runtime/state.json`; добави липсващи стойности, коригирай диапазоните или премахни непознати ключове. |
-| **FILE / INDEX** | FILE-MISSING, INDEX-EMPTY, MANIFEST-FIELD | Създай липсващите файлове (`manifest/entry.json`, `scenario/index.md`), попълни id/title/version, добави съдържание в index. |
-| **QUEST** | QUEST-EMPTY-LIST, QUEST-CONTENT, QUEST-LINK, QUEST-LINK-SELF, UNLOCK-UNKNOWN | Провери `scenario/quests/*`; добави Summary/Steps/Rewards, оправи [[links]] към реални quest/area ID, синхронизирай `available.json` и `unlock-triggers.json`. |
-| **EXPLORATION / STATE** | EXPLORATION-EMPTY, INDEX-SHORT | Ако `exploration_enabled=true`, попълни `player-data/runtime/exploration-log.json`; добави повече контекст в `scenario/index.md`. |
-| **SCHEMA / YAML** | SCHEMA-ERROR, YAML-PARSE | Увери се, че JSON отговаря на схемата; при YAML инсталирай `yaml` пакета и валидирай структурата. |
+| **CAP** | CAP-RUNTIME, CAP-RUNTIME-RANGE, CAP-UNKNOWN-RUNTIME, CAP-DISABLED-RANGE | Review `config/capabilities.json` and `player-data/runtime/state.json`; add missing runtime values, fix ranges, or remove unknown keys. |
+| **FILE / INDEX** | FILE-MISSING, INDEX-EMPTY, MANIFEST-FIELD | Create missing files (`manifest/entry.json`, `scenario/index.md`), fill in id/title/version, add content to the index. |
+| **QUEST** | QUEST-EMPTY-LIST, QUEST-CONTENT, QUEST-LINK, QUEST-LINK-SELF, UNLOCK-UNKNOWN | Check `scenario/quests/*`; add Summary/Steps/Rewards, fix [[links]] to real quest/area IDs, sync `available.json` and `unlock-triggers.json`. |
+| **EXPLORATION / STATE** | EXPLORATION-EMPTY, INDEX-SHORT | If `exploration_enabled=true`, populate `player-data/runtime/exploration-log.json`; add more context to `scenario/index.md`. |
+| **SCHEMA / YAML** | SCHEMA-ERROR, YAML-PARSE | Ensure JSON matches the schema; for YAML install the `yaml` package and validate the structure. |
 
-## Exploration log пример (валиден запис)
+## Exploration log example (valid entry)
 ```json
 {
   "id": "mistwood-spire",
@@ -396,18 +396,18 @@ Summary: 1 error(s), 1 warning(s) | Top: QUEST-CONTENT:1, QUEST-LINK:1
   "origin": "gm-suggested"
 }
 ```
-Guardrails: slug `id`, тип от {`area`,`quest`,`event`}, описания ≥60 символа, ISO8601 `added_at`, максимум 10 уникални `tags`, `origin` = `player-request`/`gm-suggested`.  
+Guardrails: slug `id`, type in {`area`,`quest`,`event`}, descriptions ≥60 chars, ISO8601 `added_at`, max 10 unique `tags`, `origin` = `player-request`/`gm-suggested`.  
 *Note: The CLI tool `npm run exploration:add` accepts legacy type names (e.g. `poi`, `landmark`) and maps them to the schema types before writing to the file.*
 
-## Definition of Done (локален чеклист)
-- `npm run validate -- --path games/<id> --run-id <tag> --json reports/last.json --append --snapshot reports/last.json --strict --summary` връща `Summary: 0 error(s), 0 warning(s)`.
-- Няма CAP errors (CAP errors: 0).
-- Quest файлове имат Summary/Steps/Rewards; няма QUEST-LINK към несъществуващи цели.
-- manifest/entry.json има id/title/version; scenario/index.md не е празен/къс.
-- Ако exploration_enabled=true → exploration-log.json съществува и не е празен масив след игра.
-- Telemetry log записан (ако ползваш `--run-id ... --log telemetry.json`) и snapshot показва, че предишните кодове са Resolved.
+## Definition of Done (local checklist)
+- `npm run validate -- --path games/<id> --run-id <tag> --json reports/last.json --append --snapshot reports/last.json --strict --summary` returns `Summary: 0 error(s), 0 warning(s)`.
+- No CAP errors (CAP errors: 0).
+- Quest files have Summary/Steps/Rewards; no QUEST-LINK to missing targets.
+- manifest/entry.json has id/title/version; scenario/index.md is not empty/short.
+- If exploration_enabled=true → exploration-log.json exists and is not an empty array after play.
+- Telemetry log is written (if you use `--run-id ... --log telemetry.json`) and snapshot shows previous codes are Resolved.
 
-### Примерни съобщения (по код)
+### Example messages (by code)
 - CAP-UNKNOWN-RUNTIME: `[WARN][CAP-UNKNOWN-RUNTIME] player-data/runtime/state.json: Runtime has unknown capabilities: stamina_extra (Remove or add to capabilities.json)`
 - CAP-DISABLED-RANGE: `[WARN][CAP-DISABLED-RANGE] config/capabilities.json: 'luck' is disabled but has min/max/range (Remove ranges or enable capability)`
 - QUEST-LINK: `[WARN][QUEST-LINK] scenario/quests/main-quest.md: Link [[unknown-area]] not found as quest or area (Create file or adjust link target)`
@@ -422,19 +422,19 @@ Guardrails: slug `id`, тип от {`area`,`quest`,`event`}, описания �
 - QUEST-CONTENT: `[WARN][QUEST-CONTENT] scenario/quests/main-quest.md: Missing "Rewards" section (Add "## Rewards" with XP/loot)`
 - EXPLORATION-EMPTY: `[WARN][EXPLORATION-EMPTY] player-data/runtime/exploration-log.json: Exploration enabled but log is empty (Add entries when exploration occurs or disable exploration)`
 
-### Чести грешки и фиксове
-- FILE-MISSING: Файл липсва → създай празен или поправи пътя.
-- CAP-RUNTIME: Enabled capability без runtime стойност → добави в state.stats или disable.
-- CAP-RUNTIME-RANGE: Стойност извън min/max или range → коригирай стойност или диапазон.
-- QUEST-ORPHAN / UNLOCK-UNKNOWN: Quest липсва, но е рефериран → създай файла или махни референцията.
-- QUEST-CONTENT: Липсва Summary/Steps/Rewards → добави секции в markdown.
-- EXPLORATION-EMPTY: Exploration е включен, но log е празен → добави entries или изключи exploration.
-- CAP-UNKNOWN-RUNTIME: runtime.stats съдържа ключове, които не са в capabilities → премахни или добави capability.
-- CAP-DISABLED-RANGE: capability е disabled, но има range/min/max → премахни диапазон или enable.
-- QUEST-LINK / QUEST-LINK-SELF: линкът не съществува или сочи към себе си → поправи целта или премахни линка.
-- UNLOCK-FORMAT: unlock-triggers стойност не е string/array → поправи на string или масив от условия.
-- INDEX-EMPTY/SHORT: scenario/index.md е твърде кратък → добави overview и стартов hook.
-- MANIFEST-FIELD: липсва id/title/version → добави ги в manifest/entry.json.
+### Common errors and fixes
+- FILE-MISSING: missing file → create it (empty is OK) or fix the path.
+- CAP-RUNTIME: enabled capability without a runtime value → add it to state.stats or disable.
+- CAP-RUNTIME-RANGE: value out of min/max or range → adjust the value or the range.
+- QUEST-ORPHAN / UNLOCK-UNKNOWN: quest is missing but referenced → create the file or remove the reference.
+- QUEST-CONTENT: missing Summary/Steps/Rewards → add sections to the markdown.
+- EXPLORATION-EMPTY: exploration enabled but log is empty → add entries or disable exploration.
+- CAP-UNKNOWN-RUNTIME: runtime.stats contains keys not present in capabilities → remove them or add the capability.
+- CAP-DISABLED-RANGE: capability is disabled but has range/min/max → remove the ranges or enable.
+- QUEST-LINK / QUEST-LINK-SELF: link missing or self-referential → fix the target or remove the link.
+- UNLOCK-FORMAT: unlock-triggers value is not string/array → change it to a string or array of conditions.
+- INDEX-EMPTY/SHORT: scenario/index.md is too short → add an overview and starter hook.
+- MANIFEST-FIELD: missing id/title/version → add them to manifest/entry.json.
 
-## Инсталиране на YAML (по избор)
-- `npm install yaml` (или `pnpm add yaml`) ако искаш да парсваш .yml/.yaml файлове.
+## Installing YAML (optional)
+- `npm install yaml` (or `pnpm add yaml`) if you want to parse .yml/.yaml files.

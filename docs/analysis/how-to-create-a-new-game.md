@@ -1,31 +1,31 @@
-# Как да създадеш нова игра (AgentRPG Engine)
+# How to Create a New Game (AgentRPG Engine)
 
-Този документ описва **end-to-end** процеса за създаване на нова игра върху AgentRPG Engine – от копиране на скелета, през попълване на задължителните файлове, до валидиране, runtime smoke и telemetry/KPI.
+This document describes the **end-to-end** process for creating a new game on top of AgentRPG Engine — from copying the skeleton, through filling the required files, to validation, runtime smoke checks, and telemetry/KPI.
 
-## 1) Бърз старт (Blank game skeleton)
+## 1) Quick start (blank game skeleton)
 
-1. **Копирай скелета**
-   - Препоръчано (CLI helper):
+1. **Copy the skeleton**
+   - Recommended (CLI helper):
      ```bash
      npm run blank:copy -- --dest games/<gameId>
      ```
-   - Ръчно:
+   - Manual:
      - Bash: `cp -R samples/blank-game games/<gameId>`
      - PowerShell: `Copy-Item samples/blank-game games\<gameId> -Recurse`
 
-2. **Задай език/дебъг режим (по избор)**
+2. **Set language / debug mode (optional)**
    ```bash
    npm run lang:set -- --game <gameId> --language bg --debug true
    ```
 
-3. **Пусни валидатора**
+3. **Run the validator**
    ```bash
    npm run validate -- --path games/<gameId> --run-id dev-local --summary --strict
    ```
 
-## 2) Минимална структура (source-of-truth)
+## 2) Minimal structure (source of truth)
 
-Минималният комплект файлове за playable игра е базиран на Product Brief v1 и validator contract-ите:
+The minimal set of files for a playable game is based on Product Brief v1 and the validator contracts:
 
 ```
 <gameId>/
@@ -60,11 +60,11 @@
     history.json
 ```
 
-## 3) Какво да редактираш първо (recommended order)
+## 3) What to edit first (recommended order)
 
 1. **`manifest/entry.json`**
    - `id`, `title`, `version`
-   - pointers към:
+   - pointers to:
      - `capabilities_file`
      - `scenario_index`
      - `ui_index`
@@ -72,83 +72,83 @@
      - `full_history_file`
 
 2. **`config/capabilities.json`**
-   - Включи само capabilities, които искаш да използваш.
-   - Дръж `state.json` синхронизиран с enabled capabilities (валидаторът проверява runtime наличността/диапазоните).
+   - Enable only the capabilities you want to use.
+   - Keep `state.json` in sync with enabled capabilities (the validator checks runtime presence/ranges).
 
 3. **`player-data/session-init.json`**
-   - `preferred_language` е задължително.
-   - `debug` е опционално.
+   - `preferred_language` is required.
+   - `debug` is optional.
 
 4. **`scenario/index.md` + quests/areas**
-   - `scenario/quests/available.json` трябва да има поне 1 quest.
-   - `scenario/quests/unlock-triggers.json` трябва да е валиден JSON и да не сочи към несъществуващи quest ID-та.
+   - `scenario/quests/available.json` must contain at least 1 quest.
+   - `scenario/quests/unlock-triggers.json` must be valid JSON and must not reference missing quest IDs.
 
 5. **UI contracts (`ui/*.json`)**
-   - `ui/index.json` сочи към останалите UI файлове.
-   - Всеки файл има `schema_version` и се валидира от схемите в `tools/validator/schemas/`.
+   - `ui/index.json` points to the other UI files.
+   - Each file has `schema_version` and is validated by schemas in `tools/validator/schemas/`.
 
 ## 4) Quest authoring (CLI tooling)
 
-### Добавяне на quest
-Използвай helper-а (ако искаш scaffold):
+### Add a quest
+Use the helper (if you want a scaffold):
 ```bash
 npm run quest:add -- --path games/<gameId> --id side-quest-01 --title "Side Quest 01"
 ```
 
-### Сценарен индекс
-След добавяне на quests/areas, обнови индексите:
+### Scenario index
+After adding quests/areas, update the indexes:
 ```bash
 npm run scenario:index -- --game <gameId>
 ```
 
 ## 5) Area authoring (CLI tooling)
 
-### Добавяне на area
+### Add an area
 ```bash
 npm run area:add -- --path games/<gameId> --id town-square --title "Town Square"
 ```
 
-## 6) Валидиране (local DoD loop)
+## 6) Validation (local DoD loop)
 
-Препоръчителен local loop:
+Recommended local loop:
 
-1. Пусни валидатора:
+1. Run the validator:
    ```bash
    npm run validate -- --path games/<gameId> --run-id dev-local --json reports/last.json --append --snapshot reports/last.json --strict --summary
    ```
-2. Поправи WARN/ERROR кодовете.
-3. Повтори, докато получиш clean резултат.
+2. Fix WARN/ERROR codes.
+3. Repeat until you get a clean result.
 
-Форматът на изхода е:
+Output format:
 `[LEVEL][CODE] file:message (suggested fix)`
 
-## 7) Runtime smoke (по избор)
+## 7) Runtime smoke (optional)
 
 ```bash
 npm run runtime -- --path games/<gameId> --debug
 ```
 
-Очаквано поведение:
-- runtime loader зарежда manifest + pointers
-- потвърждава `preferred_language`
-- UI файловете са валидни и налични
+Expected behavior:
+- the runtime loader loads manifest + pointers
+- it confirms `preferred_language`
+- UI files are valid and present
 
 ## 8) Telemetry / KPI workflow (ST-035)
 
-### 8.1 KPI файл за сесия
-KPI измерванията се подават като JSON файл. Има пример:
+### 8.1 KPI file for a session
+KPI measurements are provided as a JSON file. There is an example:
 - `samples/blank-game/telemetry/kpi.sample.json`
 
-Препоръчано място за твоята игра:
+Recommended location for your game:
 - `games/<gameId>/telemetry/kpi.json`
 
-Можеш да го обновяваш с helper:
+You can update it with the helper:
 ```bash
 npm run kpi:update -- --game <gameId> --first-min 2.5 --refusal-attempts 1 --refusal-successes 1 --validation-attempts 2 --completed-quests 1 --debug false
 ```
 
-### 8.2 Логване на telemetry entry
-За да се запише telemetry entry с KPI metrics:
+### 8.2 Logging a telemetry entry
+To write a telemetry entry with KPI metrics:
 ```bash
 npm run validate -- --path games/<gameId> --run-id dev-local --log docs/analysis/reports/telemetry-history.json --kpi games/<gameId>/telemetry/kpi.json
 ```
@@ -158,21 +158,21 @@ npm run validate -- --path games/<gameId> --run-id dev-local --log docs/analysis
 npm run metrics:report -- --history docs/analysis/reports/telemetry-history.json --insights docs/analysis/metrics-insights.md
 ```
 
-## 9) Чести проблеми (troubleshooting)
+## 9) Common problems (troubleshooting)
 
 - **`[ERROR][RUN-ID] Missing required --run-id`**
-  - Винаги подавай `--run-id`. Можеш да генерираш чрез helper скриптовете `tools/scripts/run-id.(ps1|sh)`.
+  - Always pass `--run-id`. You can generate one via the helper scripts `tools/scripts/run-id.(ps1|sh)`.
 
 - **`FILE-MISSING`**
-  - Липсва задължителен файл (най-често manifest, scenario index, saves index или UI pointer).
+  - A required file is missing (most commonly manifest, scenario index, saves index, or a UI pointer).
 
 - **`CAP-*`**
-  - Capabilities и runtime state са в несинхрон (липсващи stats, грешни диапазони, дубли и т.н.).
+  - Capabilities and runtime state are out of sync (missing stats, invalid ranges, duplicates, etc.).
 
-- **UI schema нарушения**
-  - Провери `ui/index.json` pointers и `schema_version` във всеки UI файл.
+- **UI schema violations**
+  - Check `ui/index.json` pointers and the `schema_version` in each UI file.
 
-## 10) Definition of Done (препоръка)
+## 10) Definition of Done (recommendation)
 
-- ≥3 последователни clean run-а (0 errors / 0 warnings) със `--summary --strict`.
-- `metrics:report` показва стабилни KPI и няма регресии в ключовите метрики.
+- ≥3 consecutive clean runs (0 errors / 0 warnings) with `--summary --strict`.
+- `metrics:report` shows stable KPIs and no regressions in key metrics.
