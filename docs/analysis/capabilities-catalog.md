@@ -1,19 +1,19 @@
 # Capabilities Catalog (Appendix)
 
 ## Purpose
-Пълен списък (~29 категории, 300+ способности) за RPG capability модел. Игрите избират подмножество в `config/capabilities.json` и могат да добавят собствени. Диапазоните са примерни; финалните числови стойности се дефинират в конкретната игра или engine конфигурация.
+Full list (~29 categories, 300+ capabilities) for the RPG capability model. Games choose a subset in `config/capabilities.json` and can add their own. Ranges are illustrative; final numeric values are defined in the specific game or engine configuration.
 
-## Основни правила (диапазони / поведение)
-- `health`: floor 0. При `health <= 0` герой приключва; ако играта има save/load → GM пита за load; иначе рестарт.
-- `energy`: floor 0. При `energy == 0` GM ограничава combat/придвижване (напр. не може combat и пътуване до други градове), или следва логиката на играта.
-- По избор: `mana`, `stamina`, `morale`, `hunger`, `thirst`, `reputation` (по фракция), `currency` (gold). Примерни диапазони/граници се описват в документацията/шаблоните, не са фиксирани тук.
+## Core rules (ranges / behavior)
+- `health`: floor 0. At `health <= 0` the character is done; if the game has save/load → GM asks for load; otherwise restart.
+- `energy`: floor 0. At `energy == 0` GM limits combat/movement (e.g. cannot combat and travel to other cities), or follows the game's logic.
+- Optional: `mana`, `stamina`, `morale`, `hunger`, `thirst`, `reputation` (per faction), `currency` (gold). Example ranges/limits are documented in docs/templates and are not fixed here.
 
-## Как да се ползва в игра
-- В `config/capabilities.json` играта декларира кои ключове ползва (и опционално диапазони/правила).
-- Runtime стойности могат да се пазят в `player-data/runtime/state.json` (напр. поле `stats`).
-- Дублиращи/липсващи ключове се третират като ERROR при старт.
+## How to use in a game
+- In `config/capabilities.json` the game declares which keys it uses (and optionally ranges/rules).
+- Runtime values can be stored in `player-data/runtime/state.json` (e.g. `stats` field).
+- Duplicate/missing keys are treated as ERROR on start.
 
-### Мини skeleton (пример)
+### Minimal skeleton (example)
 ```json
 {
   "health": {"enabled": true, "desc": "HP", "min": 0},
@@ -23,7 +23,7 @@
 }
 ```
 
-### Примерна структура в `player-data/runtime/state.json` (stats + schema)
+### Example structure in `player-data/runtime/state.json` (stats + schema)
 ```json
 {
   "stats": {
@@ -48,32 +48,30 @@
 }
 ```
 
-> Подробният контракт е описан в [`tools/validator/schemas/state.schema.json`]. Validator-ът използва Ajv и ще връща `STATE-SCHEMA` предупреждения, ако `player-data/runtime/state.json` има отрицателни стойности, липсващи ключове или невалидни inventories/flags.
+> The detailed contract is described in [`tools/validator/schemas/state.schema.json`]. The validator uses Ajv and will return `STATE-SCHEMA` warnings if `player-data/runtime/state.json` has negative values, missing keys, or invalid inventories/flags.
 
-### Диапазони / guardrails (синхронизирани със schema)
-
+### Ranges / guardrails (synchronized with the schema)
 | Capability        | Guardrail                                 |
 |-------------------|-------------------------------------------|
-| `health`, `energy`, `mana`, `stamina`, `hunger`, `thirst`, `stealth`, `perception` | `min/max` в [0..100] |
-| `morale`          | `min/max` в [-100..100]                   |
-| `armor`           | `min/max` в [0..50]                       |
-| `reputation`      | използва `range: [-100, 100]` (без `min/max`) |
-| `currency`        | само `min >= 0` (без горна граница)       |
-| `crit_chance`     | `min/max` в [0..1]                        |
+| `health`, `energy`, `mana`, `stamina`, `hunger`, `thirst`, `stealth`, `perception` | `min/max` in [0..100] |
+| `morale`          | `min/max` in [-100..100]                   |
+| `armor`           | `min/max` in [0..50]                       |
+| `reputation`      | uses `range: [-100, 100]` (no `min/max`) |
+| `currency`        | only `min >= 0` (no upper bound)       |
+| `crit_chance`     | `min/max` in [0..1]                        |
 | `crit_multiplier` | `min` 1..3, `max` 1..5                    |
+- Each capability requires `enabled` (bool) and a short `desc` (>=3 chars).
+- Use **either** `range` **or** `min/max`. The schema blocks mixing the two.
+- Custom capabilities inherit `baseCapability` guardrails — at least one numeric constraint (`range`, `min`, or `max`).
+- Runtime values outside the bounds above trigger `CAP-RUNTIME-RANGE`.
+- If `min/max` are missing for numeric capabilities, the validator returns `CAP-RUNTIME-BOUNDS`.
 
-- Всяко capability изисква `enabled` (bool) и кратко `desc` (>=3 символа).
-- Използвай **или** `range`, **или** `min/max`. Schema блокира смесица от двете.
-- Custom capabilities наследяват `baseCapability` guardrails – минимум едно числово ограничение (`range`, `min` или `max`).
-- Runtime стойности извън горните граници предизвикват `CAP-RUNTIME-RANGE`.
-- При липсващи `min/max` за числови способности validator връща `CAP-RUNTIME-BOUNDS`.
+### Inventories, flags, and exploration
+- `flags`: map `string -> boolean/number/string`, used for global story triggers. Example: `"flags": {"tutorial_complete": true, "favor_tokens": 2}`.
+- `inventories`: array of objects `{ id, name?, slots?, items[] }`, each item is `{ item_id, qty >= 0, title?, meta? }`. Use `slots.used/max` to provide capacity guardrails.
+- `exploration_enabled` and `exploration_log_preview` remain part of the state file; the schema ensures the preview is an array of string IDs.
 
-### Inventories, flags и exploration
-- `flags`: map от `string -> boolean/number/string`, използван за глобални story тригери. Пример: `"flags": {"tutorial_complete": true, "favor_tokens": 2}`.
-- `inventories`: масив от обекти `{ id, name?, slots?, items[] }`, всеки item е `{ item_id, qty >= 0, title?, meta? }`. Използвай `slots.used/max`, за да дадеш guardrails за капацитета.
-- `exploration_enabled` и `exploration_log_preview` остават част от state файла; schema гарантира, че preview е масив от string ID-та.
-
-### Още пример за `config/capabilities.json` (entries с диапазони)
+### Another example for `config/capabilities.json` (entries with ranges)
 ```json
 {
   "health": {"enabled": true, "desc": "HP", "min": 0},
@@ -87,39 +85,39 @@
 }
 ```
 
-### Примерни validation кодове (разширен списък)
+### Example validation codes (extended list)
 - `ERROR[CAP-MISSING]` config/capabilities.json: add key '<cap>'.
 - `ERROR[CAP-DUP]` config/capabilities.json: remove duplicate '<cap>'.
 - `ERROR[CAP-RANGE]` config/capabilities.json: fix range for '<cap>'.
 - `WARN[CAP-RUNTIME]` state.json: add '<cap>' in stats.
-- `WARN[CAP-UNUSED]` capabilities.json: key enabled but no runtime value (if играта го изисква).
+- `WARN[CAP-UNUSED]` capabilities.json: key enabled but no runtime value (if the game requires it).
 
-### Validation съобщения/кодове (примерни)
-- Липсващ capability ключ → `ERROR[CAP-MISSING] config/capabilities.json: add key '<cap>'`.
-- Дублиран capability → `ERROR[CAP-DUP] config/capabilities.json: remove duplicate '<cap>'`.
-- Невалиден диапазон (min>max) → `ERROR[CAP-RANGE] config/capabilities.json: fix range for '<cap>'`.
-- Липсваща runtime стойност (ако е задължителна за играта) → `WARN[CAP-RUNTIME] state.json: add '<cap>' in stats`.
+### Validation messages/codes (examples)
+- Missing capability key → `ERROR[CAP-MISSING] config/capabilities.json: add key '<cap>'`.
+- Duplicate capability → `ERROR[CAP-DUP] config/capabilities.json: remove duplicate '<cap>'`.
+- Invalid range (min>max) → `ERROR[CAP-RANGE] config/capabilities.json: fix range for '<cap>'`.
+- Missing runtime value (if required by the game) → `WARN[CAP-RUNTIME] state.json: add '<cap>' in stats`.
 
-## Разширени примерни диапазони/насоки по категории
-- Combat ядро: `health(0..n)`, `energy/stamina(0..100)`, `armor(0..n)`, `block_chance(0..1)`, `crit_chance(0..1)`, `crit_multiplier(1..3)`, `dodge(0..1)`, `attack_speed(0..n)`.
+## Extended example ranges/guidelines by category
+- Combat core: `health(0..n)`, `energy/stamina(0..100)`, `armor(0..n)`, `block_chance(0..1)`, `crit_chance(0..1)`, `crit_multiplier(1..3)`, `dodge(0..1)`, `attack_speed(0..n)`.
 - Magic: `mana(0..100)`, `mana_regen(0..10/turn)`, `spell_power(0..n)`, `magic_resist(0..n)`, `concentration(0..100)`.
 - Stealth/Perception: `stealth(0..100)`, `perception(0..100)`, `trap_detection(0..100)`.
 - Social/Reputation: `reputation[-100..100] per faction`, `influence(0..100)`, `charisma(0..100)`.
 - Survival: `hunger(0..100)`, `thirst(0..100)`, `temperature_resist(-50..50)`, `fatigue(0..100)`.
 - Crafting/Economy: `currency(>=0)`, `crafting_skill(0..100)`, `gathering(0..100)`, `trading(0..100)`.
 - Movement/Exploration: `speed(0..n)`, `climb(0..100)`, `swim(0..100)`, `mount_handling(0..100)`, `navigation(0..100)`.
-- Status Effects (binary/stacked): `poisoned`, `bleeding`, `stunned`, `burning`, `frozen` (bool или stack count 0..n).
+- Status Effects (binary/stacked): `poisoned`, `bleeding`, `stunned`, `burning`, `frozen` (bool or stack count 0..n).
 
-## Derived stats (примерни правила)
-- `armor` = база от equipment + бонуси; може да редуцира физическа щета.
-- `magic_resist` = база от gear + buff; редуцира магическа щета.
-- `mana_regen/stamina_regen` = функция от `wisdom`/`willpower`/equipment.
-- `crit_chance` = базов клас + buffs + equipment; `crit_multiplier` обикновено 1.5–3.0.
-- `block_chance` и `dodge` са вероятности (0..1), влияни от щит/ловкост.
-- `speed` може да е функция от `agility` − тежест на equipment.
-- `carry_capacity/encumbrance` = сила/конституция + gear; при превишение → penalizes speed/stealth.
+## Derived stats (example rules)
+- `armor` = base from equipment + bonuses; may reduce physical damage.
+- `magic_resist` = base from gear + buff; reduces magic damage.
+- `mana_regen/stamina_regen` = function of `wisdom`/`willpower`/equipment.
+- `crit_chance` = base class + buffs + equipment; `crit_multiplier` usually 1.5–3.0.
+- `block_chance` and `dodge` are probabilities (0..1), influenced by shield/agility.
+- `speed` may be a function of `agility` − equipment weight.
+- `carry_capacity/encumbrance` = strength/constitution + gear; if exceeded → penalizes speed/stealth.
 
-## Mapping: catalog → `config/capabilities.json` (пример)
+## Mapping: catalog → `config/capabilities.json` (example)
 - Combat: `health`, `energy`, `stamina`, `armor`, `block_chance`, `crit_chance`, `crit_multiplier`, `dodge`, `attack_speed`.
 - Magic: `mana`, `mana_regen`, `spell_power`, `magic_resist`, `concentration`.
 - Stealth/Perception: `stealth`, `perception`, `trap_detection`.
@@ -127,16 +125,16 @@
 - Survival: `hunger`, `thirst`, `temperature_resist`, `fatigue`.
 - Crafting/Economy: `currency` (map), `crafting_skill`, `gathering`, `trading`.
 - Movement: `speed`, `climb`, `swim`, `mount_handling`, `navigation`.
-- Status effects: булеви/стакуеми ключове (напр. `poisoned`: true|false или counter).
+- Status effects: boolean/stackable keys (e.g. `poisoned`: true|false or counter).
 
-## Validation правила за custom capabilities
-- Всеки custom ключ в `config/capabilities.json` трябва да има `enabled` (true/false) и кратко `desc`.
-- Ако е числов: задай `min` и/или `max` или `range: [min, max]`; иначе `CAP-RANGE`.
-- Ако е map: опиши очакваните под-ключове (например репутации по фракция).
-- GM валидира, че runtime `state.stats` съдържа стойност за всяко `enabled` capability (CAP-RUNTIME ако липсва).
-- Дублиране на ключ → CAP-DUP. Липсващ задължителен ключ → CAP-MISSING.
+## Validation rules for custom capabilities
+- Each custom key in `config/capabilities.json` must have `enabled` (true/false) and a short `desc`.
+- If it is numeric: set `min` and/or `max` or `range: [min, max]`; otherwise `CAP-RANGE`.
+- If it is a map: describe expected sub-keys (e.g. reputation per faction).
+- The GM validates that runtime `state.stats` contains a value for each `enabled` capability (CAP-RUNTIME if missing).
+- Duplicate key → CAP-DUP. Missing required key → CAP-MISSING.
 
-## Допълнителни примерни runtime stats
+## Additional example runtime stats
 ```json
 {
   "stats": {
@@ -162,168 +160,169 @@
 }
 ```
 
-## Метрики, свързани с capabilities (примерни)
-- % сесии с поне едно custom capability (enabled).
-- Avg брой capabilities per game (enabled).
-- % CAP-* errors при старт (quality сигнал).
-- Avg време за fix на CAP-* errors (напр. капвано в Step 4 diagnostic).
+## Metrics related to capabilities (examples)
+- % of sessions with at least one custom capability (enabled).
+- Avg number of capabilities per game (enabled).
+- % CAP-* errors on start (quality signal).
+- Avg time to fix CAP-* errors (e.g. captured in Step 4 diagnostics).
 
-## Кратки дефиниции (основни ключове)
-- `health`: жизнени точки; при `<=0` персонажът приключва (load/restart логика според играта).
-- `energy/stamina`: ресурс за действие/движение; при 0 ограничава combat/пътуване.
-- `mana`: ресурс за магия.
-- `armor`: редукция на физическа щета.
-- `magic_resist`: редукция на магическа щета.
-- `block_chance`: шанс да блокираш входящ удар (0..1).
-- `dodge`: шанс да избегнеш удар (0..1).
-- `crit_chance`: шанс за критичен удар (0..1).
-- `crit_multiplier`: множител на критичен удар (напр. 1.5–3.0).
-- `spell_power`: сила на магии.
-- `stealth`: скрита дейност; срещу `perception`.
-- `perception`: откриване на скрито/капан.
-- `reputation`: стойност per faction ([-100..100]).
-- `currency`: валута/ресурс (map).
-- `hunger/thirst/fatigue`: нужди; при прагове дават penalties.
-- `status_effects`: bool/stack (poisoned, burning, stunned и др.).
+## Short definitions (core keys)
+- `health`: hit points; at `<=0` the character is done (load/restart logic depends on the game).
+- `energy/stamina`: action/movement resource; at 0 it limits combat/travel.
+- `mana`: magic resource.
+- `armor`: physical damage reduction.
+- `magic_resist`: magic damage reduction.
+- `block_chance`: chance to block an incoming hit (0..1).
+- `dodge`: chance to avoid a hit (0..1).
+- `crit_chance`: chance for a critical hit (0..1).
+- `crit_multiplier`: critical hit multiplier (e.g. 1.5–3.0).
+- `spell_power`: spell strength.
+- `stealth`: hidden action; against `perception`.
+- `perception`: detection of hidden/traps.
+- `reputation`: value per faction ([-100..100]).
+- `currency`: currency/resource (map).
+- `hunger/thirst/fatigue`: needs; thresholds apply penalties.
+- `status_effects`: bool/stack (poisoned, burning, stunned, etc.).
 
-## Units / честоти (guidelines)
-- Регенерации: `mana_regen/stamina_regen` → “per turn” освен ако е указано друго.
-- Скорости: `speed` → “relative scalar” или “tiles/turn”; уточнете в играта.
-- Шансове: `block/dodge/crit_chance` → 0..1 (или 0–100%, но пишете в desc).
-- Температура/устойчивост: стойности по избор, но посочете скала (напр. Celsius offset).
-- Времеви полета: ISO8601 UTC.
+## Units / frequencies (guidelines)
+- Regeneration: `mana_regen/stamina_regen` → “per turn” unless stated otherwise.
+- Speeds: `speed` → “relative scalar” or “tiles/turn”; specify per game.
+- Chances: `block/dodge/crit_chance` → 0..1 (or 0–100%, but specify in `desc`).
+- Temperature/resistance: choose values, but specify a scale (e.g. Celsius offset).
+- Time fields: ISO8601 UTC.
 
-## Naming / style guide за custom ключове
-- snake_case, без интервали и главни букви (напр. `fire_affinity`, не `FireAffinity`).
-- Избягвайте неясни имена; добавете `desc`.
-- Ако е булев флаг → предпочитайте ясно име: `is_cursed`, `can_fly`.
-- Ако е map → опишете под-ключовете в `desc` или README.
+## Naming / style guide for custom keys
+- snake_case, no spaces and no uppercase letters (e.g. `fire_affinity`, not `FireAffinity`).
+- Avoid unclear names; add `desc`.
+- If it is a boolean flag → prefer a clear name: `is_cursed`, `can_fly`.
+- If it is a map → describe sub-keys in `desc` or README.
 
-## Минимален vs препоръчан сет
-- **Минимален (combat-light):** `health`, `energy`, `quests/state`, `inventory` (с много базова логика).
-- **Базов combat:** + `armor`, `crit_chance`, `crit_multiplier`, `dodge`, `block_chance`.
+## Minimal vs recommended set
+- **Minimal (combat-light):** `health`, `energy`, `quests/state`, `inventory` (with very basic logic).
+- **Baseline combat:** + `armor`, `crit_chance`, `crit_multiplier`, `dodge`, `block_chance`.
 - **Magic-heavy:** + `mana`, `mana_regen`, `spell_power`, `magic_resist`, `concentration`.
 - **Survival flavor:** + `hunger`, `thirst`, `fatigue`, `temperature_resist`.
 - **Stealth flavor:** + `stealth`, `perception`, `trap_detection`.
 - **Economy/crafting:** + `currency`, `crafting_skill`, `gathering`, `trading`.
 
-## Микро формули (guidance)
-- Критична щета: `damage = base_damage * crit_multiplier` (ако proc-не crit_chance).
-- Редукция от armor: напр. `final = base / (1 + armor/100)` (примерна формула; изберете своя).
-- Редукция от magic_resist: аналогично на armor, или cap-нете до %.
-- Encumbrance: ако `weight > capacity` → penalty на `speed` и `stealth` (например -10% на точка превишение).
-- Regen: `mana_regen`/`stamina_regen` се прилага per turn; при статус “exhausted” може да падне до 0.
+## Micro formulas (guidance)
+- Critical damage: `damage = base_damage * crit_multiplier` (if proc-ing crit_chance).
+- Armor reduction: e.g. `final = base / (1 + armor/100)` (example formula; choose your own).
+- Magic resist reduction: similarly to armor, or cap to %.
+- Encumbrance: if `weight > capacity` → penalty on `speed` and `stealth` (e.g. -10% per point exceeded).
+- Regen: `mana_regen`/`stamina_regen` applies per turn; at "exhausted" status may drop to 0.
+- Regen: `mana_regen`/`stamina_regen` is applied per turn; at “exhausted” status it may drop to 0.
 
-## Per-ability mini-defs (основни категории, 1 изречение)
-- Combat: **armor** (редукция физика), **block_chance** (шанс блок), **dodge** (шанс избегне), **crit_chance** (шанс crit), **crit_multiplier** (множител), **attack_speed** (честота/инициатива), **spell_power** (магическа сила).
-- Magic: **mana** (ресурс), **mana_regen** (възстановяване per turn), **concentration** (устойчивост на прекъсване), **magic_resist** (редукция магия).
-- Stealth: **stealth** (скриване), **perception** (откриване), **trap_detection** (специализиран perception).
-- Social: **reputation** (per faction), **influence/charisma** (социален успех, цена, реакции).
-- Survival: **hunger/thirst/fatigue** (нужди), **temperature_resist** (устойчивост).
-- Movement: **speed** (tiles/turn или scalar), **climb/swim/navigation** (специализирано придвижване).
-- Economy: **currency** (map), **trading** (цени), **crafting_skill/gathering** (успех/качество).
-- Status effects: bool/stack, влияят на stats (poison DoT, stun disable, snare/slow).
+## Per-ability mini-defs (core categories, 1 sentence)
+- Combat: **armor** (physical reduction), **block_chance** (block chance), **dodge** (evade chance), **crit_chance** (crit chance), **crit_multiplier** (multiplier), **attack_speed** (rate/initiative), **spell_power** (magical power).
+- Magic: **mana** (resource), **mana_regen** (recovery per turn), **concentration** (interrupt resistance), **magic_resist** (magic reduction).
+- Stealth: **stealth** (hiding), **perception** (detection), **trap_detection** (specialized perception).
+- Social: **reputation** (per faction), **influence/charisma** (social success, prices, reactions).
+- Survival: **hunger/thirst/fatigue** (needs), **temperature_resist** (resistance).
+- Movement: **speed** (tiles/turn or scalar), **climb/swim/navigation** (specialized movement).
+- Economy: **currency** (map), **trading** (prices), **crafting_skill/gathering** (success/quality).
+- Status effects: bool/stack, affect stats (poison DoT, stun disable, snare/slow).
 
-## Status effects подробно
-- Тип: `bool` или `stack_count`.
-- Типични ефекти: DoT (poison/bleed/burn), CC (stun/silence/root), debuff (slow/weakness), heal block, anti-magic.
-- Премахване: `cure/antidote/rest`, специални buff-ове, класови умения.
-- Препоръка: опишете продължителност/стек лимит в `desc` или rules файл.
+## Status effects (detailed)
+- Type: `bool` or `stack_count`.
+- Typical effects: DoT (poison/bleed/burn), CC (stun/silence/root), debuff (slow/weakness), heal block, anti-magic.
+- Removal: `cure/antidote/rest`, special buffs, class skills.
+- Recommendation: describe duration/stack limit in `desc` or a rules file.
 
-## Scaling / tiers (примерни насоки)
-- Stealth/perception растат с level/tier (напр. +5 на tier).
-- Armor soft-cap: напр. формула с намаляваща възвръщаемост (1/(1+armor/k)).
-- Crit caps: може да се ограничи до 80–90% за баланс.
-- Magic_resist: капнете до % (напр. 75%) или използвайте diminishing returns.
+## Scaling / tiers (example guidelines)
+- Stealth/perception scale with level/tier (e.g. +5 per tier).
+- Armor soft-cap: e.g. diminishing returns formula (1/(1+armor/k)).
+- Crit caps: may be limited to 80–90% for balance.
+- Magic_resist: cap to % (e.g. 75%) or use diminishing returns.
 
 ## Resource interactions
-- Ниски `hunger/thirst` → penalty на `mana_regen/stamina_regen` и/или `speed`.
-- Висок `fatigue` → намалява `crit_chance`, `block_chance`, `dodge`.
-- Status “exhausted” може да спира regen напълно.
+- Low `hunger/thirst` → penalty to `mana_regen/stamina_regen` and/or `speed`.
+- High `fatigue` → reduces `crit_chance`, `block_chance`, `dodge`.
+- Status “exhausted” may stop regeneration completely.
 
-## UI contract препоръки (hud)
-- `ui/hud.json` може да включва: bars за `health/energy/mana`, списък `status_effects`, карта `reputation` (per faction), `currency`, `fatigue/hunger/thirst`.
-- Добавете `schema_version` и кратки labels/units в HUD, за да е ясно на UI слоя.
+## UI contract recommendations (hud)
+- `ui/hud.json` can include: bars for `health/energy/mana`, a `status_effects` list, a `reputation` map (per faction), `currency`, `fatigue/hunger/thirst`.
+- Add `schema_version` and short labels/units in the HUD so it is clear for the UI layer.
 
 ## Quest gating via capabilities
-- Quest стъпки могат да изискват capability (напр. `strength >= 10`, `stealth >= 50`).
-- GM съобщава lock/unlock: “Need Stealth 50 to bypass guard; you have 40”.
-- При unlock GM записва флага/прогреса в state, без да спойлва съдържание извън текущата рамка.
+- Quest steps may require a capability (e.g. `strength >= 10`, `stealth >= 50`).
+- GM announces lock/unlock: “Need Stealth 50 to bypass guard; you have 40”.
+- On unlock, the GM writes the flag/progress in state without spoiling content beyond the current frame.
 
-## Crafting / economy конкретика
-- Качество на предмети (tiers): common/uncommon/rare/epic (или числов quality).
-- Success chance за craft: базира се на `crafting_skill` ± recipe difficulty.
-- Salvage % и trading modifiers: `trading` влияе на buy/sell (пример: ±(trading/200)).
-- Currency може да е много-валутно (gold/gems/credits) и да се описва като map.
+## Crafting / economy specifics
+- Item quality (tiers): common/uncommon/rare/epic (or numeric quality).
+- Success chance for crafting: based on `crafting_skill` ± recipe difficulty.
+- Salvage % and trading modifiers: `trading` affects buy/sell (example: ±(trading/200)).
+- Currency can be multi-currency (gold/gems/credits) and described as a map.
 
-## Примери за custom capabilities
-- `fire_affinity` (0..100, влияе на fire damage и resist).
-- `corruption` (0..100, висока стойност дава debuffs).
-- `sanity` (-100..100, ниско → халюцинации/penalties).
-- `radiation_resist` (0..100, редукция на radiation DoT).
+## Examples of custom capabilities
+- `fire_affinity` (0..100, affects fire damage and resist).
+- `corruption` (0..100, high value applies debuffs).
+- `sanity` (-100..100, low → hallucinations/penalties).
+- `radiation_resist` (0..100, reduction of radiation DoT).
 
 ## Validation severity guide
 - CAP-MISSING, CAP-DUP, CAP-RANGE: blocking (ERROR).
-- CAP-RUNTIME, CAP-UNUSED: WARN (ако играта ги маркира като optional, GM може да ги ескалира).
-- Custom validation може да повиши WARN → ERROR, ако capability е критично за quest gating.
+- CAP-RUNTIME, CAP-UNUSED: WARN (if the game marks them as optional, the GM may escalate them).
+- Custom validation can raise WARN → ERROR if a capability is critical for quest gating.
 
-## Data typing table (описание в desc/note)
-- Числа: описвайте единици и cap (напр. “0..100, percent”).
-- Проценти: 0..1 или 0..100% — запишете как се чете.
-- Map: опишете под-ключовете (напр. factions, currencies).
-- Bool/stack: уточнете дали е flag или stack_count; ако stack → max stack.
+## Data typing table (describe in desc/note)
+- Numbers: describe units and cap (e.g. “0..100, percent”).
+- Percentages: 0..1 or 0..100% — specify how to interpret.
+- Map: describe sub-keys (e.g. factions, currencies).
+- Bool/stack: specify whether it is a flag or stack_count; if stack → max stack.
 
-## Изчерпателен списък на capabilities (по предоставения текст)
+## Exhaustive list of capabilities (from the provided text)
 
-Списъкът съдържа **29 основни категории** с над **300+ индивидуални способности**, които обхващат практически всяка възможна механика виждана в RPG жанра. Всяка способност може да бъде комбинирана с други за създаване на уникални комбинации и плейстайлове. Различните игри използват различни комбинации; това е база, от която всяко RPG вероятно черпи.
+The list contains **29 core categories** with over **300+ individual capabilities**, covering nearly every mechanic seen in the RPG genre. Each capability can be combined with others to create unique combinations and playstyles. Different games use different combinations; this is a base that most RPGs likely draw from.
 
-### ОСНОВНИ БОЕН СИСТЕМИ
-- Преки атаки: обикновени удари, бързи удари, мощни удари, специални движения
-- Оръжейно майсторство: мечове, брадви, копия, лъкове, двойна ръка, две ръце
-- Боен стил: агресивен, защитен, балансиран
+### CORE COMBAT SYSTEMS
+- Direct attacks: normal strikes, quick strikes, heavy strikes, special moves
+- Weapon mastery: swords, axes, spears, bows, dual wield, two-handed
+- Combat style: aggressive, defensive, balanced
 
-### МАГИЯ И МАГИЧЕСКИ СПОСОБНОСТИ
-**8 магически школи:** Evocation, Conjuration, Transmutation, Illusion, Divination, Enchantment, Abjuration, Necromancy
+### MAGIC AND MAGICAL ABILITIES
+**8 magic schools:** Evocation, Conjuration, Transmutation, Illusion, Divination, Enchantment, Abjuration, Necromancy
 
-**Елементална магия:** Fire, Ice, Lightning, Water, Earth, Air, Nature, Light, Darkness
+**Elemental magic:** Fire, Ice, Lightning, Water, Earth, Air, Nature, Light, Darkness
 
-### ДВИЖЕНИЕ И ПОЗИЦИОНИРАНЕ
-Базово движение: Walk, Run, Sprint, Jump, Climb, Swim
+### MOVEMENT AND POSITIONING
+Basic movement: Walk, Run, Sprint, Jump, Climb, Swim
 
-Специални движения: Dash/Roll, Teleport/Blink, Grapple/Swing, Wall Run/Jump, Backflip, Slide, Double/Triple Jump, Charged Jump, Phase through objects, Rocket Jump, Jet Pack, Gravity Shift, Parachute, Zip-line
+Special movement: Dash/Roll, Teleport/Blink, Grapple/Swing, Wall Run/Jump, Backflip, Slide, Double/Triple Jump, Charged Jump, Phase through objects, Rocket Jump, Jet Pack, Gravity Shift, Parachute, Zip-line
 
 ### CROWD CONTROL
-Обездвижване: Stun, Paralyze, Root, Freeze, Sleep, Petrify
+Immobilization: Stun, Paralyze, Root, Freeze, Sleep, Petrify
 
-Дезориентация: Daze, Confuse, Blind, Disorient
+Disorientation: Daze, Confuse, Blind, Disorient
 
-Контрол скорост: Slow, Speed reduction, Haste reduction
+Speed control: Slow, Speed reduction, Haste reduction
 
-Позиционен контрол: Knockback, Knockdown, Throw, Push, Pull, Knockup, Juggle
+Positional control: Knockback, Knockdown, Throw, Push, Pull, Knockup, Juggle
 
-Таунт: Provoke attention, Force aggression
+Taunt: Provoke attention, Force aggression
 
-### ЗАЩИТНИ И РЕАКТИВНИ СПОСОБНОСТИ
-Парирование: Parry, Riposte
+### DEFENSIVE AND REACTIVE ABILITIES
+Parrying: Parry, Riposte
 
-Блокиране: Shield block, Armor absorption, Damage reduction
+Blocking: Shield block, Armor absorption, Damage reduction
 
-Уклончивост: Dodge, Evasion, Sidestep, Repositioning
+Evasion: Dodge, Evasion, Sidestep, Repositioning
 
-Отразяване: Reflect, Bounce spells, Redirect
+Reflection: Reflect, Bounce spells, Redirect
 
-Контраатак: Counter attack
+Counter-attack: Counter attack
 
-### ЛЕЧЕНИЕ И ПОДДЪРЖАНЕ
-Директно лечение: Heal, Healing Touch, Cure, Holy Light
+### HEALING AND SUPPORT
+Direct healing: Heal, Healing Touch, Cure, Holy Light
 
-Масово лечение: Group Heal, Area Heal, Healing Wave, Aura Heal
+Group healing: Group Heal, Area Heal, Healing Wave, Aura Heal
 
-Лечение състояние: Cure poison/disease, Remove status
+Status cure: Cure poison/disease, Remove status
 
-Възраждане: Revive, Auto-revive, Resurrection, Raise Dead
+Revive: Revive, Auto-revive, Resurrection, Raise Dead
 
-Регенерация: HP regen, Lifesteal, Blood siphon
+Regeneration: HP regen, Lifesteal, Blood siphon
 
 ### BUFF / ENHANCEMENT
 Attack buffs: Attack Up, Damage Increase, Critical Increase, Precision Boost
@@ -336,7 +335,7 @@ Elemental buffs: Elemental damage boosts, Resistance increases
 
 Compound buffs: Multi-stat up
 
-### DEBUFF / ОТСЛАБВАНЕ
+### DEBUFF / WEAKENING
 Damage debuffs: Attack Down, Damage Reduction, Armor Break
 
 Defense debuffs: Defense Down, Vulnerability, Penetration
@@ -345,42 +344,41 @@ Speed debuffs: Slow, Movement/Attack speed reduce
 
 Curse: Curse, Hex, Jinx, Doom, Malediction
 
-### СТАТУС ЕФЕКТИ / DoT
+### STATUS EFFECTS / DoT
 Poison, Burn, Bleed, Freeze/Chill, Electrocution, Decay/Necrotic
 
-### Summon / Партньор способности
-Summon същества (Beast, Elemental, Demon, Undead, Minion), Summon Familiar/Companion, Summon Weapon, Handle/Train/Command Animal, Pet Attack/Defend, Summon Assist
+### Summon / Companion abilities
+Summon creatures (Beast, Elemental, Demon, Undead, Minion), Summon Familiar/Companion, Summon Weapon, Handle/Train/Command Animal, Pet Attack/Defend, Summon Assist
 
-### ТРАНСФОРМАЦИЯ / Усилване
+### TRANSFORMATION / Empowerment
 Polymorph/Shapeshift, Berserk/Rage, Elemental Transform, Multi-form Shifting
 
-### СОЦИАЛНИ СПОСОБНОСТИ
+### SOCIAL ABILITIES
 Persuade, Deceive, Intimidate, Insight, Leadership, Charisma Aura
 
-### СКРИТНОСТ И ОТКРИВАНЕ
+### STEALTH AND DETECTION
 Stealth, Invisibility, Disguise, Detection/Perception, Tracking, Sense Magic
 
-### РАЗВЕЖДАНЕ И ЕКСПЛОРАЦИЯ
+### SURVIVAL AND EXPLORATION
 Breathing (underwater/air), Vision (dark/infra/thermal), Navigation, Survival, Gathering, Trap Detection/Disable
 
-### АЛХИМИЯ / КРАФТ
+### ALCHEMY / CRAFT
 Transmutation/Alchemy, Equivalent Exchange, Potion Brewing, Material Analysis, Synthesis
 
-### КРАФТ / ПРОИЗВОДСТВО
+### CRAFTING / PRODUCTION
 Weapon/Armor/Accessory Crafting, Repair, Enhancement/Enchant Items
 
-### БЛАГОСЛАВКА / ПРОКЛЯТИЕ
+### BLESSING / CURSE
 Blessing, Anti-Blessing, Curse/Hex, Counter-Curse, Fate Manipulation
 
-### ДИСТАНЦИОННИ СПОСОБНОСТИ
+### RANGED ABILITIES
 Projectiles (Arrow/Throw/Bullet), Beams, Explosions, Waves, Remote Control/Telekinesis
 
-### СПЕЦИАЛНИ МЕХАНИКИ И РЕСУРСИ
+### SPECIAL MECHANICS AND RESOURCES
 Cooldown, Mana Cost, Health Cost, Stamina Cost, Resource Generation (Rage/Fury/Focus), Charge Time, Channel Time
 
-### СПЕЦИАЛИЗИРАНИ РОЛИ И ТАКТИКИ
+### SPECIALIZED ROLES AND TACTICS
 Tank (Taunt/Threat), DPS (Burst/Combo), Healer (Heal/Aura/Res), Control (CC/Status), Utility (Support/Resource/Tactical)
 
 ---
-
-Различните игри ще използват подмножества или собствени добавки. Engine-ът очаква `config/capabilities.json` да декларира кои capabilities са активни за конкретната игра.
+Different games will use subsets or their own additions. The engine expects `config/capabilities.json` to declare which capabilities are active for a given game.

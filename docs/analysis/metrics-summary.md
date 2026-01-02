@@ -1,9 +1,11 @@
-# Validator Metrics Summary — 29.12.2025 г.
+
+
+# Validator Metrics Summary — 29.12.2025
 
 _Generated: 2025-12-29T10:48:39.660Z via tools/metrics/report.js_
 
-## Run история
-| Run ID | Timestamp | Duration (ms) | Errors | Warnings | Бележки |
+## Run history
+| Run ID | Timestamp | Duration (ms) | Errors | Warnings | Notes |
 |--------|-----------|---------------|--------|----------|---------|
 | dev-20251225-run5 | 2025-12-25T19:27:58.197Z | 127 | 0 | 0 | clean |
 | dev-20251225-run6 | 2025-12-25T19:28:13.058Z | 141 | 0 | 0 | clean |
@@ -17,14 +19,14 @@ _Generated: 2025-12-29T10:48:39.660Z via tools/metrics/report.js_
 | dev-20251228-04 | 2025-12-28T14:37:00.424Z | 176 | 0 | 0 | clean |
 | dev-20251228-05 | 2025-12-28T14:42:01.782Z | 182 | 0 | 0 | clean |
 
-## Аггрегирани показатели
-- Средно време за run: **152.9 ms** (на база 11 run-а)
-- Среден брой предупреждения: **2.09**
+## Aggregated metrics
+- Average run time: **152.9 ms** (based on 11 runs)
+- Average number of warnings: **2.09**
 - Clean run ratio: **8/11**
-- Avg retries до зелен статус: **0.38** (по 8 clean run-а)
+- Average retries to green status: **0.38** (across 8 clean runs)
 - Top codes: QUEST-AREA-BACKLINK:10, EXPLORATION-QUEST-MISMATCH:4, QUEST-REWARDS-XP:2, QUEST-REWARDS-GOLD:2, QUEST-REWARDS-LOOT:2
 
-## Препоръки
-1. Поддържай Definition of Done: ≥3 последователни run-а без warnings/errors и snapshot `New codes = none`.
-2. Инсталирай schema dependencies (Ajv + ajv-formats) в нови среди, за да липсват `SCHEMA` предупреждения.
-3. Архивирай telemetry история при ≥50 run-а или преди release (`npm run archive:telemetry -- --label <tag>`).
+## Recommendations
+1. Maintain the Definition of Done: ≥3 consecutive runs without warnings/errors and snapshot `New codes = none`.
+2. Install schema dependencies (Ajv + ajv-formats) in new environments to avoid `SCHEMA` warnings.
+3. Archive telemetry history at ≥50 runs or before release (`npm run archive:telemetry -- --label <tag>`).

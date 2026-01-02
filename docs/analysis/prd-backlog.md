@@ -33,14 +33,14 @@ _Last updated: 2025-12-22_
 
 ## 4. Non-Functional Requirements
 - **Local-only tooling:** no CI/CD integrations; all commands run via npm/node locally.
-- **Docs in BG:** README/Product brief/appendixes remain на български.
+- **Docs in BG:** README/Product brief/appendixes remain in Bulgarian.
 - **Telemetry privacy:** reports stay under `docs/analysis/reports/`; no external uploads.
 - **Extensibility:** allow future custom engine layers via manifest `engine_layers` without breaking core contracts.
 
 ## 5. Open Questions / Next Decisions
 1. Should we automate telemetry archiving (cron/CLI option) once history >50? (Depends on FR-02 usage.)
-2. Do we need a lightweight UI viewer milestone (Next.js) in this PRD, или остава отделен проект? (Tie-in to Build focus.)
-3. How strict да бъдат guardrails за по-екзотични capabilities (напр. `temperature_resist`, `crit_chance`)? Need per-feature decision before enabling in games.
+2. Do we need a lightweight UI viewer milestone (Next.js) in this PRD, or does it remain a separate project? (Tie-in to Build focus.)
+3. How strict should guardrails be for more exotic capabilities (e.g. `temperature_resist`, `crit_chance`)? Need per-feature decision before enabling in games.
 
 ---
 _Use this doc as the working PRD/backlog for upcoming Build cycles; update IDs/status as work progresses._

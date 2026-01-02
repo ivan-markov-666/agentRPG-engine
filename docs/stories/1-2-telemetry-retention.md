@@ -3,39 +3,39 @@
 _Status: done_
 
 ## Story Overview
-Като QA искам автоматичен начин да архивирам telemetry history, когато достигне праг или преди release, за да съхраня DoD доказателства без ръчни стъпки.
+As QA, I want an automatic way to archive telemetry history when it reaches a threshold or before a release, so I can keep DoD evidence without manual steps.
 
 ## Acceptance Criteria
-- [x] Команда `npm run archive:telemetry -- --label <tag>` премества текущия `telemetry-history.json` в `docs/analysis/reports/archive/<timestamp>-<tag>.json`.
-- [x] След архивиране се създава нов празен telemetry history файл с валидна структура.
-- [x] README съдържа стъпки за архивиране и възстановяване.
-- [x] Автоматичен тест покрива сценарий „history >= 50 entries → архив“.
-- [x] CLI връща грешка, ако архив директорията липсва или няма права.
+- [x] Command `npm run archive:telemetry -- --label <tag>` moves the current `telemetry-history.json` to `docs/analysis/reports/archive/<timestamp>-<tag>.json`.
+- [x] After archiving, a new empty telemetry history file is created with a valid structure.
+- [x] The README contains steps for archiving and recovery.
+- [x] An automated test covers the scenario “history >= 50 entries → archive”.
+- [x] The CLI returns an error if the archive directory is missing or lacks permissions.
 
 ## Tasks / Subtasks
-- [x] Имплементирай Node/TS скрипт за архивиране с аргументи `--label`, `--path` (по избор).
-- [x] Добави safeguard за минимален брой записи преди архивиране (configurable threshold).
-- [x] Обнови telemetry README с примерни run-ове и recovery стъпки.
-- [x] Напиши unit тестове за архив логиката (mock file system).
+- [x] Implement a Node/TS archiving script with arguments `--label`, `--path` (optional).
+- [x] Add a safeguard for a minimum number of entries before archiving (configurable threshold).
+- [x] Update telemetry README with example runs and recovery steps.
+- [x] Write unit tests for the archive logic (mock file system).
 
 ## Dev Notes
-- Използвай същите timestamp формати като `build-focus` (`YYYY-MM-DDTHH-mm-ss`).
-- Подготви dry-run флаг за бъдещи automation (може да е TODO коментар).
+- Use the same timestamp format as `build-focus` (`YYYY-MM-DDTHH-mm-ss`).
+- Prepare a dry-run flag for future automation (can be a TODO comment).
 
 ## Dev Agent Record
 ### Implementation Plan
-- Разширяване на `tools/archive-telemetry.js` с threshold (default 50), dry-run и конфигурируеми пътища, плюс по-строги грешки.
-- Изграждане на unit тестове (temp dir) за сценарии: under threshold skip, архивиране ≥ threshold, липсващ history.
-- Обновяване на README/validator docs с инструкции за threshold, dry-run, recovery + story logs.
+- Extend `tools/archive-telemetry.js` with threshold (default 50), dry-run, and configurable paths, plus stricter errors.
+- Build unit tests (temp dir) for scenarios: under-threshold skip, archive ≥ threshold, missing history.
+- Update README/validator docs with instructions for threshold, dry-run, recovery + story logs.
 
 ### Debug Log
-- `archive-telemetry.js` обновен с `--min`, `--dry-run`, нов API + експорти.
-- Добавен тест `tools/tests/archive-telemetry.test.js`, включен в `npm test`.
+- `archive-telemetry.js` updated with `--min`, `--dry-run`, new API + exports.
+- Added test `tools/tests/archive-telemetry.test.js`, included in `npm test`.
 
 ### Completion Notes
-- Архивиращият CLI вече поддържа `--min`, `--dry-run`, конфигурируеми пътища и коректно нулира history след успешен архив.
-- README съдържа инструкции за threshold/dry-run, recovery стъпки и примерни команди/automation.
-- Unit тестовете покриват сценарии за threshold skip, успешен архив, липсващ history и недостъпна archive директория.
+- The archiving CLI now supports `--min`, `--dry-run`, configurable paths, and correctly resets history after a successful archive.
+- The README includes instructions for threshold/dry-run, recovery steps, and example commands/automation.
+- Unit tests cover scenarios for threshold skip, successful archive, missing history, and an inaccessible archive directory.
 
 ## File List
 - `tools/archive-telemetry.js`

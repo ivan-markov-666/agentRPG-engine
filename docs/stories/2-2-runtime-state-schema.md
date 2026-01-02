@@ -3,28 +3,28 @@
 _Status: done_
 
 ## Story Overview
-Като dev искам `state.schema.json` и runtime валидаторът да гарантират, че всички статистики, nested maps и inventories в демо играта спазват guardrails, за да предотвратя невалидни session snapshots.
+As a dev, I want `state.schema.json` and the runtime validator to ensure that all stats, nested maps, and inventories in the demo game respect guardrails, so I can prevent invalid session snapshots.
 
 ## Acceptance Criteria
-- [x] `tools/validator/schemas/state.schema.json` описва структурата на `games/demo/player-data/runtime/state.json`, включително неотрицателни стойности и типове.
-- [x] Validator проверява state файла срещу schema и хвърля грешка при несъответствия.
-- [x] Документация (Product Brief / capabilities catalog) съдържа препратка към state schema правилата.
-- [x] Тестов комплект покрива валидни и невалидни state примери.
+- [x] `tools/validator/schemas/state.schema.json` describes the structure of `games/demo/player-data/runtime/state.json`, including non-negative values and types.
+- [x] Validator compares the state file against the schema and throws an error on mismatches.
+- [x] Documentation (Product Brief / capabilities catalog) references the state schema rules.
+- [x] Test suite covers valid and invalid state examples.
 
 ## Tasks / Subtasks
-- [x] Дефинирай JSON schema с типове за `stats`, `flags`, `inventories`, nested structures.
-- [x] Обнови validator да зарежда schema и да логва смислени грешки (`STATE-SCHEMA`).
-- [x] Добави примерни state файлове за тестове и документация.
-- [x] Напиши unit/integration тестове.
+- [x] Define a JSON schema with types for `stats`, `flags`, `inventories`, nested structures.
+- [x] Update the validator to load the schema and log meaningful errors (`STATE-SCHEMA`).
+- [x] Add example state files for tests and documentation.
+- [x] Write unit/integration tests.
 
 ## Dev Notes
-- Пази backward compatibility, но позволи optional полета чрез `additionalProperties: false` където е възможно.
+- Preserve backward compatibility, but allow optional fields via `additionalProperties: false` where possible.
 
 ## Dev Agent Record
-- Разширена е `tools/validator/schemas/state.schema.json` с пълно описание на runtime полетата (current_day/hour, flags, inventories, exploration preview, nested stats).
-- Към `tools/validator/tests/validator.test.js` са добавени integration тестове за валиден и невалиден state, за да се гарантира `STATE-SCHEMA` покритие.
-- Документацията (`docs/analysis/capabilities-catalog.md`, `docs/analysis/validator-readme.md`) е обновена с state schema указания и примерни структури.
-- `npm test` (validator + telemetry tests) преминава успешно, доказвайки приложимостта на schema-та.
+- `tools/validator/schemas/state.schema.json` extended with a full description of runtime fields (current_day/hour, flags, inventories, exploration preview, nested stats).
+- Added integration tests for valid and invalid state to `tools/validator/tests/validator.test.js` to ensure `STATE-SCHEMA` coverage.
+- Documentation (`docs/analysis/capabilities-catalog.md`, `docs/analysis/validator-readme.md`) updated with state schema guidance and sample structures.
+- `npm test` (validator + telemetry tests) passes, proving the schema works.
 
 ## File List
 - `tools/validator/schemas/state.schema.json`
@@ -33,9 +33,9 @@ _Status: done_
 - `docs/analysis/validator-readme.md`
 
 ## Change Log
-1. State schema разшірение: добавени inventories/flags/exploration дефиниции и по-строги типове.
-2. Validator тестове: добавени валиден/невалиден runtime state сценарий.
-3. Документация: capabilities catalog + validator README описват state schema контрол и примерни грешки.
+1. State schema extension: added inventories/flags/exploration definitions and stricter types.
+2. Validator tests: added valid/invalid runtime state scenarios.
+3. Documentation: capabilities catalog + validator README describe state schema control and sample errors.
 
 ## Status
 done

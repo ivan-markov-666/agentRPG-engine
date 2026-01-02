@@ -3,30 +3,30 @@
 _Status: done_
 
 ## Story Overview
-Като GM/Dev искам capabilities guardrails да бъдат формализирани в JSON Schema и validator правила, за да получавам грешки при невалидни стойности.
+As a GM/Dev, I want capability guardrails to be formalized in JSON Schema and validator rules, so I get errors on invalid values.
 
 ## Acceptance Criteria
-- [x] `tools/validator/schemas/capabilities.schema.json` съдържа min/max диапазони за всички guardrail параметри от Product Brief.
-- [x] `games/demo/config/capabilities.json` валидира успешно срещу новата schema.
-- [x] Validator връща CAP-RUNTIME-RANGE грешки, когато runtime стойности (state file) са извън диапазона.
-- [x] Документацията (Product Brief, capabilities catalog) е синхронизирана със schema дефинициите.
+- [x] `tools/validator/schemas/capabilities.schema.json` contains min/max ranges for all guardrail parameters from the Product Brief.
+- [x] `games/demo/config/capabilities.json` validates successfully against the new schema.
+- [x] The validator returns CAP-RUNTIME-RANGE errors when runtime values (state file) are out of range.
+- [x] Documentation (Product Brief, capabilities catalog) is synchronized with the schema definitions.
 
 ## Tasks / Subtasks
-- [x] Обнови schema файла с числови ограничения и enum стойности където е приложимо.
-- [x] Добави validator стъпка, която сравнява runtime state срещу schema и хвърля грешка при нарушение.
-- [x] Обнови demo config и Product Brief таблицата с актуални диапазони.
-- [x] Напиши unit тестове за schema (валидни/невалидни примери).
+- [x] Update the schema file with numeric constraints and enum values where applicable.
+- [x] Add a validator step that compares runtime state against the schema and throws an error on violation.
+- [x] Update demo config and the Product Brief table with current ranges.
+- [x] Write unit tests for the schema (valid/invalid examples).
 
 ## Dev Notes
-- Използвай AJV или текущия validator stack — нужни са custom error messages (`CAP-RUNTIME-RANGE`).
-- Guardrail таблицата в Product Brief е източник на истина → автоматизирай синхронизация, ако е възможно.
+- Use AJV or the current validator stack — custom error messages are needed (`CAP-RUNTIME-RANGE`).
+- The guardrail table in the Product Brief is the source of truth → automate synchronization if possible.
 
 ## Dev Agent Record
-- Guardrail schema разширена с нови дефиниции (armor, morale, crit_chance, crit_multiplier) и правило `range XOR min/max`.
-- Demo capabilities конфигурацията синхронизирана с новите диапазони и допълнителни полета.
-- Capabilities catalog допълнен с таблица за диапазоните и указания за runtime enforcement.
-- Validator summary тестът адаптиран да игнорира CAP-SCHEMA кодовете според CLI флага.
-- `npm run build:ts` и `npm test` потвърждават чист билд и тестове след промените.
+- Guardrail schema extended with new definitions (armor, morale, crit_chance, crit_multiplier) and the `range XOR min/max` rule.
+- Demo capabilities configuration synced with the new ranges and additional fields.
+- Capabilities catalog extended with a ranges table and guidance for runtime enforcement.
+- Validator summary test adapted to ignore CAP-SCHEMA codes according to a CLI flag.
+- `npm run build:ts` and `npm test` confirm a clean build and passing tests after the changes.
 
 ## File List
 - `tools/validator/schemas/capabilities.schema.json`
@@ -37,9 +37,9 @@ _Status: done_
 - `docs/sprint-artifacts/sprint-status.yaml`
 
 ## Change Log
-1. Добавени строгите guardrail диапазони и валидиране за capabilities schema; валидаторът връща CAP-RUNTIME-RANGE при нарушения.
-2. Demo config и документацията са синхронизирани с новите ограничения и примери.
-3. Тестовете и sprint статусите са обновени за финализиране на историята.
+1. Added strict guardrail ranges and validation for the capabilities schema; the validator returns CAP-RUNTIME-RANGE on violations.
+2. Demo config and documentation are synchronized with the new constraints and examples.
+3. Tests and sprint statuses were updated to finalize the story.
 
 ## Status
 done
