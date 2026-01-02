@@ -30,6 +30,17 @@
 - **Individual story documents:** `docs/stories/XX-*.md` — acceptance criteria + Dev Agent Record (ST-001 … ST-035).
 - **Sprint artifacts / status:** `docs/sprint-artifacts/` (e.g. `sprint-status.yaml`) — progress on DoD tasks and release readiness.
 
+## Ivan agent — Game Builder persona
+- **Къде е дефиниран:** `ivan.md` описва Ivan — вътрешен agent, който води автора през всички фази (Setup → Post-Launch) и съдържа пълния списък от validator, runtime и tooling guardrails.
+- **Какво прави:** гарантира, че работиш само в `games/<gameId>/**`, синхронизира content с Product Brief/PRD, напомня за езиковата „language gate“ сцена и държи quests/areas/capabilities в рамките на схемите. Водещият принцип е „Ivan описва какво е позволено; README описва къде се намират инструментите“.
+- **Как се ползва:**  
+  1. Отвори `ivan.md` и следвай фазите (Phase 0–7). Всяка фаза съдържа чеклист и tooling hints (примерно `quest:add`, `scenario:index`, exploration helpers).  
+  2. Изпълнявай стъпките само в `games/<gameId>/` – Ivan е експлицитен, че промени извън game папката = нарушение.  
+  3. Използвай предоставените CLI примери (validate/runtime/metrics) и синхронизирай резултатите с telemetry/KPI файловете, както е описано в README.  
+  4. При съмнение за guardrail провери `ivan.md` секциите „ВАЖНО:“ (capabilities↔state, exploration log, UI/saves, runtime CLI). Те обобщават изискванията от validator checks и JSON схемите.  
+  5. Когато добавяш нови NPC/areas/quests, копирай от skeleton-а и потвърждавай с Ivan, че backlinks, rewards и exploration записи са покрити (има конкретни bullet-и за това).
+- **Как помага на екипа:** Ivan служи като „контрактен асистент“ – описва DoD guardrails, tooling workflows, препоръчителни команди и въпроси към потребителя. Използването му намалява риска от engine-level промени и ускорява валидирането преди `npm run validate` / `npm run runtime`. README + Ivan са двата задължителни референса при онбординг на нов автор или GM.
+
 ## Quick Start — Blank Game Skeleton
 1. **Copy the skeleton**:
    - CLI helper: `npm run blank:copy -- --dest games/<gameId>`
