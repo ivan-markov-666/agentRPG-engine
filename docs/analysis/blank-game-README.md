@@ -1,18 +1,18 @@
 # Blank Game README (LLM-friendly)
 
-Примерни стъпки за създаване на игра по скелета `samples/blank-game/` (структурата може да се копира в `games/<gameId>/`).
+Example steps for creating a game from the `samples/blank-game/` skeleton (the structure can be copied into `games/<gameId>/`).
 
-## Стъпки
-1) Копирай скелета `samples/blank-game/` в `games/<gameId>/` (ако липсва `samples/`, просто създай структурата по-долу).
-2) Попълни `manifest/entry.json` (идентичност на играта, pointers към файловете, capabilities файл).
-3) Попълни `scenario/index.md` + поне 1 quest файл (main quest) и 1 area (`scenario/areas/default-area.md`).
-4) Попълни `scenario/quests/available.json` (ID ↔ title) и `unlock-triggers.json` (условия за unlock).
-5) Попълни `player-data/session-init.json` (име на играч, `preferred_language`, optional debug).
-6) Попълни `player-data/runtime/state.json` (примерни активни quest-ове и stats).
-7) Попълни `config/capabilities.json` (пример по-долу). Ако добавяш/махаш capability, дръж sync със `state.json`.
-8) Стартирай сесията (GM валидация). Фиксирай WARN/ERROR съобщенията (виж таблицата с validation codes в Step 3).
+## Steps
+1) Copy the `samples/blank-game/` skeleton into `games/<gameId>/` (if `samples/` is missing, just create the structure below).
+2) Fill in `manifest/entry.json` (game identity, pointers to files, capabilities file).
+3) Fill in `scenario/index.md` + at least 1 quest file (main quest) and 1 area (`scenario/areas/default-area.md`).
+4) Fill in `scenario/quests/available.json` (ID ↔ title) and `unlock-triggers.json` (unlock conditions).
+5) Fill in `player-data/session-init.json` (player name, `preferred_language`, optional debug).
+6) Fill in `player-data/runtime/state.json` (example active quests and stats).
+7) Fill in `config/capabilities.json` (example below). If you add/remove a capability, keep it in sync with `state.json`.
+8) Start the session (GM validation). Fix WARN/ERROR messages (see the validation codes table in Step 3).
 
-## Минимална структура
+## Minimal structure
 ```
 <gameId>/
   manifest/entry.json
@@ -24,7 +24,7 @@
       completed-quests.json
       exploration-log.json
     saves/
-      index.json (по избор)
+      index.json (optional)
   scenario/
     index.md
     areas/
@@ -35,8 +35,8 @@
       main-quest-01.md
 ```
 
-## Примерен `config/capabilities.json`
-Диапазоните са примерни; настрой ги според играта.
+## Example `config/capabilities.json`
+The ranges are examples; tune them per game.
 ```json
 {
   "health": { "enabled": true, "desc": "HP", "min": 0, "max": 100 },
@@ -56,7 +56,7 @@
 }
 ```
 
-## Примерно `player-data/runtime/state.json` (stats част)
+## Example `player-data/runtime/state.json` (stats part)
 ```json
 {
   "stats": {
@@ -82,19 +82,19 @@
 }
 ```
 
-## Бележки
-- Validation codes са в Step 3 на product brief (формат `[LEVEL][CODE] file:message (suggested fix)`).
-- Ако capability е enabled в `config/capabilities.json`, добави го и в runtime `stats` (или го отключи). Липсващ/дублиран → CAP-MISSING/CAP-DUP.
-- При min > max → CAP-RANGE; при липсваща runtime стойност → CAP-RUNTIME.
-- Репутации са per faction (пример `guild`, `village`); можеш да добавиш други ключове.
-- currency може да е map по видове (gold, gems, credits) без горен лимит.
-- Naming guide: snake_case, добавяй `desc`; Boolean ключове ясни (`is_cursed`), map ключове опиши в `desc`.
-- Минимален сет: health/energy/quests/inventory; combat добавя armor/crit/block/dodge; magic добавя mana/mana_regen/spell_power/resist; survival добавя hunger/thirst/fatigue; stealth/perception за stealth-heavy игри.
-- HUD препоръка: bars за health/energy/mana, списък status_effects, map за reputation/currency, нужди (fatigue/hunger/thirst).
-- Status effects: bool/stack; уточни ефект (DoT/CC) и как се cure-ва; CAP-* са blocking, CAP-RUNTIME/UNUSED са WARN.
-- GM validation checklist: стартирай → валидирай задължителни файлове + capabilities; съобщения `[LEVEL][CODE] file:message (suggested fix)`; CAP-* блокират, WARN не; ако GM auto-създаде quest/area, логва и казва какво да се попълни.
+## Notes
+- Validation codes are in Step 3 of the product brief (format `[LEVEL][CODE] file:message (suggested fix)`).
+- If a capability is enabled in `config/capabilities.json`, add it to runtime `stats` (or unlock it). Missing/duplicate → CAP-MISSING/CAP-DUP.
+- If min > max → CAP-RANGE; if a runtime value is missing → CAP-RUNTIME.
+- Reputation is per faction (e.g. `guild`, `village`); you can add other keys.
+- currency can be a map by type (gold, gems, credits) without an upper limit.
+- Naming guide: snake_case, add `desc`; keep boolean keys explicit (`is_cursed`), describe map keys in `desc`.
+- Minimal set: health/energy/quests/inventory; combat adds armor/crit/block/dodge; magic adds mana/mana_regen/spell_power/resist; survival adds hunger/thirst/fatigue; stealth/perception for stealth-heavy games.
+- HUD recommendation: bars for health/energy/mana, list of status_effects, map for reputation/currency, needs (fatigue/hunger/thirst).
+- Status effects: bool/stack; specify the effect (DoT/CC) and how it is cured; CAP-* are blocking, CAP-RUNTIME/UNUSED are WARN.
+- GM validation checklist: start → validate required files + capabilities; messages `[LEVEL][CODE] file:message (suggested fix)`; CAP-* blocks, WARN does not; if the GM auto-creates a quest/area, it logs and explains what to fill in.
 
-## Примерен `ui/hud.json` (скелет)
+## Example `ui/hud.json` (skeleton)
 ```json
 {
   "schema_version": "ui.hud.v1",

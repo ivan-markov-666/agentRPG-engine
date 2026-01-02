@@ -3,29 +3,29 @@
 _Status: done_
 
 ## Story Overview
-Като dev екип искаме унифициран run ID helper (PowerShell + Bash) и задължителен `--run-id` флаг за telemetry, за да проследяваме кой run е извършен и от кого.
+As the dev team, we want a unified run ID helper (PowerShell + Bash) and a required `--run-id` flag for telemetry, so we can track which run was executed and by whom.
 
 ## Acceptance Criteria
-- [x] `scripts/run-id.ps1` и `scripts/run-id.sh` генерират UUID-формат и могат да се source-нат в shell профил.
-- [x] CLI `npm run validate` изисква `--run-id` и записва стойността в telemetry entries.
-- [x] README описва как да настроиш helper-а на Windows/Linux/macOS.
-- [x] Тест покрива липсващ run-id (очаква се грешка) и валиден run-id.
+- [x] `scripts/run-id.ps1` and `scripts/run-id.sh` generate a UUID-format value and can be sourced in a shell profile.
+- [x] The CLI `npm run validate` requires `--run-id` and records the value in telemetry entries.
+- [x] The README describes how to set up the helper on Windows/Linux/macOS.
+- [x] A test covers missing run-id (expects an error) and a valid run-id.
 
 ## Tasks / Subtasks
-- [x] Добави shell/Powershell helper-и и инструкции за инсталация.
-- [x] Обнови validator CLI да отказва изпълнение без `--run-id`.
-- [x] Разшири telemetry структурата с поле `runId` и тестове.
-- [x] Документирай в `validator-readme.md` и README.
+- [x] Add shell/PowerShell helpers and installation instructions.
+- [x] Update the validator CLI to refuse execution without `--run-id`.
+- [x] Extend the telemetry structure with a `runId` field and tests.
+- [x] Document in `validator-readme.md` and the README.
 
 ## Dev Notes
-- Може да използваш `crypto.randomUUID()` (Node 18+) или устойчива библиотека.
-- При липса на run-id CLI трябва да върне exit code 1 и полезно съобщение.
+- You can use `crypto.randomUUID()` (Node 18+) or a robust library.
+- When run-id is missing, the CLI must return exit code 1 and a helpful message.
 
 ## Dev Agent Record
-- Добавени бяха `tools/scripts/run-id.ps1` и `tools/scripts/run-id.sh` с функции `New-AgentRPGRunId` и `run_id_generate`, пригодени за source/import в shell профили и clipboard поддръжка.
-- Валидаторът вече отказва изпълнение при липсващ `--run-id`, а telemetry payload съдържа `runId` и legacy `run_id`.
-- Тестовете в `tools/validator/tests/validator.test.js` валидират error flow при липсващ run-id, успешен log запис и обновените CLI сценарии (snapshot, summary, guardrails).
-- Документацията (`README.md`, `docs/analysis/validator-readme.md`) описва задължителния run-id и интеграцията на helper-ите.
+- Added `tools/scripts/run-id.ps1` and `tools/scripts/run-id.sh` with functions `New-AgentRPGRunId` and `run_id_generate`, designed for source/import in shell profiles and clipboard support.
+- The validator now refuses execution when `--run-id` is missing, and the telemetry payload contains `runId` and legacy `run_id`.
+- Tests in `tools/validator/tests/validator.test.js` validate the error flow for missing run-id, successful log writing, and updated CLI scenarios (snapshot, summary, guardrails).
+- Documentation (`README.md`, `docs/analysis/validator-readme.md`) describes the required run-id and helper integration.
 
 ## File List
 - `tools/scripts/run-id.ps1`
@@ -39,9 +39,9 @@ _Status: done_
 - `docs/sprint-artifacts/sprint-status.yaml`
 
 ## Change Log
-1. Създадени shell helper-и за run-id генерация (UUID + prefix, clipboard copy, source/import-friendly).
-2. Валидатор CLI изисква `--run-id`, telemetry payload включва `runId`, а тестовете покриват новото поведение.
-3. README и validator-readme обновени с инструкции за helper-ите и задължителния флаг; story и sprint статусите актуализирани.
+1. Created shell helpers for run-id generation (UUID + prefix, clipboard copy, source/import-friendly).
+2. Validator CLI requires `--run-id`, telemetry payload includes `runId`, and tests cover the new behavior.
+3. README and validator-readme updated with helper instructions and the required flag; story and sprint statuses updated.
 
 ## Status
 done

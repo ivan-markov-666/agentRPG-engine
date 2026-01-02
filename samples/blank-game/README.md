@@ -1,51 +1,51 @@
 # Blank Game Skeleton
 
-Този скелет служи като „чиста“ игра, която минава валидатора без допълнителни стъпки и съдържа всички задължителни файлове, описани в Product Brief v1.
+This skeleton is a “clean” game that passes the validator without extra steps and includes all mandatory files described in Product Brief v1.
 
-## Съдържание
-| Папка/файл | Описание |
-|------------|----------|
-| `manifest/entry.json` | Основен manifest с pointers към всички останали ресурси. |
-| `scenario/index.md` | Главен сценарен индекс с линкове към areas/quests. |
-| `scenario/areas/default-area.md` | Минимална area с guardrail-friendly секции. |
-| `scenario/quests/available.json` / `unlock-triggers.json` | Quest каталог + unlock правила. |
-| `scenario/quests/main-quest-01.md` | Основен quest пример. |
-| `scenario/world/index.md` | World frame (сетинг, тон, ограничения). |
-| `config/capabilities.json` | Активирани capabilities и диапазони. |
-| `player-data/session-init.json` | Стартова конфигурация (includes `preferred_language`). |
+## Contents
+| Folder/File | Description |
+|------------|-------------|
+| `manifest/entry.json` | Main manifest with pointers to all other resources. |
+| `scenario/index.md` | Primary scenario index with links to areas/quests. |
+| `scenario/areas/default-area.md` | Minimal area with guardrail-friendly sections. |
+| `scenario/quests/available.json` / `unlock-triggers.json` | Quest catalog + unlock rules. |
+| `scenario/quests/main-quest-01.md` | Example main quest. |
+| `scenario/world/index.md` | World frame (setting, tone, constraints). |
+| `config/capabilities.json` | Enabled capabilities and ranges. |
+| `player-data/session-init.json` | Launch configuration (includes `preferred_language`). |
 | `player-data/runtime/*.json` | `state.json`, `completed-quests.json`, `exploration-log.json`, `history.full.jsonl`. |
-| `player-data/saves/` | Примерен save index + save файл. |
-| `ui/*.json` | Scene/actions/hud/history/index sample файлове. |
-| `README.md` (този файл) | Инструкции за работа със скелета. |
+| `player-data/saves/` | Sample save index + save file. |
+| `ui/*.json` | Sample scene/actions/hud/history/index files. |
+| `README.md` (this file) | Instructions for working with the skeleton. |
 
 ## Quick Start
-1. **Копирай скелета**
+1. **Copy the skeleton**
    - CLI helper: `npm run blank:copy -- --dest games/my-new-game`
-   - Ръчно: `cp -R samples/blank-game games/my-new-game` (Bash) или `Copy-Item samples/blank-game games\my-new-game -Recurse` (PowerShell)
-2. **Актуализирай идентификатори и език**
-   - Редактирай `manifest/entry.json` (`id`, `game_id`, `title`).
-   - Задай език/дебъг чрез helper-а (по избор): `npm run lang:set -- --game my-new-game --language bg --debug true`.
-   - При нужда промени `player-data/session-init.json` ръчно (например `run_id` или други полета).
-3. **Попълни съдържание**
-   - Scenario: добави нови quests/areas, обнови `scenario/index.md`.
-   - Runtime state: настрой `player-data/runtime/state.json` според capabilities.
-   - UI файлове: опиши началната сцена в `ui/scene.json`, действия в `ui/actions.json`, HUD стойности и т.н.
-4. **Пусни валидатора**
+   - Manual: `cp -R samples/blank-game games/my-new-game` (Bash) or `Copy-Item samples/blank-game games\my-new-game -Recurse` (PowerShell)
+2. **Update identifiers and language**
+   - Edit `manifest/entry.json` (`id`, `game_id`, `title`).
+   - Set language/debug via the helper (optional): `npm run lang:set -- --game my-new-game --language bg --debug true`.
+   - If needed, adjust `player-data/session-init.json` manually (e.g. `run_id` or other fields).
+3. **Fill in content**
+   - Scenario: add new quests/areas, update `scenario/index.md`.
+   - Runtime state: configure `player-data/runtime/state.json` according to the capabilities.
+   - UI files: describe the starting scene in `ui/scene.json`, actions in `ui/actions.json`, HUD values, etc.
+4. **Run the validator**
    ```bash
    npm run validate -- --path games/my-new-game --run-id dev-local --summary
    ```
-   Очакван резултат: 0 errors / 0 warnings.
-5. **Започни runtime smoke** (по избор)
+   Expected result: 0 errors / 0 warnings.
+5. **Start runtime smoke** (optional)
    ```bash
    npm run runtime -- --path games/my-new-game --debug
    ```
 
-## Как да обновиш скелета
-- **Capabilities**: обнови `config/capabilities.json` и след това синхронизирай `player-data/runtime/state.json`.
-- **Quests**: използвай `npm run quest:add -- --path games/my-new-game ...` за автоматични scaffolds.
+## How to update the skeleton
+- **Capabilities**: update `config/capabilities.json`, then sync `player-data/runtime/state.json`.
+- **Quests**: use `npm run quest:add -- --path games/my-new-game ...` for automatic scaffolds.
 - **Areas**: `npm run area:add -- --path games/my-new-game ...`.
 - **Scenario index**: `npm run scenario:index -- --game my-new-game`.
 
-## Валидиране в CI / tests
-- Smoke тестът в `tools/tests/blank-game.test.ts` копира скелета в temp директория и пуска валидатора с `--summary`.
-- Поддържай скелета в синхрон с Product Brief: при промени в контрактите обновявай и този README.
+## Validation in CI / tests
+- The smoke test in `tools/tests/blank-game.test.ts` copies the skeleton into a temp directory and runs the validator with `--summary`.
+- Keep the skeleton in sync with the Product Brief: whenever contracts change, update this README as well.
