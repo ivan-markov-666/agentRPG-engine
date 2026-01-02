@@ -29,6 +29,7 @@
 ### Stories & sprint artifacts
 - **Individual story documents:** `docs/stories/XX-*.md` — acceptance criteria + Dev Agent Record (ST-001 … ST-035).
 - **Sprint artifacts / status:** `docs/sprint-artifacts/` (e.g. `sprint-status.yaml`) — progress on DoD tasks and release readiness.
+- **Ivan agent (recommended for game dev):** `ivan.md` — describes the Ivan persona, phased guardrails, and all validator/runtime/tooling expectations. Always consult this agent before editing `games/<gameId>/` so that new work stays within the engine contracts.
 
 ## Ivan agent — Game Builder persona
 - **Къде е дефиниран:** `ivan.md` описва Ivan — вътрешен agent, който води автора през всички фази (Setup → Post-Launch) и съдържа пълния списък от validator, runtime и tooling guardrails.
