@@ -15,6 +15,7 @@ Full breakdown of all planned epics, user stories, and technical tasks before st
 | EP-005 | Runtime Contracts & MVP Closure | File-first runtime contracts + schemas + minimal runtime loader + MVP gap closure. | ST-013, ST-014, ST-015, ST-016, ST-017, ST-018, ST-019, ST-020, ST-021 |
 | EP-006 | Content Tooling & Workflow Glue (MVP) | Official helper tools (README) for authoring/pipelines + repeatable local DoD workflow glue. | ST-022, ST-023, ST-024, ST-025, ST-026, ST-027, ST-028, ST-029, ST-030 |
 | EP-007 | Repo TS-only Policy & Tooling Migration | Remove JS source from git + `dist/` as build output (not committed) + migrate tools to TS. | ST-031 |
+| EP-008 | Map & Location Awareness | World + area maps with hotspots, runtime state tracking, validator/tooling support, and HUD mini-maps. | ST-032, ST-033, ST-034, ST-035 |
 
 ## Story Breakdown
 ### EP-001 — Validator Reliability & CLI DoD
@@ -61,6 +62,12 @@ Full breakdown of all planned epics, user stories, and technical tasks before st
 
 ### EP-007 — Repo TS-only Policy & Tooling Migration
 1. **ST-031 Repo TS-only Policy (no JS sources in git)** — `dist/` is build output (not committed) + tooling for inventory/enforcement of `.js` source.
+
+### EP-008 — Map & Location Awareness
+1. **ST-032 Map Assets & Metadata Contracts** — manifest pointers, maps directory structure, JSON schema for world/area maps, image conventions.
+2. **ST-033 Runtime State & Telemetry Updates** — extend `state.json` with `current_location`, `visited_locations`, guardrails + telemetry capture.
+3. **ST-034 Validator & Tooling for Maps** — validator rules for map references, CLI `map:add` scaffolder, ASCII/minimap generation.
+4. **ST-035 UI & World Atlas Integration** — HUD mini-map output, world atlas view wiring, documentation for GM/LLM usage.
 
 ## Status Legend
 - `ready-for-dev`: The story file is complete and can be started via `dev-story`.

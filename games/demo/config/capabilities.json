@@ -1,16 +1,16 @@
 {
-  "health": { "enabled": true, "desc": "HP", "min": 0, "max": 100 },
+  "health": { "enabled": true, "desc": "Health Points", "min": 0, "max": 100 },
   "energy": { "enabled": true, "desc": "Stamina", "min": 0, "max": 100 },
-  "mana": { "enabled": true, "desc": "Magic energy", "min": 0, "max": 100 },
-  "stamina": { "enabled": true, "desc": "Physical endurance", "min": 0, "max": 100 },
-  "hunger": { "enabled": true, "desc": "Hunger level", "min": 0, "max": 100 },
-  "thirst": { "enabled": true, "desc": "Thirst level", "min": 0, "max": 100 },
-  "reputation": { "enabled": true, "desc": "Faction reputation per group", "range": [-100, 100] },
-  "currency": { "enabled": true, "desc": "Gold", "min": 0 },
+  "mana": { "enabled": true, "desc": "Magic Energy", "min": 0, "max": 100 },
+  "stamina": { "enabled": true, "desc": "Physical Endurance", "min": 0, "max": 100 },
+  "hunger": { "enabled": true, "desc": "Hunger Level", "min": 0, "max": 100 },
+  "thirst": { "enabled": true, "desc": "Thirst Level", "min": 0, "max": 100 },
+  "reputation": { "enabled": true, "desc": "Faction Reputation per Group", "range": [-100, 100] },
+  "currency": { "enabled": true, "desc": "Gold Pouch", "min": 0 },
   "morale": { "enabled": true, "desc": "Party morale", "min": -100, "max": 100 },
-  "armor": { "enabled": true, "desc": "Physical damage reduction", "min": 0, "max": 50 },
-  "stealth": { "enabled": true, "desc": "Sneak ability", "min": 0, "max": 100 },
-  "perception": { "enabled": true, "desc": "Detect hidden", "min": 0, "max": 100 },
-  "crit_chance": { "enabled": true, "desc": "Chance to crit", "min": 0, "max": 1 },
-  "crit_multiplier": { "enabled": true, "desc": "Critical damage multiplier", "min": 1, "max": 3 }
+  "armor": { "enabled": true, "desc": "Physical Damage Reduction", "min": 0, "max": 50 },
+  "stealth": { "enabled": true, "desc": "Sneak Ability", "min": 0, "max": 100 },
+  "perception": { "enabled": true, "desc": "Detect Hidden", "min": 0, "max": 100 },
+  "crit_chance": { "enabled": true, "desc": "Chance to Crit", "min": 0, "max": 1 },
+  "crit_multiplier": { "enabled": true, "desc": "Critical Damage Multiplier", "min": 1, "max": 3 }
 }

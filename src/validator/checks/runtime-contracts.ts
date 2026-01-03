@@ -4,6 +4,7 @@ import path from 'path';
 import { add, loadData } from '../utils/io';
 import { validateFileWithSchema } from '../utils/schema';
 import type { BasicContext } from '../context';
+import type { Issue } from '../types';
 
 interface ManifestEntry {
   ui_index?: string;
@@ -11,9 +12,15 @@ interface ManifestEntry {
   full_history_file?: string;
   scenario_index?: string;
   capabilities_file?: string;
+  map_world_index?: string;
+  map_assets_dir?: string;
 }
 
 const repoSchemasDir = path.resolve(__dirname, '..', '..', '..', 'tools', 'validator', 'schemas');
+
+function normalizeRelPath(rel: string): string {
+  return rel.replace(/\\/g, '/');
+}
 
 function getStringField(obj: Record<string, unknown>, key: string): string | null {
   const value = obj[key];
@@ -57,6 +64,11 @@ export async function checkRuntimeContracts(ctx: BasicContext): Promise<void> {
   const fullHistoryFile = getStringField(manifest as Record<string, unknown>, 'full_history_file');
   if (fullHistoryFile) {
     pointers.push({ key: 'full_history_file', rel: fullHistoryFile, code: 'FULL-HISTORY' });
+  }
+
+  const mapWorldIndex = getStringField(manifest as Record<string, unknown>, 'map_world_index');
+  if (mapWorldIndex) {
+    pointers.push({ key: 'map_world_index', rel: mapWorldIndex, code: 'MAP-WORLD-INDEX' });
   }
 
   pointers.forEach(({ rel, code }) => {
@@ -139,6 +151,105 @@ export async function checkRuntimeContracts(ctx: BasicContext): Promise<void> {
         );
       }
     }
+  }
+
+  const mapAssetsDir = getStringField(manifest as Record<string, unknown>, 'map_assets_dir');
+  if (mapAssetsDir) {
+    const normalizedDir = normalizeRelPath(mapAssetsDir);
+    const absDir = path.join(base, normalizedDir);
+    if (!fs.existsSync(absDir)) {
+      add(
+        issues,
+        'ERROR',
+        'MAP-ASSETS-DIR-MISSING',
+        normalizedDir,
+        'Manifest map_assets_dir points to a missing directory',
+        'Create the directory or adjust map_assets_dir',
+      );
+    } else if (!fs.statSync(absDir).isDirectory()) {
+      add(
+        issues,
+        'ERROR',
+        'MAP-ASSETS-DIR-TYPE',
+        normalizedDir,
+        'map_assets_dir must reference a directory',
+        'Update the pointer to a directory path',
+      );
+    }
+  }
+
+  if (mapWorldIndex) {
+    const normalizedWorld = normalizeRelPath(mapWorldIndex);
+    const worldSchema = path.join(repoSchemasDir, 'maps.world.schema.json');
+    validateFileWithSchema(base, normalizedWorld, worldSchema, 'MAP-WORLD', issues, { level: 'ERROR' });
+
+    const worldData = loadData(path.join(base, normalizedWorld), issues);
+    if (worldData && typeof worldData === 'object') {
+      const worldImage = (worldData as { image?: { file?: unknown } }).image;
+      const worldImageFile =
+        worldImage && typeof worldImage === 'object' && typeof (worldImage as { file?: unknown }).file === 'string'
+          ? (worldImage as { file: string }).file
+          : null;
+      ensureImageExists(base, worldImageFile, 'MAP-WORLD-IMAGE', issues);
+
+      const regions = Array.isArray((worldData as { regions?: unknown }).regions)
+        ? ((worldData as { regions: unknown[] }).regions as Record<string, unknown>[])
+        : [];
+      regions.forEach((region, idx) => {
+        if (!region || typeof region !== 'object') return;
+        const mapFile =
+          typeof (region as { map_file?: unknown }).map_file === 'string'
+            ? ((region as { map_file: string }).map_file)
+            : null;
+        if (mapFile) {
+          validateAreaMap(base, mapFile, idx, issues);
+        }
+      });
+    }
+  }
+}
+
+function ensureImageExists(base: string, relPath: string | null, code: string, issues: Issue[]): void {
+  if (!relPath) return;
+  const normalized = normalizeRelPath(relPath);
+  const abs = path.join(base, normalized);
+  if (!fs.existsSync(abs)) {
+    add(issues, 'ERROR', code, normalized, 'Referenced map image file is missing', 'Create the image file or update metadata');
+  }
+}
+
+function validateAreaMap(base: string, relPath: string, regionIndex: number, issues: Issue[]): void {
+  const normalized = normalizeRelPath(relPath);
+  const abs = path.join(base, normalized);
+  if (!fs.existsSync(abs)) {
+    add(
+      issues,
+      'ERROR',
+      'MAP-AREA-MISSING',
+      normalized,
+      `World map region ${regionIndex + 1} references missing area map`,
+      'Create the area map file or update regions[].map_file',
+    );
+    return;
+  }
+
+  validateFileWithSchema(
+    base,
+    normalized,
+    path.join(repoSchemasDir, 'maps.area.schema.json'),
+    'MAP-AREA',
+    issues,
+    { level: 'ERROR' },
+  );
+
+  const areaData = loadData(abs, issues);
+  if (areaData && typeof areaData === 'object') {
+    const areaImage = (areaData as { image?: { file?: unknown } }).image;
+    const areaImageFile =
+      areaImage && typeof areaImage === 'object' && typeof (areaImage as { file?: unknown }).file === 'string'
+        ? (areaImage as { file: string }).file
+        : null;
+    ensureImageExists(base, areaImageFile, 'MAP-AREA-IMAGE', issues);
   }
 }
 

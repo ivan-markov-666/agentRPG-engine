@@ -7,6 +7,18 @@ import type { Issue } from '../types';
 import type { RuntimeState } from '../../types/runtime-state';
 import type { ExplorationLogEntry } from '../../types/exploration-log';
 
+type ExplorationSchemaType = 'area' | 'quest' | 'event';
+
+const SCHEMA_EXPLORATION_TYPES = new Set<ExplorationSchemaType>(['area', 'quest', 'event']);
+const LEGACY_TYPE_TO_SCHEMA_TYPE: Record<string, ExplorationSchemaType> = {
+  city: 'area',
+  landmark: 'area',
+  dungeon: 'area',
+  poi: 'area',
+  mcp: 'event',
+  'side-quest-hook': 'event',
+};
+
 interface CheckContext {
   base: string;
   issues: Issue[];
@@ -14,6 +26,12 @@ interface CheckContext {
 
 function exists(filePath: string): boolean {
   return fs.existsSync(filePath);
+}
+
+function hasTag(tags: unknown, expected: string): boolean {
+  if (!Array.isArray(tags)) return false;
+  const normalized = expected.trim().toLowerCase();
+  return tags.some((tag) => typeof tag === 'string' && tag.trim().toLowerCase() === normalized);
 }
 
 export async function checkRequiredFiles(ctx: CheckContext): Promise<void> {
@@ -126,6 +144,51 @@ export async function checkRequiredFiles(ctx: CheckContext): Promise<void> {
 
   const statePath = path.join(base, 'player-data/runtime/state.json');
 
+  const questIds = new Set<string>();
+  const questMarkdownIds = new Set<string>();
+  const questsDir = path.join(base, 'scenario/quests');
+  const availablePath = path.join(base, 'scenario/quests/available.json');
+  if (exists(availablePath)) {
+    const availableData = loadData(availablePath, issues);
+    if (Array.isArray(availableData)) {
+      availableData.forEach((entry, idx) => {
+        if (entry && typeof entry === 'object' && typeof (entry as { quest_id?: unknown }).quest_id === 'string') {
+          questIds.add((entry as { quest_id: string }).quest_id.trim());
+        } else {
+          add(
+            issues,
+            'WARN',
+            'QUEST-ENTRY',
+            'scenario/quests/available.json',
+            `Entry #${idx + 1} is missing quest_id`,
+            'Each quest requires quest_id/title',
+          );
+        }
+      });
+    } else if (availableData && typeof availableData === 'object') {
+      Object.entries(availableData).forEach(([questId, title]) => {
+        if (typeof questId === 'string' && questId.trim()) {
+          questIds.add(questId.trim());
+        }
+        if (typeof title !== 'string' || !title.trim()) {
+          add(
+            issues,
+            'WARN',
+            'QUEST-ENTRY',
+            'scenario/quests/available.json',
+            `Quest '${questId}' is missing a valid title`,
+            'Ensure quest title is a non-empty string',
+          );
+        }
+      });
+    }
+  }
+  if (exists(questsDir)) {
+    fs.readdirSync(questsDir)
+      .filter((file) => file.endsWith('.md'))
+      .forEach((file) => questMarkdownIds.add(path.basename(file, '.md')));
+  }
+
   if (exists(statePath)) {
     const state = loadData(statePath, issues) as RuntimeState | null;
     const explorationEnabled =
@@ -171,61 +234,151 @@ export async function checkRequiredFiles(ctx: CheckContext): Promise<void> {
 
         explData.forEach((entry, idx) => {
           if (!entry || typeof entry !== 'object') return;
-          if (entry.id) {
-            if (seenIds.has(entry.id)) {
+          const castEntry = entry as ExplorationLogEntry & { area_id?: string; quest_id?: string; type?: string; tags?: string[] };
+          const normalizedId = typeof castEntry.id === 'string' ? castEntry.id : undefined;
+          if (normalizedId) {
+            if (seenIds.has(normalizedId)) {
               add(
                 issues,
                 'WARN',
                 'EXPLORATION-DUPLICATE-ID',
                 'player-data/runtime/exploration-log.json',
-                `Duplicate exploration id '${entry.id}' (index ${idx})`,
+                `Duplicate exploration id '${normalizedId}' (index ${idx})`,
                 'Use unique ids for each entry',
               );
             } else {
-              seenIds.add(entry.id);
-              entryIdSet.add(entry.id);
+              seenIds.add(normalizedId);
+              entryIdSet.add(normalizedId);
             }
           }
-          if (entry.title) {
-            if (seenTitles.has(entry.title)) {
+          if (castEntry.title) {
+            if (seenTitles.has(castEntry.title)) {
               add(
                 issues,
                 'WARN',
                 'EXPLORATION-DUPLICATE-TITLE',
                 'player-data/runtime/exploration-log.json',
-                `Duplicate exploration title '${entry.title}' (index ${idx})`,
+                `Duplicate exploration title '${castEntry.title}' (index ${idx})`,
                 'Use unique titles for each entry',
               );
             } else {
-              seenTitles.add(entry.title);
+              seenTitles.add(castEntry.title);
             }
           }
-          if (entry.area_id) {
-            const areaFile = path.join(base, 'scenario/areas', `${entry.area_id}.md`);
+          const rawType = typeof castEntry.type === 'string' ? castEntry.type.trim() : '';
+          let schemaType: ExplorationSchemaType | null = null;
+          if (SCHEMA_EXPLORATION_TYPES.has(rawType as ExplorationSchemaType)) {
+            schemaType = rawType as ExplorationSchemaType;
+          } else if (rawType && LEGACY_TYPE_TO_SCHEMA_TYPE[rawType]) {
+            schemaType = LEGACY_TYPE_TO_SCHEMA_TYPE[rawType];
+            add(
+              issues,
+              'WARN',
+              'EXPLORATION-TYPE-LEGACY',
+              'player-data/runtime/exploration-log.json',
+              `Entry '${castEntry.title || normalizedId || `index ${idx}`}' uses legacy type '${rawType}', migrate to '${schemaType}'`,
+              'Update exploration entry type to area|quest|event',
+            );
+          } else {
+            add(
+              issues,
+              'ERROR',
+              'EXPLORATION-TYPE-UNKNOWN',
+              'player-data/runtime/exploration-log.json',
+              `Entry '${castEntry.title || normalizedId || `index ${idx}`}' has unsupported type '${rawType || '<empty>'}'`,
+              'Use type area|quest|event',
+            );
+            return;
+          }
+          const areaId = typeof castEntry.area_id === 'string' ? castEntry.area_id.trim() : '';
+          if (schemaType === 'area' && !areaId) {
+            add(
+              issues,
+              'ERROR',
+              'EXPLORATION-AREA-ID',
+              'player-data/runtime/exploration-log.json',
+              `Entry '${castEntry.title || normalizedId || `index ${idx}`}' missing area_id for area type`,
+              'Populate area_id for area entries',
+            );
+          }
+          if (areaId) {
+            const areaFile = path.join(base, 'scenario/areas', `${areaId}.md`);
             if (!exists(areaFile)) {
               add(
                 issues,
                 'WARN',
                 'EXPLORATION-AREA-MISSING',
                 'player-data/runtime/exploration-log.json',
-                `Entry '${entry.title || entry.id}' references missing area '${entry.area_id}'`,
+                `Entry '${castEntry.title || castEntry.id}' references missing area '${areaId}'`,
                 'Create scenario/areas file or update area_id',
+              );
+            } else if (!hasTag(castEntry.tags, `area:${areaId}`)) {
+              add(
+                issues,
+                'WARN',
+                'EXPLORATION-TAG-AREA',
+                'player-data/runtime/exploration-log.json',
+                `Entry '${castEntry.title || normalizedId || `index ${idx}`}' should include tag 'area:${areaId}'`,
+                'Tag entries with area:<id> to satisfy guardrails',
               );
             }
           }
-          const description = typeof entry.description === 'string' ? entry.description.trim() : '';
+          const questId = typeof castEntry.quest_id === 'string' ? castEntry.quest_id.trim() : '';
+          if (schemaType === 'quest' && !questId) {
+            add(
+              issues,
+              'ERROR',
+              'EXPLORATION-QUEST-ID',
+              'player-data/runtime/exploration-log.json',
+              `Entry '${castEntry.title || normalizedId || `index ${idx}`}' missing quest_id for quest type`,
+              'Populate quest_id referencing scenario/quests',
+            );
+          }
+          if (questId) {
+            if (!questIds.has(questId)) {
+              add(
+                issues,
+                'WARN',
+                'EXPLORATION-QUEST-UNKNOWN',
+                'player-data/runtime/exploration-log.json',
+                `Entry '${castEntry.title || normalizedId || `index ${idx}`}' references unknown quest '${questId}'`,
+                'Add quest to scenario/quests/available.json',
+              );
+            }
+            if (!questMarkdownIds.has(questId)) {
+              add(
+                issues,
+                'WARN',
+                'EXPLORATION-QUEST-FILE',
+                `scenario/quests/${questId}.md`,
+                `Quest file missing for quest '${questId}' referenced by exploration log`,
+                'Create quest markdown before tagging exploration entry',
+              );
+            }
+            if (!hasTag(castEntry.tags, `quest:${questId}`)) {
+              add(
+                issues,
+                'WARN',
+                'EXPLORATION-TAG-QUEST',
+                'player-data/runtime/exploration-log.json',
+                `Entry '${castEntry.title || normalizedId || `index ${idx}`}' should include tag 'quest:${questId}'`,
+                'Tag entries with quest:<id> for linked quests',
+              );
+            }
+          }
+          const description = typeof castEntry.description === 'string' ? castEntry.description.trim() : '';
           if (!description || description.replace(/\s+/g, ' ').length < 60) {
             add(
               issues,
               'WARN',
               'EXPLORATION-DESCRIPTION-SHORT',
               'player-data/runtime/exploration-log.json',
-              `Description for '${entry.title || entry.id || `index ${idx}`}' is too short`,
+              `Description for '${castEntry.title || normalizedId || `index ${idx}`}' is too short`,
               'Provide ≥60 characters detailing hooks/risks',
             );
           }
-          const tagsCount = Array.isArray(entry.tags)
-            ? entry.tags.filter((tag) => typeof tag === 'string' && tag.trim()).length
+          const tagsCount = Array.isArray(castEntry.tags)
+            ? castEntry.tags.filter((tag) => typeof tag === 'string' && tag.trim()).length
             : 0;
           if (tagsCount < 1) {
             add(
@@ -233,7 +386,7 @@ export async function checkRequiredFiles(ctx: CheckContext): Promise<void> {
               'WARN',
               'EXPLORATION-TAGS-MIN',
               'player-data/runtime/exploration-log.json',
-              `Entry '${entry.title || entry.id || `index ${idx}`}' has no tags`,
+              `Entry '${castEntry.title || normalizedId || `index ${idx}`}' has no tags`,
               'Add at least one descriptive tag (theme, danger, faction)',
             );
           }

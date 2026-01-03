@@ -1,5 +1,5 @@
 {
-  "health": { "enabled": true, "desc": "HP", "min": 0, "max": 100 },
+  "health": { "enabled": true, "desc": "Health Points", "min": 0, "max": 100 },
   "energy": { "enabled": true, "desc": "Stamina", "min": 0, "max": 100 },
   "mana": { "enabled": true, "desc": "Magic energy", "min": 0, "max": 100 },
   "stamina": { "enabled": true, "desc": "Physical endurance", "min": 0, "max": 100 },

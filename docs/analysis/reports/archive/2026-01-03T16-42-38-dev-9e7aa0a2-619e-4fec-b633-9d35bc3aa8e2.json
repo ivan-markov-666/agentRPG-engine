@@ -1,0 +1,290 @@
+[
+  {
+    "run_id": "dev-20251225-run5",
+    "timestamp": "2025-12-25T19:27:58.197Z",
+    "duration_ms": 127,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "run_id": "dev-20251225-run6",
+    "timestamp": "2025-12-25T19:28:13.058Z",
+    "duration_ms": 141,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "run_id": "dev-local",
+    "timestamp": "2025-12-25T19:44:23.259Z",
+    "duration_ms": 140,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "run_id": "dev-20251225-auto",
+    "timestamp": "2025-12-25T19:48:21.440Z",
+    "duration_ms": 116,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "run_id": "dev-20251225-auto",
+    "timestamp": "2025-12-25T19:48:44.730Z",
+    "duration_ms": 119,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "run_id": "dev-20251225-quests",
+    "timestamp": "2025-12-25T19:53:33.723Z",
+    "duration_ms": 111,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "run_id": "dev-20251228-01",
+    "timestamp": "2025-12-28T14:27:30.534Z",
+    "duration_ms": 254,
+    "errors": 0,
+    "warnings": 11,
+    "issues": [
+      {
+        "level": "WARN",
+        "code": "QUEST-REWARDS-XP",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "XP reward missing or malformed",
+        "fix": "Add \"- Xp: ...\" line with details/numbers"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-REWARDS-GOLD",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "GOLD reward missing or malformed",
+        "fix": "Add \"- Gold: ...\" line with details/numbers"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-REWARDS-LOOT",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "LOOT reward missing or malformed",
+        "fix": "Add \"- Loot: ...\" line with details/numbers"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-REWARDS-SOCIAL",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "SOCIAL reward missing or malformed",
+        "fix": "Add \"- Social: ...\" line with details/numbers"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-AREA-BACKLINK",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "Area [[default-area]] does not reference this quest",
+        "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-AREA-BACKLINK",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "Area [[default-area]] does not reference this quest",
+        "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-AREA-BACKLINK",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "Area [[training-grounds]] does not reference this quest",
+        "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-AREA-BACKLINK",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "Area [[default-area]] does not reference this quest",
+        "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-AREA-BACKLINK",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "Area [[training-grounds]] does not reference this quest",
+        "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+      },
+      {
+        "level": "WARN",
+        "code": "EXPLORATION-QUEST-MISMATCH",
+        "file": "player-data/runtime/exploration-log.json",
+        "message": "Quest 'main-quest-01' links [[default-area]] but exploration log lacks entry tagged quest:main-quest-01",
+        "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+      },
+      {
+        "level": "WARN",
+        "code": "EXPLORATION-QUEST-MISMATCH",
+        "file": "player-data/runtime/exploration-log.json",
+        "message": "Quest 'main-quest-01' links [[training-grounds]] but exploration log lacks entry tagged quest:main-quest-01",
+        "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+      }
+    ]
+  },
+  {
+    "run_id": "dev-20251228-02",
+    "timestamp": "2025-12-28T14:33:38.212Z",
+    "duration_ms": 150,
+    "errors": 0,
+    "warnings": 11,
+    "issues": [
+      {
+        "level": "WARN",
+        "code": "QUEST-REWARDS-XP",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "XP reward missing or malformed",
+        "fix": "Add \"- Xp: ...\" line with details/numbers"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-REWARDS-GOLD",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "GOLD reward missing or malformed",
+        "fix": "Add \"- Gold: ...\" line with details/numbers"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-REWARDS-LOOT",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "LOOT reward missing or malformed",
+        "fix": "Add \"- Loot: ...\" line with details/numbers"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-REWARDS-SOCIAL",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "SOCIAL reward missing or malformed",
+        "fix": "Add \"- Social: ...\" line with details/numbers"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-AREA-BACKLINK",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "Area [[default-area]] does not reference this quest",
+        "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-AREA-BACKLINK",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "Area [[default-area]] does not reference this quest",
+        "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-AREA-BACKLINK",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "Area [[training-grounds]] does not reference this quest",
+        "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-AREA-BACKLINK",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "Area [[default-area]] does not reference this quest",
+        "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+      },
+      {
+        "level": "WARN",
+        "code": "QUEST-AREA-BACKLINK",
+        "file": "scenario/quests/main-quest-01.md",
+        "message": "Area [[training-grounds]] does not reference this quest",
+        "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+      },
+      {
+        "level": "WARN",
+        "code": "EXPLORATION-QUEST-MISMATCH",
+        "file": "player-data/runtime/exploration-log.json",
+        "message": "Quest 'main-quest-01' links [[default-area]] but exploration log lacks entry tagged quest:main-quest-01",
+        "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+      },
+      {
+        "level": "WARN",
+        "code": "EXPLORATION-QUEST-MISMATCH",
+        "file": "player-data/runtime/exploration-log.json",
+        "message": "Quest 'main-quest-01' links [[training-grounds]] but exploration log lacks entry tagged quest:main-quest-01",
+        "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+      }
+    ]
+  },
+  {
+    "run_id": "dev-20251228-03",
+    "timestamp": "2025-12-28T14:36:37.918Z",
+    "duration_ms": 166,
+    "errors": 0,
+    "warnings": 1,
+    "issues": [
+      {
+        "level": "WARN",
+        "code": "EXPLORATION-PREVIEW-MISMATCH",
+        "file": "player-data/runtime/state.json",
+        "message": "exploration_log_preview references missing id 'testlocation'",
+        "fix": "Update preview list to include only existing exploration ids"
+      }
+    ]
+  },
+  {
+    "run_id": "dev-20251228-04",
+    "timestamp": "2025-12-28T14:37:00.424Z",
+    "duration_ms": 176,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "run_id": "dev-20251228-05",
+    "timestamp": "2025-12-28T14:42:01.782Z",
+    "duration_ms": 182,
+    "errors": 0,
+    "warnings": 0,
+    "issues": []
+  },
+  {
+    "runId": "dev-fcd6b15d-0ca0-4ac5-aec2-f6d07c5afed1",
+    "run_id": "dev-fcd6b15d-0ca0-4ac5-aec2-f6d07c5afed1",
+    "timestamp": "2026-01-03T14:40:58.210Z",
+    "duration_ms": 110,
+    "durationMs": 110,
+    "errors": 0,
+    "warnings": 0,
+    "issues": [],
+    "metrics": {
+      "firstActiveQuestMs": 90000,
+      "refusalAttempts": 0,
+      "refusalSuccesses": 0,
+      "validationAttempts": 1,
+      "completedQuests": 1,
+      "debugEnabled": false
+    }
+  },
+  {
+    "runId": "dev-9e7aa0a2-619e-4fec-b633-9d35bc3aa8e2",
+    "run_id": "dev-9e7aa0a2-619e-4fec-b633-9d35bc3aa8e2",
+    "timestamp": "2026-01-03T14:42:38.347Z",
+    "duration_ms": 109,
+    "durationMs": 109,
+    "errors": 0,
+    "warnings": 0,
+    "issues": [],
+    "metrics": {
+      "firstActiveQuestMs": 90000,
+      "refusalAttempts": 0,
+      "refusalSuccesses": 0,
+      "validationAttempts": 1,
+      "completedQuests": 1,
+      "debugEnabled": false
+    }
+  }
+]

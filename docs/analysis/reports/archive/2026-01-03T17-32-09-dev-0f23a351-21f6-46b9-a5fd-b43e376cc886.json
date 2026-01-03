@@ -1,0 +1,38 @@
+[
+  {
+    "runId": "dev-f35f3c9a-bcef-48b9-b95f-471532e0691c",
+    "run_id": "dev-f35f3c9a-bcef-48b9-b95f-471532e0691c",
+    "timestamp": "2026-01-03T15:20:08.342Z",
+    "duration_ms": 106,
+    "durationMs": 106,
+    "errors": 0,
+    "warnings": 0,
+    "issues": [],
+    "metrics": {
+      "firstActiveQuestMs": 120000,
+      "refusalAttempts": 0,
+      "refusalSuccesses": 0,
+      "validationAttempts": 1,
+      "completedQuests": 0,
+      "debugEnabled": false
+    }
+  },
+  {
+    "runId": "dev-0f23a351-21f6-46b9-a5fd-b43e376cc886",
+    "run_id": "dev-0f23a351-21f6-46b9-a5fd-b43e376cc886",
+    "timestamp": "2026-01-03T15:32:09.091Z",
+    "duration_ms": 119,
+    "durationMs": 119,
+    "errors": 0,
+    "warnings": 0,
+    "issues": [],
+    "metrics": {
+      "firstActiveQuestMs": 120000,
+      "refusalAttempts": 0,
+      "refusalSuccesses": 0,
+      "validationAttempts": 1,
+      "completedQuests": 0,
+      "debugEnabled": false
+    }
+  }
+]

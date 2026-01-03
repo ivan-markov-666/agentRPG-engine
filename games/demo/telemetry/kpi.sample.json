@@ -1,0 +1,8 @@
+{
+  "firstActiveQuestMs": 120000,
+  "refusalAttempts": 0,
+  "refusalSuccesses": 0,
+  "validationAttempts": 1,
+  "completedQuests": 0,
+  "debugEnabled": false
+}

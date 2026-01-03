@@ -10,5 +10,15 @@
   "ui_index": "ui/index.json",
   "saves_index": "player-data/saves/index.json",
   "full_history_file": "player-data/runtime/history.full.jsonl",
-  "world_index": "scenario/world/index.md"
+  "world_index": "scenario/world/index.md",
+  "map_world_index": "maps/world/index.json",
+  "map_assets_dir": "maps",
+  "map_cli": {
+    "version": "0.1.0",
+    "entrypoint": "npm run map:add",
+    "commands": {
+      "add": "npm run map:add -- --game blank-game",
+      "minimap": "npm run map:minimap -- --game blank-game --area default-area"
+    }
+  }
 }

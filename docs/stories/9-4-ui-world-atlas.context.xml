@@ -1,0 +1,80 @@
+<storyContext>
+  <meta>
+    <storyKey>9-4-ui-world-atlas</storyKey>
+    <epicId>EP-008</epicId>
+    <storyId>ST-035</storyId>
+    <title>UI &amp; World Atlas Integration</title>
+    <status>drafted</status>
+    <contextVersion>1.0</contextVersion>
+  </meta>
+
+  <story>
+    <asA>UI/experience designer &amp; runtime integrator</asA>
+    <iWant>World Atlas изглед + HUD mini-map, които използват map JSON/PNG данните</iWant>
+    <soThat>GM/LLM и играчът винаги да виждат къде се намират (глобално и локално) с визуални и текстови fallback-и</soThat>
+  </story>
+
+  <acceptanceCriteria>
+    <criteria id="AC1">`ui/index.json` и свързаните UI файлове дефинират нови ресурси: `ui/map.world.json`, `ui/map.area.json`, HUD mini-map секция.</criteria>
+    <criteria id="AC2">Runtime CLI (`npm run runtime -- --debug`) може да показва World Atlas / mini-map ASCII fallback при команда “show map”.</criteria>
+    <criteria id="AC3">HUD mini-map използва данните от area map JSON (ascii_preview + легенда) и маркира `current_location`.</criteria>
+    <criteria id="AC4">Документацията (blank-game README, how-to-create, Product Brief annex) описва UX flow и GM указания.</criteria>
+    <criteria id="AC5">Blank-game примерите (ui/*) съдържат минимални map файове + HUD настройки.</criteria>
+  </acceptanceCriteria>
+
+  <tasks>
+    <task id="T1">Добави UI schema файлове `ui/map.world.schema.json`, `ui/map.area.schema.json`, разшири `ui/hud.schema.json`.</task>
+    <task id="T2">Имплементирай runtime/UI renderer (TS) за новите JSON-и, включително ASCII fallback в CLI.</task>
+    <task id="T3">Добави HUD mini-map секция в `samples/blank-game/ui/hud.json` + world/area map JSON примери.</task>
+    <task id="T4">Обнови документацията (blank-game README, how-to-create, Product Brief) с инструкции за World Atlas/mini-map.</task>
+    <task id="T5">Покрий с тестове (snapshot/render tests) – например runtime CLI output за “show map” и schema validation за новите UI файлове.</task>
+  </tasks>
+
+  <artifacts>
+    <docs>
+      <doc path="docs/analysis/product-brief-A RPG game engine for LLM models.-2025-12-19.md" title="Product Brief v1" section="Location &amp; map system update" snippet="Описва World Atlas view, mini-map/HUD и как runtime/UI трябва да експонират глобалната карта." />
+      <doc path="docs/analysis/how-to-create-a-new-game.md" title="How to Create a New Game" section="UI contracts / runtime smoke" snippet="Разделите за UI договорите трябва да включат новите map JSON ресурси и инструкции за GM interaction." />
+      <doc path="docs/analysis/blank-game-README.md" title="Blank Game README" section="UI files walkthrough" snippet="Служи за пример; тук трябва да включим map world/area JSON файлове и HUD mini-map настройките." />
+    </docs>
+    <code>
+      <item path="ui/map.world.schema.json" kind="schema" symbol="World map schema" reason="Нов UI contract файл, който описва глобалната карта." />
+      <item path="ui/map.area.schema.json" kind="schema" symbol="Area map schema" reason="Определя структурата за локалния изглед." />
+      <item path="ui/hud.schema.json" kind="schema" symbol="HUD schema" reason="Трябва да включи mini_map секция, която се подава към UI." />
+      <item path="src/runtime/ui" kind="runtime" symbol="UI renderer" reason="Компонентите/функциите, които зареждат UI JSON-ите и предоставят ASCII output." />
+      <item path="samples/blank-game/ui" kind="data" symbol="Sample UI" reason="Трябва да съдържа World Atlas и mini-map примери за разработчиците." />
+    </code>
+  </artifacts>
+
+  <interfaces>
+    <interface name="ui/map.world.json" kind="JSON schema" signature="{ image: string, regions: [{ id, label, bounding_box, area_id }], legend: {...} }" path="ui/map.world.schema.json" />
+    <interface name="HUD mini_map" kind="JSON schema" signature="{ ascii: string[], legend: Record&lt;string, string&gt;, player_icon: string }" path="ui/hud.schema.json" />
+    <interface name="Runtime show map command" kind="CLI" signature="npm run runtime -- --path games/&lt;id&gt; --debug (input: 'show map')" path="src/runtime/cli/runtime.ts" />
+  </interfaces>
+
+  <constraints>
+    <constraint>UI файловете остават read-only за играча; GM/LLM обновява ги чрез engine → трябва да има schema_version bump при нужда.</constraint>
+    <constraint>ASCII fallback за World Atlas трябва да е ≤64 символа ширина; mini-map да използва символи, съвместими с CLI output.</constraint>
+    <constraint>World Atlas показва marker за `state.current_area_id`; ако липсва карта → UI показва текстово предупреждение.</constraint>
+  </constraints>
+
+  <dependencies>
+    <dependency ecosystem="node" path="package.json">
+      <package name="typescript" version="5.x" />
+      <package name="@types/node" version="20.x" />
+    </dependency>
+  </dependencies>
+
+  <tests>
+    <standards>UI JSON схемите се валидират чрез AJV тестове; runtime CLI има snapshot тестове за “show map” output (World Atlas + mini-map).</standards>
+    <locations>
+      <location>src/runtime/ui/__tests__</location>
+      <location>tools/validator/tests/ui/*.test.ts</location>
+    </locations>
+    <ideas>
+      <idea ac="AC1">Schema тест: loader отказва ако `ui/map.world.json` липсва или нарушава schema_version.</idea>
+      <idea ac="AC2">Runtime CLI тест за команда “show map”, който сравнява ASCII output и marker позиция.</idea>
+      <idea ac="AC3">HUD mini-map snapshot тест с различни legend символи.</idea>
+      <idea ac="AC5">Blank-game smoke: UI файловете с mini-map са валидни и runtime ги визуализира.</idea>
+    </ideas>
+  </tests>
+</storyContext>

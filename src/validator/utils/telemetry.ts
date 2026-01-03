@@ -63,12 +63,15 @@ export function writeLog(options: WriteLogOptions): void {
     existing = readExistingLog(outPath);
   }
 
+  const entries: TelemetryEntry[] = [];
   if (Array.isArray(existing)) {
-    existing.push(payload);
-    fs.writeFileSync(outPath, JSON.stringify(existing, null, 2), 'utf8');
-  } else {
-    fs.writeFileSync(outPath, JSON.stringify(payload, null, 2), 'utf8');
+    entries.push(...(existing as TelemetryEntry[]));
+  } else if (existing && typeof existing === 'object') {
+    entries.push(existing as TelemetryEntry);
   }
+  entries.push(payload);
+
+  fs.writeFileSync(outPath, JSON.stringify(entries, null, 2), 'utf8');
 }
 
 export default writeLog;

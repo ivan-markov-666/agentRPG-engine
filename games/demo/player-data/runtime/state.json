@@ -26,6 +26,9 @@
     "armor": 5,
     "stealth": 8,
     "perception": 12
+    ,
+    "crit_chance": 0.15,
+    "crit_multiplier": 1.8
   },
   "exploration_enabled": true,
   "exploration_log_preview": [

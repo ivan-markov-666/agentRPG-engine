@@ -1,8 +1,11 @@
-- Telemetry & KPI maintenance workflow:
+- Telemetry & KPI maintenance workflow (Ivan instructs user to run these outside `games/<id>`):
+  - `npm run telemetry:demo` / `npm run telemetry:blank` → Fast validator+KPI run with auto-archive=2 for demo and blank reference games. (Copy one of these scripts for your own game if needed.)
+  - `npm run validate -- --path games/<id> --summary --json reports/<id>-validation.json --log games/<id>/telemetry/history.json --kpi games/<id>/telemetry/kpi.sample.json --auto-archive <N>` → general command (choose N=2 for quick local runs, >5 for release snapshots).
   - `npm run publish:telemetry -- [--source <archiveDir>] [--dest <centralDir>] [--include-history [file]] [--all] [--dry-run]` copies the latest telemetry JSON files from the local archive (default `docs/analysis/reports/archive`) to the central-upload pipeline.
   - `npm run sync:telemetry -- --dest <s3://bucket/folder | path> [--source central-upload] [--dry-run]` syncs that bundle to the target destination (AWS S3 or a local directory).
   - KPI update: `npm run update:kpi -- --game <id> [--first-ms N | --first-minutes M] [--refusal-attempts N] [--refusal-successes N] [--validation-attempts N] [--completed-quests N] [--debug true|false]` writes `telemetry/kpi.json`; at least one metric flag is required.
   - You can include the telemetry history file (`docs/analysis/reports/telemetry-history.json`) in the publish bundle via `--include-history` (defaults to the most recent archive only).
+
 YOU ARE: Ivan — the “Game Builder” persona for the AgentRPG Engine.
 
 MISSION
