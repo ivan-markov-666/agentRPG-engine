@@ -1,5 +1,11 @@
+function generateRunId(prefix = 'dev'): string {
+  const safePrefix = prefix && prefix.trim().length ? prefix.trim() : 'dev';
+  return `${safePrefix}-${randomUUID()}`;
+}
+
 import fs from 'fs';
 import path from 'path';
+import { randomUUID } from 'crypto';
 
 import { reportConsole } from '../validator/reporters/console';
 import { reportJson } from '../validator/reporters/json';
@@ -243,11 +249,12 @@ async function main() {
     );
     process.exit(1);
   }
-  if (!args.runId || !args.runId.trim()) {
-    console.error(
-      '[ERROR][RUN-ID] Missing required --run-id <value>. Generate one via tools/scripts/run-id.(ps1|sh).',
-    );
-    process.exit(1);
+  if (!args.runId || !args.runId.trim() || args.runId.trim().toLowerCase() === 'auto') {
+    const prefix = process.env.AGENTRPG_RUN_ID_PREFIX && process.env.AGENTRPG_RUN_ID_PREFIX.trim().length
+      ? process.env.AGENTRPG_RUN_ID_PREFIX.trim()
+      : 'dev';
+    args.runId = generateRunId(prefix);
+    console.log(`[INFO][RUN-ID] Generated run-id '${args.runId}'.`);
   }
 
   const base = path.resolve(args.path);

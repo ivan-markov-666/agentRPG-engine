@@ -207,6 +207,14 @@ Engine-level capabilities (the game can disable some per game):
 - **Exploration mode**: after the main quest ends, the GM continues to offer exploration within the setting (keeps the player in-world; does not allow an “Apple Store” in medieval times).
 - **Validation on start**: checks required files (entry, scenario/index, available, unlock-triggers, completed-quests placeholder). If required files/capabilities are missing → error.
 - **World frame for exploration**: `scenario/world/index.md` (or `.../setting.md`) describes era/setting, allowed technologies/magic, taboos/boundaries, and tone. During exploration the GM uses this file + `current_area_id`, rejects out-of-bounds requests, and redirects to a nearby allowed option.
+- **Location & map system (Jan 2026 update)**:
+  - `manifest/entry.json` gains optional pointers: `map_world_index` (global atlas JSON), `map_assets_dir` (folder with PNG/JPG/SVG maps), and `map_cli` metadata (version + tooling entrypoints + command hints).
+  - `player-data/runtime/state.json` stores `current_location` alongside `current_area_id`, including `{ "area_id": "town-square", "hotspot_id": "market", "coordinates": {"x": 128, "y": 64} }` plus `visited_locations` history for telemetry.
+  - Every area with maps provides `maps/areas/<areaId>.json` describing hotspots/bounding boxes, zoom hints, ASCII fallback slices, and a pointer to the canonical image (e.g. `maps/areas/<areaId>.png`) with pixel dimensions.
+  - A global atlas lives under `maps/world/index.json` + `maps/world/world.png`, listing regions and linking to area map files so the GM/LLM can show “where in the world” the player is. The runtime/UI exposes a dedicated “World Atlas” view.
+  - CLI tooling (`npm run map:add ...`) scaffolds JSON metadata + ASCII preview and enforces image path conventions; validator rules ensure that references (state.current_location.hotspot_id, manifest map pointers, assets) stay in sync.
+  - Movement guardrails are “soft”: validator warns if `current_location` is outside a declared hotspot polygon/rectangle, but runtime/GM may still describe off-map improvisation (GM redirects the player back into known regions).
+  - Mini-map / HUD: JSON metadata contains an `ascii_preview` grid + `legend` so CLI/runtime can render a small textual minimap even when the PNG is not accessible; UI clients can overlay markers on the real image by using the hotspot coordinates.
 - **Validation (structure + fallbacks):**
   - Checks presence/format: `manifest/entry.json`, `scenario/index.md`, `scenario/quests/available.json`, `scenario/quests/unlock-triggers.json`, `player-data/runtime/state.json` (or placeholder), `player-data/runtime/completed-quests.json` (or empty array), (optional) `scenario/world/index.md`.
   - `available.json`: map/array `quest_id -> title` (canonical for ID ↔ title).

@@ -1,0 +1,80 @@
+<storyContext>
+  <meta>
+    <storyKey>9-1-map-assets-metadata</storyKey>
+    <epicId>EP-008</epicId>
+    <storyId>ST-032</storyId>
+    <title>Map Assets &amp; Metadata Contracts</title>
+    <status>drafted</status>
+    <contextVersion>1.0</contextVersion>
+  </meta>
+
+  <story>
+    <asA>Game Designer / platform content owner</asA>
+    <iWant>стандартизирани указатели в manifest и map директории (world + area) с ясни JSON схеми, ASCII fallback-и и tooling hookup</iWant>
+    <soThat>GM/LLM и validator-ът да знаят къде се намира играчът, да избягваме счупени карти и да позволим бъдещи UI интеграции без допълнително reverse engineering</soThat>
+  </story>
+
+  <acceptanceCriteria>
+    <criteria id="AC1">Manifest поддържа `map_world_index`, `map_assets_dir`, `map_cli` с описани requirement-и и schema промени.</criteria>
+    <criteria id="AC2">`maps/world` и `maps/areas/&lt;areaId&gt;` съдържат JSON + image файлове с hotspots, bounding boxes и ASCII preview.</criteria>
+    <criteria id="AC3">Добавени са JSON Schema файлове за world/area maps и са закачени във валидатора.</criteria>
+    <criteria id="AC4">Документацията (Product Brief, README, blank-game walkthrough) описва структурата и naming conventions.</criteria>
+    <criteria id="AC5">Blank-game примерите демонстрират новите карти.</criteria>
+  </acceptanceCriteria>
+
+  <tasks>
+    <task id="T1">Extend `manifest.entry.schema.json` + runtime docs с новите pointer полета и usage guidance.</task>
+    <task id="T2">Define JSON Schema файлове `maps.world.schema.json` и `maps.area.schema.json`, плюс validator wiring.</task>
+    <task id="T3">Създай scaffold структура в `samples/blank-game/maps/` (world + поне една area) с PNG placeholder-и и ASCII preview.</task>
+    <task id="T4">Документирай flow-а в Product Brief + `docs/analysis/how-to-create-a-new-game.md` + `docs/analysis/blank-game-README.md`.</task>
+    <task id="T5">Add migration guidance / developer notes за съществуващи игри в README или отделен doc section.</task>
+  </tasks>
+
+  <artifacts>
+    <docs>
+      <doc path="docs/analysis/product-brief-A RPG game engine for LLM models.-2025-12-19.md" title="Product Brief v1" section="Location &amp; map system update" snippet="Jan 2026 addition описва manifest map pointers, state.current_location, maps/world + maps/areas JSON-и, soft guardrails и ASCII mini-map fallback-и (линии ~204-217)." />
+      <doc path="docs/analysis/how-to-create-a-new-game.md" title="How to Create a New Game" section="Minimal structure / scenario &amp; UI steps" snippet="Раздели 2–4 описват минималната файловa структура и къде се съхраняват scenario/ui assets — трябва да се допълнят с maps/ указания за разработчиците." />
+      <doc path="docs/analysis/blank-game-README.md" title="Blank Game README" section="File-by-file walkthrough" snippet="Документът служи като пример за всяка директория в skeleton-а; тук трябва да добавим инструкции за новата maps/ структура и примери за hotspots." />
+      <doc path="docs/analysis/epics-and-stories.md" title="Epics &amp; Stories Roadmap" section="EP-008 Map &amp; Location Awareness" snippet="Епикът дефинира четирите истории (ST-032..ST-035) и целта за карти, runtime state и UI интеграции." />
+    </docs>
+
+    <code>
+      <item path="tools/validator/schemas/manifest.entry.schema.json" kind="schema" symbol="Manifest Entry Schema" lines="1-70" reason="Трябва да се разшири с map pointers и документация за валидацията им." />
+      <item path="samples/blank-game/manifest/entry.json" kind="data" symbol="Sample manifest" reason="Ще служи като пример за новите map fields; трябва да се обнови за да мине валидатора." />
+      <item path="samples/blank-game" kind="structure" symbol="Skeleton game" reason="Нова директория `maps/` + изображения и JSON-и трябва да бъдат добавени към skeleton-а." />
+      <item path="tools/validator" kind="tooling" symbol="Validator CLI" reason="Нужно е да зарежда новите map schema файлове; ST-032 трябва да подготви схемите/файловете за последващите истории." />
+    </code>
+  </artifacts>
+
+  <interfaces>
+    <interface name="manifest.map pointers" kind="JSON schema" signature="map_world_index: string; map_assets_dir: string; map_cli: { version: string, entrypoint: string }" path="tools/validator/schemas/manifest.entry.schema.json" />
+  </interfaces>
+
+  <constraints>
+    <constraint>Допълнителни полета в manifest трябва да останат опционални за игри без карти (backwards compatibility) и да са относителни пътища спрямо game root.</constraint>
+    <constraint>JSON Schema файловете за maps трябва да позволяват PNG/JPG/SVG, но да изискват минимум един hotspot и валидни coordinate bounds.</constraint>
+    <constraint>`ascii_preview` ширина ≤ 64 символа; legend keys ≤2 chars за четим мини-map.</constraint>
+  </constraints>
+
+  <dependencies>
+    <dependency ecosystem="node" path="package.json">
+      <package name="typescript" version="5.x" />
+      <package name="@types/node" version="20.x" />
+      <package name="ajv" version="8.x" />
+    </dependency>
+  </dependencies>
+
+  <tests>
+    <standards>Validator и tooling тестовете се стартират чрез `npm test`; схемите се покриват с AJV unit тестове в `tools/validator/tests`. Новите map schema-и трябва да имат positive/negative примери.</standards>
+    <locations>
+      <location>tools/validator/tests/**/*.test.ts</location>
+      <location>samples/blank-game/**/* (използвано за integration smoke)</location>
+    </locations>
+    <ideas>
+      <idea ac="AC1">Unit тест за manifest schema — валидира, че липсващи map pointers са допустими, но когато са подадени трябва да са валидни относителни пътища.</idea>
+      <idea ac="AC2">Fixture тест за `maps/world/index.json` + area JSON, който минава схемата и проверява, че поне един hotspot е наличен.</idea>
+      <idea ac="AC3">Validator smoke: валидаторът зарежда новите schema файлове и отхвърля карта с несъответстващ `ascii_preview` размер.</idea>
+      <idea ac="AC5">Blank-game e2e: `npm run validate -- --path samples/blank-game` остава clean след добавяне на maps/ файловете.</idea>
+    </ideas>
+  </tests>
+</storyContext>

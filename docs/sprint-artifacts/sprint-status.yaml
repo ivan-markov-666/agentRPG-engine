@@ -1,0 +1,65 @@
+generated: 2026-01-03T12:10:00+02:00
+project: AgentRPG Engine
+project_key: agentrpg-engine
+tracking_system: file-system
+story_location: docs/stories
+
+development_status:
+  EP-001: contexted
+  ST-001: done
+  ST-004: done
+  ST-005: done
+  EP-001-retrospective: optional
+
+  EP-002: contexted
+  ST-002: done
+  ST-006: done
+  ST-007: done
+  ST-008: done
+  EP-002-retrospective: optional
+
+  EP-003: contexted
+  ST-003: done
+  ST-009: done
+  EP-003-retrospective: optional
+
+  EP-004: contexted
+  ST-010: done
+  ST-011: done
+  ST-012: done
+  EP-004-retrospective: optional
+
+  EP-005: contexted
+  ST-013: done
+  ST-014: done
+  ST-015: done
+  ST-016: done
+  ST-017: ready-for-dev
+  ST-018: ready-for-dev
+  ST-019: ready-for-dev
+  ST-020: ready-for-dev
+  ST-021: ready-for-dev
+  EP-005-retrospective: optional
+
+  EP-006: contexted
+  ST-022: ready-for-dev
+  ST-023: ready-for-dev
+  ST-024: ready-for-dev
+  ST-025: ready-for-dev
+  ST-026: ready-for-dev
+  ST-027: ready-for-dev
+  ST-028: ready-for-dev
+  ST-029: ready-for-dev
+  ST-030: done
+  EP-006-retrospective: optional
+
+  EP-007: contexted
+  ST-031: in-progress
+  EP-007-retrospective: optional
+
+  EP-008: contexted
+  ST-032: in-progress
+  ST-033: ready-for-dev
+  ST-034: ready-for-dev
+  ST-035: ready-for-dev
+  EP-008-retrospective: optional

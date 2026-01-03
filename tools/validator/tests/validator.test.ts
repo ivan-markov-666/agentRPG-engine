@@ -105,6 +105,141 @@ async function runCheck(
     assert(issues.some((i) => i.code === 'EXPLORATION-PREVIEW-MISMATCH'), 'Expected EXPLORATION-PREVIEW-MISMATCH');
   }
 
+  // EXPLORATION legacy type + missing tags
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+      'scenario/index.md': '# Intro\nThis index provides enough narrative context to satisfy length checks for the validator overview.',
+      'scenario/areas/forest.md': '# Forest\nDetails about the forest and nearby threats exceeding the minimum length requirement.',
+      'scenario/quests/available.json': [{ quest_id: 'quest-1', title: 'Quest One' }],
+      'scenario/quests/quest-1.md': SAMPLE_QUEST_MARKDOWN,
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': { exploration_enabled: true },
+      'player-data/runtime/exploration-log.json': [
+        {
+          id: 'forest-scout',
+          title: 'Forest Scout',
+          type: 'poi',
+          area_id: 'forest',
+          quest_id: 'quest-1',
+          description:
+            'A patrol through the forest outskirts revealed strange glyphs and the lingering scent of alchemical fire across the ridge.',
+          tags: ['scouting']
+        }
+      ],
+      'player-data/runtime/completed-quests.json': []
+    });
+    assert(issues.some((i) => i.code === 'EXPLORATION-TYPE-LEGACY'), 'Expected EXPLORATION-TYPE-LEGACY');
+    assert(issues.some((i) => i.code === 'EXPLORATION-TAG-AREA'), 'Expected EXPLORATION-TAG-AREA');
+    assert(issues.some((i) => i.code === 'EXPLORATION-TAG-QUEST'), 'Expected EXPLORATION-TAG-QUEST');
+  }
+
+  // EXPLORATION quest guardrails (missing quest_id and unknown quest)
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+      'scenario/index.md': '# Intro\nThis intro is long enough to pass the validator threshold for scenario context.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': { exploration_enabled: true },
+      'player-data/runtime/exploration-log.json': [
+        {
+          id: 'mystery-hook',
+          title: 'Mystery Hook',
+          type: 'quest',
+          description:
+            'A clandestine contact hints at a hidden vault beneath the old library, but refuses to share specifics until proof of loyalty appears.',
+          tags: ['hook']
+        },
+        {
+          id: 'unknown-quest',
+          title: 'Unknown Quest',
+          type: 'quest',
+          quest_id: 'quest-missing',
+          description:
+            'The militia suspects saboteurs near the upper ridge and wants advance scouts to confirm before committing troops.',
+          tags: ['hook']
+        }
+      ],
+      'player-data/runtime/completed-quests.json': []
+    });
+    assert(issues.some((i) => i.code === 'EXPLORATION-QUEST-ID'), 'Expected EXPLORATION-QUEST-ID');
+    assert(issues.some((i) => i.code === 'EXPLORATION-QUEST-UNKNOWN'), 'Expected EXPLORATION-QUEST-UNKNOWN');
+    assert(issues.some((i) => i.code === 'EXPLORATION-TAG-QUEST'), 'Expected EXPLORATION-TAG-QUEST when quest tag missing');
+  }
+
+  // EXPLORATION area cross references and preview list
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+      'scenario/index.md': '# Intro\nSatisfies validator narrative length expectations.',
+      'scenario/areas/landing.md': '# Landing\nArea description long enough to pass guardrails. [[quest-main]] referenced.',
+      'scenario/quests/available.json': [{ quest_id: 'quest-main', title: 'Main Quest' }],
+      'scenario/quests/quest-main.md': SAMPLE_QUEST_MARKDOWN.replace('[[default-area]]', '[[landing]]'),
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {
+        exploration_enabled: true,
+        exploration_log_preview: ['landing-scout', 'missing-entry']
+      },
+      'player-data/runtime/exploration-log.json': [
+        {
+          id: 'landing-scout',
+          title: 'Landing Scout',
+          type: 'area',
+          area_id: 'landing',
+          added_at: '2025-12-28T10:00:00.000Z',
+          origin: 'gm-suggested',
+          description:
+            'Recon teams survey the landing zone, interview refugees, and mark suspicious supply drops that do not match manifests.',
+          tags: ['hook']
+        }
+      ],
+      'player-data/runtime/completed-quests.json': []
+    });
+    assert(issues.some((i) => i.code === 'EXPLORATION-TAG-AREA'), 'Expected EXPLORATION-TAG-AREA when area tag missing');
+    assert(issues.some((i) => i.code === 'EXPLORATION-TAG-QUEST'), 'Expected EXPLORATION-TAG-QUEST when quest tag missing');
+    assert(issues.some((i) => i.code === 'EXPLORATION-PREVIEW-MISMATCH'), 'Expected EXPLORATION-PREVIEW-MISMATCH for missing entry');
+  }
+
+  // EXPLORATION log missing while enabled
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
+      'scenario/index.md': '# Intro\nContext text for validator guardrails.',
+      'scenario/areas/forest.md': '# Forest\nArea content over minimum length.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': { exploration_enabled: true },
+      'player-data/runtime/completed-quests.json': []
+    });
+    assert(issues.some((i) => i.code === 'EXPLORATION-LOG-MISSING'), 'Expected EXPLORATION-LOG-MISSING when exploration enabled without log');
+  }
+
+  // QUEST area linkage missing exploration tag
+  {
+    const issues = await runCheck(checkQuests, {
+      'scenario/areas/harbor.md': '# Harbor\nArea text mentioning [[quest-main]].',
+      'scenario/quests/available.json': [{ quest_id: 'quest-main', title: 'Main Quest' }],
+      'scenario/quests/quest-main.md': SAMPLE_QUEST_MARKDOWN.replace('[[default-area]]', '[[harbor]]'),
+      'scenario/quests/unlock-triggers.json': { 'quest-main': 'always' },
+      'player-data/runtime/exploration-log.json': [
+        {
+          id: 'harbor-patrol',
+          title: 'Harbor Patrol',
+          type: 'area',
+          area_id: 'harbor',
+          description:
+            'Patrols sweep the harbor boardwalk searching for contraband shipments and ambushed supply vessels rumored by refugees.',
+          added_at: '2025-12-28T10:00:00.000Z',
+          origin: 'player-request',
+          tags: ['watch']
+        }
+      ]
+    });
+    assert(issues.some((i) => i.code === 'EXPLORATION-TAG-AREA'), 'Expected EXPLORATION-TAG-AREA when area tag missing');
+    assert(issues.some((i) => i.code === 'EXPLORATION-QUEST-MISMATCH'), 'Expected EXPLORATION-QUEST-MISMATCH when quest tag missing');
+  }
+
   // CAP-UNKNOWN-RUNTIME
   {
     const issues = await runCheck(checkCapabilities, {

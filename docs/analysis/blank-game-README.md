@@ -3,14 +3,24 @@
 Example steps for creating a game from the `samples/blank-game/` skeleton (the structure can be copied into `games/<gameId>/`).
 
 ## Steps
-1) Copy the `samples/blank-game/` skeleton into `games/<gameId>/` (if `samples/` is missing, just create the structure below).
-2) Fill in `manifest/entry.json` (game identity, pointers to files, capabilities file).
-3) Fill in `scenario/index.md` + at least 1 quest file (main quest) and 1 area (`scenario/areas/default-area.md`).
-4) Fill in `scenario/quests/available.json` (ID ↔ title) and `unlock-triggers.json` (unlock conditions).
-5) Fill in `player-data/session-init.json` (player name, `preferred_language`, optional debug).
-6) Fill in `player-data/runtime/state.json` (example active quests and stats).
-7) Fill in `config/capabilities.json` (example below). If you add/remove a capability, keep it in sync with `state.json`.
-8) Start the session (GM validation). Fix WARN/ERROR messages (see the validation codes table in Step 3).
+1. Copy the `samples/blank-game/` skeleton into `games/<gameId>/` (if `samples/` is missing, just create the structure below).
+2. Fill in `manifest/entry.json` (game identity, pointers to files, capabilities file).
+3. Fill in `scenario/index.md` + at least 1 quest file (main quest) and 1 area (`scenario/areas/default-area.md`).
+4. Fill in `scenario/quests/available.json` (ID ↔ title) and `unlock-triggers.json` (unlock conditions).
+5. Fill in `player-data/session-init.json` (player name, `preferred_language`, optional debug).
+6. Fill in `player-data/runtime/state.json` (example active quests and stats).
+7. Fill in `config/capabilities.json` (example below). If you add/remove a capability, keep it in sync with `state.json`.
+8. (Maps, optional but recommended) Copy `maps/` directory, then adjust `manifest/entry.json` pointers (`map_world_index`, `map_assets_dir`, `map_cli`). Update the world/area JSON files with your regions/hotspots.
+9. Start the session (GM validation). Fix WARN/ERROR messages (see the validation codes table in Step 3).
+
+### Map assets quick reference
+- `maps/world/index.json` describes the global atlas (image, regions pointing to area maps, ASCII preview + legend). Image file lives next to it.
+- `maps/areas/<areaId>.json` describes hotspots/bounding boxes within the area and references its PNG/JPG/SVG. ASCII preview is used for CLI fallbacks (HUD mini-map, screenshots).
+- `manifest/entry.json` optional pointers:
+  - `map_world_index`: relative path to the world JSON (`maps/world/index.json` in the skeleton).
+  - `map_assets_dir`: folder containing `world/` and `areas/` subdirectories (defaults to `maps/` in the skeleton).
+  - `map_cli`: metadata to document helper commands (future CLI `map:add`, `map:minimap`). Add entries that make sense for your tooling.
+- When adding new areas/regions, duplicate the existing JSON files, update coordinates/legend, and keep image paths relative to the game root. Validator expects referenced files to exist when these pointers are present.
 
 ## Minimal structure
 ```
@@ -33,6 +43,13 @@ Example steps for creating a game from the `samples/blank-game/` skeleton (the s
       available.json
       unlock-triggers.json
       main-quest-01.md
+  maps/
+    world/
+      index.json
+      world.png
+    areas/
+      default-area.json
+      default-area.png
 ```
 
 ## Example `config/capabilities.json`

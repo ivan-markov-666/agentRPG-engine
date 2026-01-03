@@ -94,3 +94,15 @@ Status: done. Official CLI entrypoint `npm run runtime` for loading runtime snap
 
 ## ST-031 — Repo TS-only Policy (no JS sources in git)
 Status: in-progress. `dist/` is build output (not committed) + tooling for inventory/enforcement of `.js` source.
+
+## ST-032 — Map Assets & Metadata Contracts
+Status: drafted. Manifest pointers, maps/ directory structure, JSON schema за world/area карти и image конвенции.
+
+## ST-033 — Runtime State & Telemetry Updates
+Status: drafted. Обновен state schema с `current_location`/`visited_locations` + telemetry за movement.
+
+## ST-034 — Map Validator Rules & Tooling
+Status: drafted. `map:add` scaffolder, validator MAP-* кодове, minimap генератор.
+
+## ST-035 — UI & World Atlas Integration
+Status: drafted. HUD mini-map, World Atlas UI файлове и документация за GM/LLM map UX.

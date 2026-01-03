@@ -6,7 +6,11 @@
     "area_id": "default-area",
     "added_at": "2025-12-22T21:23:50.736Z",
     "origin": "player-request",
-    "tags": ["briefing", "quest:main-quest-01"],
+    "tags": [
+      "briefing",
+      "quest:main-quest-01",
+      "area:default-area"
+    ],
     "description": "Elder Maros outlined the Prove Your Worth steps beside the recruitment table and requested faster patrol rotations.",
     "notes": "Players suggested recruiting extra wardens to secure the northern gate."
   },
@@ -17,7 +21,11 @@
     "area_id": "training-grounds",
     "added_at": "2025-12-22T21:27:12.100Z",
     "origin": "gm-suggested",
-    "tags": ["scouting", "quest:main-quest-01"],
+    "tags": [
+      "scouting",
+      "quest:main-quest-01",
+      "area:training-grounds"
+    ],
     "description": "Sergeant Isla highlighted the wolf incursion vectors and marked hotspots on the mission board tied to the sabotage rumors."
   }
 ]

@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "id": "aurora-entry",
+    "title": "Aurora Valley Recon",
+    "type": "quest",
+    "quest_id": "main-quest-01",
+    "area_id": "default-area",
+    "description": "Scouting run requested by the elder before tackling main-quest-01 objectives near the farms and protecting caravans from bandits along the ridge.",
+    "added_at": "2026-01-01T00:00:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "quest:main-quest-01",
+      "area:default-area",
+      "hook"
+    ]
+  }
+]

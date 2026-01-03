@@ -64,6 +64,41 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 300
+    },
+    "map_world_index": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "map_assets_dir": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "map_cli": {
+      "type": "object",
+      "required": ["version"],
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "entrypoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "commands": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      }
     }
   }
 }

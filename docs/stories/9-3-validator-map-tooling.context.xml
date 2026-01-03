@@ -1,0 +1,80 @@
+<storyContext>
+  <meta>
+    <storyKey>9-3-validator-map-tooling</storyKey>
+    <epicId>EP-008</epicId>
+    <storyId>ST-034</storyId>
+    <title>Map Validator Rules &amp; Tooling</title>
+    <status>drafted</status>
+    <contextVersion>1.0</contextVersion>
+  </meta>
+
+  <story>
+    <asA>Validator/tooling engineer</asA>
+    <iWant>CLI `map:add`, minimap генератор и MAP-* validator правила</iWant>
+    <soThat>map файловете, state и manifest да са синхронизирани, а авторите да имат лесен scaffold за карти</soThat>
+  </story>
+
+  <acceptanceCriteria>
+    <criteria id="AC1">CLI `npm run map:add` scaffold-ва JSON + image references, ASCII preview и валидира входовете (дубликати, липсващи файлове).</criteria>
+    <criteria id="AC2">Validator кодове `MAP-FILE-MISSING`, `MAP-HOTSPOT-UNKNOWN`, `MAP-ASCII-DRIFT` и др. са имплементирани и документирани.</criteria>
+    <criteria id="AC3">CLI `map:minimap` (или екв.) може да визуализира ASCII миникарта и да маркира текущата позиция.</criteria>
+    <criteria id="AC4">Документацията (validator README + tooling секции) описва командите, кодовете и примерни workflows.</criteria>
+    <criteria id="AC5">Тестове покриват новите CLI-та и validator кодовете (temp game workspace, schema fixtures).</criteria>
+  </acceptanceCriteria>
+
+  <tasks>
+    <task id="T1">Имплементирай `tools/maps/add-map.ts` + CLI wiring (package.json script, argument parsing, validation).</task>
+    <task id="T2">Добави `map:minimap` helper (може да е отделен CLI) за ASCII output + HUD integration hook.</task>
+    <task id="T3">Разшири validator checks (`src/validator/checks/maps.ts` или подобен) за MAP-* кодовете и ги включи в основния flow.</task>
+    <task id="T4">Напиши Jest/Vitest тестове за CLI-тата (temp game fixtures) и validator кодовете (positive/negative cases).</task>
+    <task id="T5">Обнови документацията: validator README, blank-game README (как да използват map:add), Product Brief annex при нужда.</task>
+  </tasks>
+
+  <artifacts>
+    <docs>
+      <doc path="docs/analysis/product-brief-A RPG game engine for LLM models.-2025-12-19.md" title="Product Brief v1" section="Location &amp; map system update" snippet="Описва нуждата от CLI tooling (`map:add`, ASCII миникарта) и soft guardrails за движение." />
+      <doc path="docs/analysis/validator-readme.md" title="Validator CLI README" section="Tooling / schema enforcement" snippet="Трябва да добавим секция за map CLI-та и новите MAP-* error кодове." />
+      <doc path="docs/analysis/how-to-create-a-new-game.md" title="How to Create a New Game" section="Area authoring / tooling" snippet="Добавяме инструкции за авторите как да използват `map:add` при създаване на нови areas." />
+    </docs>
+    <code>
+      <item path="tools/maps/add-map.ts" kind="cli" symbol="Map Add CLI" reason="Нов файл/скрипт за scaffold на карти." />
+      <item path="tools/maps/minimap.ts" kind="cli" symbol="Map Minimap CLI" reason="Генерира ASCII mini-map за HUD/console." />
+      <item path="src/validator/checks" kind="validator" symbol="Map checks" reason="Модул, който ще съдържа MAP-FILE-MISSING и др." />
+      <item path="package.json" kind="config" symbol="npm scripts" reason="Добавяне на `map:add`, `map:minimap` скриптове." />
+      <item path="tools/tests" kind="tests" symbol="CLI tests" reason="Нови тестове за map tooling и validator кодове." />
+    </code>
+  </artifacts>
+
+  <interfaces>
+    <interface name="map:add CLI" kind="command" signature="npm run map:add -- --game &lt;id&gt; --area &lt;areaId&gt; --image maps/areas/&lt;areaId&gt;.png [--hotspot id:label:x1,y1,x2,y2] [--force]" path="tools/maps/add-map.ts" />
+    <interface name="Validator MAP checks" kind="module" signature="checkMaps(context: ValidatorContext): Issue[]" path="src/validator/checks/maps.ts" />
+  </interfaces>
+
+  <constraints>
+    <constraint>CLI трябва да отказва overwrite без `--force` и да гарантира, че paths са вътре в game root.</constraint>
+    <constraint>Validator кодовете следват naming конвенцията `MAP-*` и предоставят suggested fix.</constraint>
+    <constraint>ASCII preview генераторът поддържа максимум 64x32 grid за четимост и множество symbols според legend.</constraint>
+  </constraints>
+
+  <dependencies>
+    <dependency ecosystem="node" path="package.json">
+      <package name="commander" version="11.x" optional="true" />
+      <package name="fs-extra" version="11.x" />
+      <package name="typescript" version="5.x" />
+    </dependency>
+  </dependencies>
+
+  <tests>
+    <standards>Използваме същия test runner като останалите tools (npm test). CLI тестове работят върху temp директории, validator тестовете използват fixtures.</standards>
+    <locations>
+      <location>tools/tests/map-add.test.ts</location>
+      <location>tools/tests/map-validator.test.ts</location>
+    </locations>
+    <ideas>
+      <idea ac="AC1">Temp game workspace → `map:add` създава JSON + PNG placeholder и актуализира ASCII preview; проверка за duplicate id.</idea>
+      <idea ac="AC2">Validator unit тест за липсващ image файл → очаква `MAP-FILE-MISSING` с пътя.</idea>
+      <idea ac="AC3">Minimap CLI тест, който маркира текуща позиция и проверява, че legend се използва.</idea>
+      <idea ac="AC5">Integration: `npm run map:add` + `npm run validate` върху sample → без нови errors.</idea>
+    </ideas>
+  </tests>
+</storyContext>

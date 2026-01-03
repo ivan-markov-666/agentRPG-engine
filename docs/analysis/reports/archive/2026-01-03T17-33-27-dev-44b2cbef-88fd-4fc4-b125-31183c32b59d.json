@@ -1,0 +1,38 @@
+[
+  {
+    "runId": "dev-4dce5b3b-65fa-49be-aaa7-124dfc072d6a",
+    "run_id": "dev-4dce5b3b-65fa-49be-aaa7-124dfc072d6a",
+    "timestamp": "2026-01-03T15:33:04.717Z",
+    "duration_ms": 115,
+    "durationMs": 115,
+    "errors": 0,
+    "warnings": 0,
+    "issues": [],
+    "metrics": {
+      "firstActiveQuestMs": 90000,
+      "refusalAttempts": 0,
+      "refusalSuccesses": 0,
+      "validationAttempts": 1,
+      "completedQuests": 1,
+      "debugEnabled": false
+    }
+  },
+  {
+    "runId": "dev-44b2cbef-88fd-4fc4-b125-31183c32b59d",
+    "run_id": "dev-44b2cbef-88fd-4fc4-b125-31183c32b59d",
+    "timestamp": "2026-01-03T15:33:27.140Z",
+    "duration_ms": 112,
+    "durationMs": 112,
+    "errors": 0,
+    "warnings": 0,
+    "issues": [],
+    "metrics": {
+      "firstActiveQuestMs": 90000,
+      "refusalAttempts": 0,
+      "refusalSuccesses": 0,
+      "validationAttempts": 1,
+      "completedQuests": 1,
+      "debugEnabled": false
+    }
+  }
+]

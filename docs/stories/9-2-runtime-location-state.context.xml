@@ -1,0 +1,80 @@
+<storyContext>
+  <meta>
+    <storyKey>9-2-runtime-location-state</storyKey>
+    <epicId>EP-008</epicId>
+    <storyId>ST-033</storyId>
+    <title>Runtime State &amp; Telemetry Updates</title>
+    <status>drafted</status>
+    <contextVersion>1.0</contextVersion>
+  </meta>
+
+  <story>
+    <asA>Runtime engineer / validator maintainer</asA>
+    <iWant>да разширя state.json с current_location, visited_locations и telemetry hooks</iWant>
+    <soThat>картите и метриките да знаят реалното местоположение на играча и да имаме guardrails срещу невалидни координати</soThat>
+  </story>
+
+  <acceptanceCriteria>
+    <criteria id="AC1">State schema съдържа `current_location` (area_id, hotspot_id, coordinates, map_ref) и `visited_locations[]` с guardrails.</criteria>
+    <criteria id="AC2">Validator добавя MAP-* кодове за невалидни координати/hotspot връзки.</criteria>
+    <criteria id="AC3">Telemetry записва показатели (location_updates, new_locations_unlocked, map_warnings).</criteria>
+    <criteria id="AC4">Документацията описва как GM/LLM актуализира state + telemetry.</criteria>
+    <criteria id="AC5">Blank-game/state.json примерите включват новите полета.</criteria>
+  </acceptanceCriteria>
+
+  <tasks>
+    <task id="T1">Обнови `tools/validator/schemas/state.schema.json` (AJV schema) + TypeScript типове (`src/types/state.ts`).</task>
+    <task id="T2">Имплементирай validator checks (например `src/validator/checks/state.ts`) за MAP-* кодовете и wiring към telemetry.</task>
+    <task id="T3">Разшири telemetry writer (`tools/validator/utils/telemetry.ts` или екв.) с новите counters и документирай JSON структурата.</task>
+    <task id="T4">Обнови `docs/analysis/validator-readme.md` + Product Brief секциите за state/telemetry; добави GM указания.</task>
+    <task id="T5">Обнови sample данните (`samples/blank-game/player-data/runtime/state.json`, `telemetry/kpi.sample.json`) и тестовете.</task>
+  </tasks>
+
+  <artifacts>
+    <docs>
+      <doc path="docs/analysis/product-brief-A RPG game engine for LLM models.-2025-12-19.md" title="Product Brief v1" section="Location &amp; map system update" snippet="Описва `current_location`, `visited_locations`, guardrails и телеметрията за movement (Jan 2026 update, редове ~210-218)." />
+      <doc path="docs/analysis/validator-readme.md" title="Validator CLI README" section="State schema control / telemetry" snippet="Разделите за state schema и telemetry workflows трябва да покрият новите MAP-* кодове и counters." />
+      <doc path="docs/analysis/how-to-create-a-new-game.md" title="How to Create a New Game" section="Player-data/runtime/state.json" snippet="Инструкциите за state.json трябва да споменат current_location/visited_locations, за да могат dev-овете да попълват данните." />
+    </docs>
+    <code>
+      <item path="tools/validator/schemas/state.schema.json" kind="schema" symbol="State Schema" reason="Основният JSON Schema, който трябва да дефинира current_location и visited_locations." />
+      <item path="src/types/state.ts" kind="types" symbol="State interfaces" reason="TypeScript типовете трябва да отразяват новите ключове и да се използват от runtime/validator." />
+      <item path="tools/validator/checks" kind="validator" symbol="State checks" reason="Ще съдържа логиката за MAP-LOCATION-UNKNOWN, MAP-HOTSPOT-MISMATCH и др." />
+      <item path="tools/validator/utils/telemetry.ts" kind="utility" symbol="Telemetry writer" reason="Поддържа метрики; трябва да добави новите counters и да ги записва в history." />
+      <item path="samples/blank-game/player-data/runtime/state.json" kind="data" symbol="Sample state" reason="Ще служи като пример за current_location/visited_locations." />
+    </code>
+  </artifacts>
+
+  <interfaces>
+    <interface name="State.current_location" kind="JSON schema" signature="{ area_id: string, hotspot_id?: string, coordinates?: { x: number, y: number }, map_ref?: string }" path="tools/validator/schemas/state.schema.json" />
+    <interface name="Telemetry payload" kind="JSON structure" signature="{ runId, map: { location_updates, new_locations_unlocked, map_warnings } }" path="docs/analysis/validator-readme.md" />
+  </interfaces>
+
+  <constraints>
+    <constraint>Coordinates са integers ≥0 и не трябва да превишават размерите, декларирани в map JSON (валидира се срещу metadata).</constraint>
+    <constraint>`visited_locations` се поддържа ≤256 записа; validator WARN, ако лимитът бъде надвишен.</constraint>
+    <constraint>Backwards compatibility: ако играта няма карти, current_location може да присъства само с area_id; telemetry counters остават 0.</constraint>
+  </constraints>
+
+  <dependencies>
+    <dependency ecosystem="node" path="package.json">
+      <package name="ajv" version="8.x" />
+      <package name="@types/node" version="20.x" />
+      <package name="typescript" version="5.x" />
+    </dependency>
+  </dependencies>
+
+  <tests>
+    <standards>Използваме Jest/Vitest (както е конфигурирано в tooling) за validator unit tests; schema changes трябва да имат positive/negative fixtures. Telemetry се проверява чрез snapshot JSON.</standards>
+    <locations>
+      <location>tools/validator/tests/**/*.test.ts</location>
+      <location>samples/blank-game/player-data/runtime/state.json</location>
+    </locations>
+    <ideas>
+      <idea ac="AC1">AJV тест: state.json с липсващ hotspot_id при налична карта → WARN/ERROR според правилото.</idea>
+      <idea ac="AC2">Unit тест за MAP-HOTSPOT-MISMATCH, който подава state/current_location към validator и очаква специфичен код.</idea>
+      <idea ac="AC3">Telemetry test: симулира се validator run, който увеличава location_updates и map_warnings; проверява се, че telemetry payload съдържа новите полета.</idea>
+      <idea ac="AC5">Integration test: `npm run validate` върху blank-game с новите state полета → Summary 0/0.</idea>
+    </ideas>
+  </tests>
+</storyContext>

@@ -70,6 +70,7 @@ The minimal set of files for a playable game is based on Product Brief v1 and th
      - `ui_index`
      - `saves_index`
      - `full_history_file`
+     - `map_world_index`, `map_assets_dir`, `map_cli` (optional but recommended when you ship atlases/maps)
 
 2. **`config/capabilities.json`**
    - Enable only the capabilities you want to use.
@@ -107,6 +108,16 @@ npm run scenario:index -- --game <gameId>
 ```bash
 npm run area:add -- --path games/<gameId> --id town-square --title "Town Square"
 ```
+
+### Map assets (world + area)
+- World atlas lives under `maps/world/index.json` + image (PNG/JPG/SVG). Each region links to `maps/areas/<areaId>.json`.
+- Area maps describe hotspots/bounding boxes and reference their image file. Both JSONs include `ascii_preview`/`legend` for CLI fallback.
+- Recommended helpers (coming from tooling roadmap): `npm run map:add -- --game <gameId> --area <areaId>` (scaffold JSON + ASCII) and `npm run map:minimap -- --game <id> --area <areaId>` (preview in console). Until the CLI ships, copy the blank-game samples and edit coordinates/headings manually.
+- Update `manifest/entry.json` with:
+  - `map_world_index`: relative path to the world JSON.
+  - `map_assets_dir`: directory that contains map images/JSON.
+  - `map_cli`: version + optional helper commands (so LLM tooling knows how to call the helpers).
+- Keep images inside the game folder; do not reference absolute paths.
 
 ## 6) Validation (local DoD loop)
 
@@ -176,3 +187,6 @@ npm run metrics:report -- --history docs/analysis/reports/telemetry-history.json
 
 - ≥3 consecutive clean runs (0 errors / 0 warnings) with `--summary --strict`.
 - `metrics:report` shows stable KPIs and no regressions in key metrics.
+
+### Migration note (maps, Jan 2026)
+- Existing games can keep running without map pointers, but to adopt the atlas/minimap features add the optional fields to `manifest/entry.json` and create the `maps/` directory following the skeleton example. The validator treats map pointers as optional unless they are present; once added, the referenced files/images must exist and pass the new schemas.
