@@ -1,0 +1,10 @@
+dist
+node_modules
+.bmad
+.windsurf
+bmad-custom-src
+package-lock.json
+blacklist.txt
+.git
+output.txt
+docs
