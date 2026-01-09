@@ -99,6 +99,81 @@
           }
         }
       }
+    },
+    "engine_features": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "engine_notes": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "content_sets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]{3,60}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "scenario_index": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "capabilities_file": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "unlock_condition": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "default_enabled": {
+            "type": "boolean"
+          },
+          "state_namespace": {
+            "type": "string",
+            "pattern": "^[a-z0-9_-]{2,40}$"
+          },
+          "engine_layers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "engine_features": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
+            }
+          },
+          "notes": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      }
     }
   }
 }

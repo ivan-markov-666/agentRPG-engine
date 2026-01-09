@@ -20,5 +20,28 @@
       "add": "npm run map:add -- --game blank-game",
       "minimap": "npm run map:minimap -- --game blank-game --area default-area"
     }
-  }
+  },
+  "content_sets": [
+    {
+      "id": "base-campaign",
+      "title": "Основна кампания",
+      "description": "Главната история на празната игра; активна по подразбиране.",
+      "scenario_index": "scenario/index.md",
+      "capabilities_file": "config/capabilities.json",
+      "default_enabled": true,
+      "state_namespace": "base",
+      "notes": "Съдържа входните куестове и основната карта."
+    },
+    {
+      "id": "dlc-example",
+      "title": "Примерно DLC: Войнишки поход",
+      "description": "Допълнителна мини-кампания за демонстрация на content_sets.",
+      "scenario_index": "scenario/dlc/example/index.md",
+      "capabilities_file": "config/dlc-example.capabilities.json",
+      "unlock_condition": "state.flags.base_story_complete == true",
+      "default_enabled": false,
+      "state_namespace": "dlc_example",
+      "notes": "Използвайте за тестване на runtime selection/enablement."
+    }
+  ]
 }

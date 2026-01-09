@@ -1,0 +1,20 @@
+{
+  "errors": 0,
+  "warnings": 1,
+  "cap_errors": 0,
+  "top_codes": [
+    {
+      "code": "QUEST-REWARDS-GOLD-RANGE",
+      "count": 1
+    }
+  ],
+  "issues": [
+    {
+      "code": "QUEST-REWARDS-GOLD-RANGE",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-10.md",
+      "message": "Gold reward (0) is outside recommended 25-500 range",
+      "fix": "Adjust gold to stay within the standard balance window"
+    }
+  ]
+}

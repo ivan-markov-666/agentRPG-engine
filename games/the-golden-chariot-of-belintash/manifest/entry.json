@@ -1,0 +1,47 @@
+{
+  "id": "the-golden-chariot-of-belintash",
+  "game_id": "the-golden-chariot-of-belintash",
+  "title": "Златната колесница на Белинташ",
+  "version": "0.4.0",
+  "engine_compat": "1.0.0",
+  "engine_layers": ["@agentrpg/engine"],
+  "capabilities_file": "config/capabilities.json",
+  "scenario_index": "scenario/index.md",
+  "ui_index": "ui/index.json",
+  "saves_index": "player-data/saves/index.json",
+  "full_history_file": "player-data/runtime/history.full.jsonl",
+  "world_index": "scenario/world/index.md",
+  "map_world_index": "maps/world/index.json",
+  "map_assets_dir": "maps",
+  "map_cli": {
+    "version": "0.2.0",
+    "entrypoint": "npm run map:add",
+    "commands": {
+      "add": "npm run map:add -- --game the-golden-chariot-of-belintash",
+      "minimap": "npm run map:minimap -- --game the-golden-chariot-of-belintash --area starting-area"
+    }
+  },
+  "content_sets": [
+    {
+      "id": "base-campaign",
+      "title": "Основна кампания",
+      "description": "Акт I: Каменица → Мостово → Врата. Главната история и текущите side quests.",
+      "scenario_index": "scenario/index.md",
+      "capabilities_file": "config/capabilities.json",
+      "default_enabled": true,
+      "state_namespace": "base",
+      "notes": "Съдържа основната актова линия, companion hook-ове и актуалните карти за Родопите."
+    },
+    {
+      "id": "dlc-stanimaka-act2",
+      "title": "Акт II: Станимака",
+      "description": "Планирано DLC с градските сцени в Станимака и Бачково.",
+      "scenario_index": "scenario/dlc/stanimaka/index.md",
+      "capabilities_file": "config/dlc-example.capabilities.json",
+      "unlock_condition": "state.flags.act1_complete == true",
+      "default_enabled": false,
+      "state_namespace": "dlc_example",
+      "notes": "Използвайте за тестване на runtime selection/enablement."
+    }
+  ]
+}

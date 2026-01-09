@@ -1,0 +1,31 @@
+{
+  "errors": 0,
+  "warnings": 2,
+  "cap_errors": 0,
+  "top_codes": [
+    {
+      "code": "QUEST-REWARDS-XP-RANGE",
+      "count": 1
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "count": 1
+    }
+  ],
+  "issues": [
+    {
+      "code": "QUEST-REWARDS-XP-RANGE",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-08.md",
+      "message": "XP reward (1020) is outside recommended 50-1000 range",
+      "fix": "Adjust XP to stay within the standard balance window"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-08' links [[wonders-bridges-cave]] but exploration log lacks entry tagged quest:main-quest-08",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    }
+  ]
+}

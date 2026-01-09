@@ -1,0 +1,86 @@
+{
+  "current_area_id": "act_v_sanctum",
+  "current_day": 142,
+  "current_hour": 9,
+  "exploration_enabled": true,
+  "exploration_log_preview": ["laut-recon", "balkan-trail-scout"],
+  "content_sets": {
+    "belintash-crack": {
+      "enabled": true,
+      "last_scene_id": "dlc-bc-03-outro",
+      "state": {
+        "collapse_stage": 2,
+        "rescued_archivists": 3,
+        "hazard_timer": "ticking",
+        "support_nodes": ["steam:north", "crystal:deep-hall"],
+        "notes": "Stabilized main tunnel; prism focus recovered."
+      }
+    },
+    "next-guardians": {
+      "enabled": true,
+      "last_scene_id": "dlc-ng-03-resolution",
+      "state": {
+        "legacy_rank": 3,
+        "town_morale": 74,
+        "heir_alignment": "wind",
+        "structures": ["tower", "library", "ward"],
+        "trials_result": "alliance"
+      },
+      "notes": "Heir Ana-Elena now commands the ward network."
+    },
+    "balkan-trail": {
+      "enabled": true,
+      "last_scene_id": "dlc-bt-03-ritual",
+      "state": {
+        "expedition_stage": "complete",
+        "convoy_morale": 78,
+        "supply_tokens": 2,
+        "alliance_track": {
+          "byzantine": 3,
+          "latin": 1,
+          "voinuk": 2
+        },
+        "artifact_clues": [
+          "glyph:solun-dock",
+          "chant:voinuk-oath"
+        ],
+        "trail_notes": [
+          "Byzantine ward anchored at Salonika catacombs.",
+          "Next Guardians agreed to share tower schematics."
+        ],
+        "trails_resolution": "byzantine"
+      },
+      "notes": "Convoy returned with intact beam prism."
+    },
+    "laut-stronghold": {
+      "enabled": true,
+      "last_scene_id": "dlc-ls-01-briefing",
+      "state": {
+        "defense_phase": "scouting",
+        "stronghold_integrity": 68,
+        "ward_power": 2,
+        "woinuk_morale": 72,
+        "espionage_alert": 1,
+        "hazard_tokens": 1,
+        "safehouses": ["ivash", "stefan-lane"],
+        "artifact_insight": ["ward_pillar_alpha", "beam_conduit"],
+        "oath_resolution": "ward"
+      },
+      "notes": "Ready to trigger Three Walls scenario."
+    }
+  },
+  "dlc_state": {
+    "belintash": {
+      "focus_core": "prism",
+      "collapse_stage_final": 2
+    },
+    "next_guardians": {
+      "legacy_rank": 3,
+      "structures": ["tower", "library", "ward"],
+      "trials_result": "alliance"
+    },
+    "balkan_trail": {
+      "trails_resolution": "byzantine"
+    }
+  }
+}

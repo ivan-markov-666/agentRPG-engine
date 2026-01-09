@@ -1,0 +1,50 @@
+{
+  "stronghold_integrity": {
+    "enabled": true,
+    "desc": "Общо състояние на стените и структурите на Лаут",
+    "min": 0,
+    "max": 100
+  },
+  "ward_power": {
+    "enabled": true,
+    "desc": "Натрупана енергия за защитни ритуали",
+    "min": 0,
+    "max": 5
+  },
+  "woinuk_morale": {
+    "enabled": true,
+    "desc": "Моралът и решителността на защитниците",
+    "min": 0,
+    "max": 100
+  },
+  "espionage_alert": {
+    "enabled": true,
+    "desc": "Ниво на подозрение и открити шпионски клетки",
+    "min": 0,
+    "max": 5
+  },
+  "hazard_tokens": {
+    "enabled": true,
+    "desc": "Активни кризи (пробиви, пожари, саботаж)",
+    "min": 0,
+    "max": 5
+  },
+  "safehouses": {
+    "enabled": true,
+    "desc": "Контролирани убежища и маршрути за евакуация",
+    "min": 0,
+    "max": 4
+  },
+  "artifact_insight": {
+    "enabled": true,
+    "desc": "Отключени фрагменти/руни за beam ward",
+    "min": 0,
+    "max": 6
+  },
+  "oath_resolution": {
+    "enabled": true,
+    "desc": "Финален избор: ward / evacuation / betrayal",
+    "min": 0,
+    "max": 3
+  }
+}

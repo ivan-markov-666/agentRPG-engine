@@ -1,0 +1,22 @@
+{
+  "schema_version": "ui.history.v1",
+  "limit": 20,
+  "full_history_file": "player-data/runtime/history.full.jsonl",
+  "events": [
+    {
+      "id": "exp-kamenitsa-nightwatch",
+      "timestamp": "1221-05-12T05:20:00Z",
+      "text": "Нощният обход на Каменица — проверката на таблото и ковачницата потвърди следите към Мостово."
+    },
+    {
+      "id": "quest-mq02-briefing",
+      "timestamp": "1221-05-12T07:10:00Z",
+      "text": "Стоян ти предаде въжетата и задачата да следиш стадото на рида."
+    },
+    {
+      "id": "hook-kalina",
+      "timestamp": "1221-05-12T08:25:00Z",
+      "text": "Калина намекна за редки билки на терасите на Мостово — начало на side quest."
+    }
+  ]
+}

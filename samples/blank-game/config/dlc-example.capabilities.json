@@ -1,0 +1,4 @@
+{
+  "battle_fervor": { "enabled": true, "desc": "Войнишки устрем", "min": -50, "max": 50 },
+  "supply_chain": { "enabled": true, "desc": "Логистика за похода", "min": 0, "max": 100 }
+}

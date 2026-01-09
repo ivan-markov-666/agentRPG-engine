@@ -1,0 +1,23 @@
+{
+  "schema_version": "ui.actions.v1",
+  "actions": [
+    {
+      "id": "continue",
+      "label": "Продължи разговора",
+      "enabled": true,
+      "kind": "chat"
+    },
+    {
+      "id": "open-notice-board",
+      "label": "Прегледай таблото с обяви",
+      "enabled": true,
+      "kind": "scene"
+    },
+    {
+      "id": "check-inventory",
+      "label": "Провери запаси и товари",
+      "enabled": true,
+      "kind": "hud"
+    }
+  ]
+}

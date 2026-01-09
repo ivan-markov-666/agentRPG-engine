@@ -1,0 +1,79 @@
+{
+  "current_area_id": "belintash-amulet-vault",
+  "active_quests": [
+    {
+      "quest_id": "main-quest-14",
+      "status": "active",
+      "progress": 1,
+      "current_step_id": "step-1"
+    }
+  ],
+  "stats": {
+    "health": 76,
+    "stamina": 40,
+    "focus": 40,
+    "morale": 35,
+    "hunger": 20,
+    "thirst": 18,
+    "amulet_burden": 0,
+    "carry_capacity": 15,
+    "reputation": {
+      "bulgarian_court": 0,
+      "byzantine_exiles": 0,
+      "latin_traders": 0,
+      "bogomils": 0,
+      "orthodox_church": 25,
+      "common_folk": 10
+    },
+    "currency": {
+      "gold_hyperpyron": 0,
+      "silver_trachy": 230,
+      "copper_coins": 12,
+      "trade_goods": 1
+    },
+    "armor": 5,
+    "stealth": 10,
+    "perception": 12,
+    "crit_chance": 0.05,
+    "crit_multiplier": 1.5
+  },
+  "world_state": {
+    "date": "2024-09-18",
+    "time_of_day": "night",
+    "weather": {
+      "type": "underground_lampglow",
+      "intensity": "hum",
+      "temperature_c": 16,
+      "wind": "none"
+    },
+    "visibility": "led_glow",
+    "noise_level": "soft generators",
+    "location": {
+      "area_id": "belintash-amulet-vault",
+      "name": "Камерата на амулета",
+      "map_marker": "amulet_vault",
+      "coordinates": [24.768, 41.819]
+    }
+  },
+  "companion_relationships": {
+    "default-companion": 0
+  },
+  "exploration_enabled": true,
+  "exploration_log_preview": [
+    "epilogue-amulet-surge",
+    "epilogue-inscription-choice",
+    "epilogue-final-shot"
+  ],
+  "content_sets": {
+    "base-campaign": {
+      "enabled": true,
+      "last_scene_id": "belintash-amulet-vault",
+      "notes": "Епилог IV — Камерата на амулета: амулетът се събужда, надписът се превежда и финалният кадър ще реши съдбата на тайната."
+    },
+    "dlc-example": {
+      "enabled": false,
+      "progress": 0,
+      "notes": "Ще се отключи след завършване на основната история."
+    }
+  }
+}

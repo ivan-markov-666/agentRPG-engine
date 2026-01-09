@@ -4,10 +4,40 @@
   "title": "Session Init (v1)",
   "type": "object",
   "properties": {
-    "player_name": { "type": "string", "minLength": 1 },
-    "preferred_language": { "type": "string", "minLength": 1 },
+    "player_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Името, което играчът е избрал за героя си."
+    },
+    "player_gender": {
+      "type": "string",
+      "enum": ["male", "female", "nonbinary", "custom"],
+      "description": "Как играчът иска героят да бъде адресиран."
+    },
+    "player_gender_custom": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Допълнителен текст, ако е избрано player_gender=custom."
+    },
+    "preferred_language": {
+      "type": "string",
+      "minLength": 1,
+      "description": "LLM езикът, на който ще се провежда сесията."
+    },
     "debug": { "type": "boolean" }
   },
-  "required": ["preferred_language"],
+  "required": ["preferred_language", "player_name", "player_gender"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "player_gender": { "const": "custom" }
+        }
+      },
+      "then": {
+        "required": ["player_gender_custom"]
+      }
+    }
+  ],
   "additionalProperties": true
 }

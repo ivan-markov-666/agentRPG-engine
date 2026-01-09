@@ -1,0 +1,7 @@
+{
+  "legacy_rank": { "enabled": true, "desc": "Ниво на наследниците", "min": 0, "max": 5 },
+  "town_morale": { "enabled": true, "desc": "Морал в Забърдо", "min": 0, "max": 100 },
+  "heir_alignment_wind": { "enabled": true, "desc": "Наклон към въздушни ритуали", "min": -3, "max": 3 },
+  "heir_alignment_earth": { "enabled": true, "desc": "Наклон към земни ward-ове", "min": -3, "max": 3 },
+  "structure_slots": { "enabled": true, "desc": "Свободни слотове за постройки", "min": 0, "max": 6 }
+}

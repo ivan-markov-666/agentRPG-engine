@@ -22,12 +22,24 @@
       }
     },
     "stats": { "$ref": "#/definitions/stats" },
+    "world_state": { "$ref": "#/definitions/worldState" },
+    "companion_relationships": { "$ref": "#/definitions/companionRelationships" },
     "flags": { "$ref": "#/definitions/flagMap" },
     "inventories": { "$ref": "#/definitions/inventoryList" },
     "exploration_enabled": { "type": "boolean" },
     "exploration_log_preview": {
       "type": "array",
       "items": { "type": "string" }
+    },
+    "content_sets": {
+      "type": "object",
+      "patternProperties": {
+        "^belintash-crack$": { "$ref": "#/definitions/belintashContentSetState" },
+        "^next-guardians$": { "$ref": "#/definitions/nextGuardiansContentSetState" },
+        "^balkan-trail$": { "$ref": "#/definitions/balkanTrailContentSetState" },
+        "^laut-stronghold$": { "$ref": "#/definitions/lautStrongholdContentSetState" }
+      },
+      "additionalProperties": { "$ref": "#/definitions/contentSetState" }
     }
   },
   "additionalProperties": true,
@@ -42,6 +54,9 @@
         "hunger": { "$ref": "#/definitions/range0100" },
         "thirst": { "$ref": "#/definitions/range0100" },
         "morale": { "$ref": "#/definitions/rangeNeg100100" },
+        "carry_capacity_max": { "type": "number", "minimum": 0 },
+        "carry_weight_current": { "type": "number", "minimum": 0 },
+        "encumbrance_level": { "type": "string" },
         "reputation": { "$ref": "#/definitions/reputationMap" },
         "currency": { "$ref": "#/definitions/currencyMap" },
         "status_effects": { "$ref": "#/definitions/statusEffects" },
@@ -58,7 +73,10 @@
     "currencyMap": {
       "type": "object",
       "properties": {
-        "gold": { "type": "number", "minimum": 0 }
+        "gold_hyperpyron": { "type": "number", "minimum": 0 },
+        "silver_trachy": { "type": "number", "minimum": 0 },
+        "copper_coins": { "type": "number", "minimum": 0 },
+        "trade_goods": { "type": "number", "minimum": 0 }
       },
       "additionalProperties": { "type": ["number", "object"] }
     },
@@ -71,6 +89,45 @@
         },
         "additionalProperties": true
       }
+    },
+    "companionRelationships": {
+      "type": "object",
+      "additionalProperties": { "type": "number", "minimum": -100, "maximum": 100 }
+    },
+    "worldState": {
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "format": "date" },
+        "time_of_day": { "type": "string" },
+        "weather": {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string" },
+            "intensity": { "type": "string" },
+            "temperature_c": { "type": "number" },
+            "wind": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "visibility": { "type": "string" },
+        "noise_level": { "type": "string" },
+        "location": {
+          "type": "object",
+          "properties": {
+            "area_id": { "type": "string" },
+            "name": { "type": "string" },
+            "map_marker": { "type": "string" },
+            "coordinates": {
+              "type": "array",
+              "items": { "type": "number" },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
     },
     "flagMap": {
       "type": "object",
@@ -124,6 +181,172 @@
         {
           "type": "object",
           "additionalProperties": { "$ref": "#/definitions/genericStat" }
+        }
+      ]
+    },
+    "contentSetState": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "last_scene_id": { "type": "string" },
+        "progress": {
+          "anyOf": [
+            { "type": "number" },
+            { "type": "string" },
+            { "type": "object" },
+            { "type": "array" }
+          ]
+        },
+        "state": { "type": "object" },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "belintashContentSetState": {
+      "allOf": [
+        { "$ref": "#/definitions/contentSetState" },
+        {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "object",
+              "properties": {
+                "collapse_stage": { "type": "number", "minimum": 0, "maximum": 5 },
+                "rescued_archivists": { "type": "number", "minimum": 0, "maximum": 20 },
+                "hazard_timer": { "type": "string", "enum": ["stable", "ticking", "spike"] },
+                "support_nodes": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "notes": { "type": "string" }
+              },
+              "required": ["collapse_stage", "rescued_archivists", "hazard_timer"],
+              "additionalProperties": true
+            }
+          },
+          "required": ["state"]
+        }
+      ]
+    },
+    "nextGuardiansContentSetState": {
+      "allOf": [
+        { "$ref": "#/definitions/contentSetState" },
+        {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "object",
+              "properties": {
+                "legacy_rank": { "type": "number", "minimum": 0, "maximum": 5 },
+                "town_morale": { "type": "number", "minimum": 0, "maximum": 100 },
+                "heir_alignment": {
+                  "type": "string",
+                  "enum": ["wind", "earth", "idealistic", "pragmatic", "neutral"]
+                },
+                "structures": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "trials_result": {
+                  "type": "string",
+                  "enum": ["victory", "alliance", "evacuated"]
+                }
+              },
+              "required": ["legacy_rank", "town_morale", "heir_alignment", "structures"],
+              "additionalProperties": true
+            }
+          },
+          "required": ["state"]
+        }
+      ]
+    },
+    "balkanTrailContentSetState": {
+      "allOf": [
+        { "$ref": "#/definitions/contentSetState" },
+        {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "object",
+              "properties": {
+                "expedition_stage": { "type": "string", "enum": ["planning", "underway", "finale", "complete"] },
+                "convoy_morale": { "type": "number", "minimum": 0, "maximum": 100 },
+                "supply_tokens": { "type": "number", "minimum": 0, "maximum": 6 },
+                "alliance_track": {
+                  "type": "object",
+                  "properties": {
+                    "byzantine": { "type": "number", "minimum": -5, "maximum": 5 },
+                    "latin": { "type": "number", "minimum": -5, "maximum": 5 },
+                    "voinuk": { "type": "number", "minimum": -5, "maximum": 5 }
+                  },
+                  "required": ["byzantine", "latin", "voinuk"],
+                  "additionalProperties": false
+                },
+                "artifact_clues": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "trail_notes": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "trails_resolution": {
+                  "type": "string",
+                  "enum": ["byzantine", "latin", "voinuk", "solo", "split", "unknown", null]
+                }
+              },
+              "required": ["expedition_stage", "convoy_morale", "supply_tokens", "alliance_track", "artifact_clues"],
+              "additionalProperties": true
+            }
+          },
+          "required": ["state"]
+        }
+      ]
+    },
+    "lautStrongholdContentSetState": {
+      "allOf": [
+        { "$ref": "#/definitions/contentSetState" },
+        {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "object",
+              "properties": {
+                "defense_phase": { "type": "string", "enum": ["scouting", "siege", "aftermath"] },
+                "stronghold_integrity": { "type": "number", "minimum": 0, "maximum": 100 },
+                "ward_power": { "type": "number", "minimum": 0, "maximum": 5 },
+                "woinuk_morale": { "type": "number", "minimum": 0, "maximum": 100 },
+                "espionage_alert": { "type": "number", "minimum": 0, "maximum": 5 },
+                "hazard_tokens": { "type": "number", "minimum": 0, "maximum": 5 },
+                "safehouses": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "artifact_insight": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "oath_resolution": {
+                  "type": "string",
+                  "enum": ["ward", "evacuation", "betrayal", "undecided"]
+                },
+                "notes": { "type": "string" }
+              },
+              "required": [
+                "defense_phase",
+                "stronghold_integrity",
+                "ward_power",
+                "woinuk_morale",
+                "espionage_alert",
+                "hazard_tokens",
+                "safehouses",
+                "artifact_insight",
+                "oath_resolution"
+              ],
+              "additionalProperties": true
+            }
+          },
+          "required": ["state"]
         }
       ]
     }

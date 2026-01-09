@@ -1,0 +1,17 @@
+{
+  "main-quest-01": "always",
+  "main-quest-02": "main-quest-01",
+  "main-quest-03": "main-quest-02",
+  "main-quest-04": "main-quest-03",
+  "main-quest-05": "main-quest-04",
+  "main-quest-06": "main-quest-05",
+  "main-quest-07": "main-quest-06",
+  "main-quest-08": "main-quest-07",
+  "main-quest-09": "main-quest-08",
+  "main-quest-10": "main-quest-09",
+  "main-quest-11": "main-quest-10",
+  "main-quest-12": "main-quest-11",
+  "main-quest-13": "main-quest-12",
+  "main-quest-14": "main-quest-13",
+  "side-quest-mos-help-14": "main-quest-02"
+}

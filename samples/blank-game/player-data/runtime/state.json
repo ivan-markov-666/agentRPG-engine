@@ -16,11 +16,17 @@
     "morale": 0,
     "hunger": 20,
     "thirst": 20,
+    "carry_capacity_max": 40,
+    "carry_weight_current": 12,
+    "encumbrance_level": "normal",
     "reputation": {
       "village": 0
     },
     "currency": {
-      "gold": 50
+      "gold_hyperpyron": 2,
+      "silver_trachy": 15,
+      "copper_coins": 40,
+      "trade_goods": 0
     },
     "armor": 5,
     "stealth": 10,
@@ -28,6 +34,45 @@
     "crit_chance": 0.05,
     "crit_multiplier": 1.5
   },
+  "world_state": {
+    "date": "1221-05-12",
+    "time_of_day": "morning",
+    "weather": {
+      "type": "sunny",
+      "intensity": "mild",
+      "temperature_c": 18,
+      "wind": "calm"
+    },
+    "visibility": "clear",
+    "noise_level": "quiet",
+    "location": {
+      "area_id": "kamenitsa-square",
+      "name": "Каменица",
+      "map_marker": "kamenitsa_house",
+      "coordinates": [24.933, 41.798]
+    }
+  },
+  "companion_relationships": {
+    "default-companion": 0
+  },
+  "amulet_state": {
+    "equipped": true,
+    "burden": 15,
+    "status": "stable",
+    "cooldown_remaining_minutes": 0
+  },
   "exploration_enabled": false,
-  "exploration_log_preview": []
+  "exploration_log_preview": [],
+  "content_sets": {
+    "base-campaign": {
+      "enabled": true,
+      "last_scene_id": "default-area",
+      "notes": "Основната кампания стартова позиция."
+    },
+    "dlc-example": {
+      "enabled": false,
+      "progress": 0,
+      "notes": "Ще се отключи след завършване на основната история."
+    }
+  }
 }
