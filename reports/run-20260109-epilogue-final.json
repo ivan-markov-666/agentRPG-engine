@@ -1,0 +1,133 @@
+{
+  "errors": 0,
+  "warnings": 16,
+  "cap_errors": 0,
+  "top_codes": [
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "count": 8
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "count": 7
+    },
+    {
+      "code": "EXPLORATION-DUPLICATE-ID",
+      "count": 1
+    }
+  ],
+  "issues": [
+    {
+      "code": "EXPLORATION-DUPLICATE-ID",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Duplicate exploration id 'epilogue-final-shot' (index 90)",
+      "fix": "Use unique ids for each entry"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-13.md",
+      "message": "Area [[belintash-collapse]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-13.md",
+      "message": "Area [[philippopolis]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-13.md",
+      "message": "Area [[philippopolis]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-13.md",
+      "message": "Area [[belintash-collapse]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-13' links [[belintash-modern-camp]] but exploration log lacks entry tagged quest:main-quest-13",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-13' links [[belintash-collapse]] but exploration log lacks entry tagged quest:main-quest-13",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-13' links [[philippopolis]] but exploration log lacks entry tagged quest:main-quest-13",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-14.md",
+      "message": "Area [[belintash-collapse]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-14.md",
+      "message": "Area [[belintash-collapse]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-14.md",
+      "message": "Area [[zabyrdo]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-14.md",
+      "message": "Area [[philippopolis]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-14' links [[belintash-modern-camp]] but exploration log lacks entry tagged quest:main-quest-14",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-14' links [[belintash-collapse]] but exploration log lacks entry tagged quest:main-quest-14",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-14' links [[zabyrdo]] but exploration log lacks entry tagged quest:main-quest-14",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-14' links [[philippopolis]] but exploration log lacks entry tagged quest:main-quest-14",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    }
+  ]
+}

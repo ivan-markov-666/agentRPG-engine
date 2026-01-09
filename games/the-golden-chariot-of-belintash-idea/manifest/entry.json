@@ -1,0 +1,56 @@
+{
+  "id": "belintash",
+  "game_id": "the-golden-chariot-of-belintash-idea",
+  "title": "The Golden Chariot of Belintash",
+  "version": "0.1.0",
+  "engine_compat": "1.0.0",
+  "engine_layers": ["@agentrpg/engine"],
+  "scenario_index": "SCENARIOS/ACT-V/01-sanctum.md",
+  "world_index": "WORLD-BIBLE.md",
+  "content_sets": [
+    {
+      "id": "belintash-crack",
+      "title": "Пукнатината на Белинташ",
+      "description": "Инженерен отряд стабилизира тунелите под Белинташ след епилога.",
+      "scenario_index": "SCENARIOS/DLC/01-belintash-crack/index.md",
+      "capabilities_file": "CONFIG/belintash-crack.capabilities.json",
+      "unlock_condition": "state.flags.seal_complete == true",
+      "default_enabled": true,
+      "state_namespace": "belintash_crack",
+      "notes": "Hazard timer (collapse_stage), rescue arcs, engineering checks."
+    },
+    {
+      "id": "next-guardians",
+      "title": "Следващото поколение пазители",
+      "description": "Town-management DLC където наследниците строят лагера в Забърдо.",
+      "scenario_index": "SCENARIOS/DLC/02-next-guardians/index.md",
+      "capabilities_file": "CONFIG/next-guardians.capabilities.json",
+      "unlock_condition": "state.flags.quest_hook_next_generation == true",
+      "default_enabled": false,
+      "state_namespace": "next_guardians",
+      "notes": "Legacy morale, heirloom skill tree, town upgrades."
+    },
+    {
+      "id": "balkan-trail",
+      "title": "Balkan Trail / Светлинният лъч",
+      "description": "Експедиционен sandbox по Балканите – дипломатически мисии, артефакт лов и supply logistics.",
+      "scenario_index": "SCENARIOS/DLC/03-balkan-trail/index.md",
+      "capabilities_file": "CONFIG/balkan-trail.capabilities.json",
+      "unlock_condition": "state.flags.final_vision == true",
+      "default_enabled": false,
+      "state_namespace": "balkan_trail",
+      "notes": "Expedition map, convoy management, cross-DLC diplomacy bonuses."
+    },
+    {
+      "id": "laut-stronghold",
+      "title": "Лаут — войнушкото селище",
+      "description": "Тактически DLC около отбраната на селището Лаут с ward ритуали, археология и шпионаж.",
+      "scenario_index": "SCENARIOS/DLC/04-laut-stronghold/index.md",
+      "capabilities_file": "CONFIG/laut-stronghold.capabilities.json",
+      "unlock_condition": "state.laut.alliance >= 'trusted'",
+      "default_enabled": false,
+      "state_namespace": "laut_stronghold",
+      "notes": "Stronghold defense phases, ward rituals, voinuk clan diplomacy."
+    }
+  ]
+}

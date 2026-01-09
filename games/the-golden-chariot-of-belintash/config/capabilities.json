@@ -1,0 +1,17 @@
+{
+  "health": { "enabled": true, "desc": "Жизнени точки", "min": 0, "max": 100 },
+  "stamina": { "enabled": true, "desc": "Физическа издръжливост", "min": 0, "max": 100 },
+  "focus": { "enabled": true, "desc": "Ментален фокус за умения и амулета", "min": 0, "max": 50 },
+  "hunger": { "enabled": true, "desc": "Глад (0=сит, 100=гладен)", "min": 0, "max": 100 },
+  "thirst": { "enabled": true, "desc": "Жажда (0=напит, 100=жаден)", "min": 0, "max": 100 },
+  "morale": { "enabled": true, "desc": "Морал на героя/групата", "min": -100, "max": 100 },
+  "amulet_burden": { "enabled": true, "desc": "Натоварване на амулета", "min": 0, "max": 100 },
+  "armor": { "enabled": true, "desc": "Физическа защита", "min": 0, "max": 50 },
+  "stealth": { "enabled": true, "desc": "Способност за прикриване", "min": 0, "max": 100 },
+  "perception": { "enabled": true, "desc": "Забелязване на детайли", "min": 0, "max": 100 },
+  "carry_capacity": { "enabled": true, "desc": "Максимално тегло на инвентара (кг)", "min": 0, "max": 120 },
+  "reputation": { "enabled": true, "desc": "Репутация по фракции", "range": [-100, 100] },
+  "currency": { "enabled": true, "desc": "Многослойна валута (иперпери/трахеи/медни/бартер)", "min": 0 },
+  "crit_chance": { "enabled": true, "desc": "Шанс за критичен удар", "min": 0, "max": 1 },
+  "crit_multiplier": { "enabled": true, "desc": "Множител за критичен удар", "min": 1, "max": 3 }
+}

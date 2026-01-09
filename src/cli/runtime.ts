@@ -18,11 +18,20 @@ interface CliArgs {
   debug: boolean;
   save: string | null;
   saveId: string | null;
+  contentSet: string | null;
+  listContentSets: boolean;
 }
 
 function parseArgs(argv: string[]): CliArgs {
-  const args: CliArgs = { path: null, debug: false, save: null, saveId: null };
-  const valueFlags = new Set(['--path', '-p', '--save', '--save-id']);
+  const args: CliArgs = {
+    path: null,
+    debug: false,
+    save: null,
+    saveId: null,
+    contentSet: null,
+    listContentSets: false,
+  };
+  const valueFlags = new Set(['--path', '-p', '--save', '--save-id', '--content-set']);
 
   for (let i = 2; i < argv.length; i += 1) {
     const flag = argv[i];
@@ -45,6 +54,12 @@ function parseArgs(argv: string[]): CliArgs {
         break;
       case '--save-id':
         args.saveId = argv[++i];
+        break;
+      case '--content-set':
+        args.contentSet = argv[++i];
+        break;
+      case '--list-content-sets':
+        args.listContentSets = true;
         break;
       case '--debug':
         args.debug = true;
@@ -105,7 +120,9 @@ async function main() {
   }
 
   if (!baseDir) {
-    console.error('Usage: npm run runtime -- --path games/<gameId> [--debug] | --path games/<gameId> --save <rel/path> [--debug] | --path games/<gameId> --save-id <id> [--debug]');
+    console.error(
+      'Usage: npm run runtime -- --path games/<gameId> [--debug] [--list-content-sets] [--content-set <id>] | --path games/<gameId> --save <rel/path> [--debug] | --path games/<gameId> --save-id <id> [--debug]',
+    );
     process.exit(1);
     return;
   }
@@ -113,12 +130,53 @@ async function main() {
   const host = new LocalFsHostAdapter(baseDir);
   const snapshot = await loadGameRuntimeSnapshot(host);
 
+  if (args.listContentSets) {
+    if (!snapshot.contentSets.length) {
+      console.log('No content sets defined in manifest.');
+    } else {
+      console.log('Content sets:');
+      snapshot.contentSets.forEach((set) => {
+        console.log(
+          ` - ${set.id}${set.enabled ? ' [enabled]' : ''} → scenario=${set.scenarioIndex}, capabilities=${set.capabilitiesFile ?? '<inherit>'}`,
+        );
+      });
+    }
+    if (!args.debug) {
+      console.log('');
+    }
+  }
+
+  const resolvedContentSet = (() => {
+    if (!snapshot.contentSets.length) return null;
+    if (args.contentSet) {
+      return snapshot.contentSets.find((set) => set.id === args.contentSet) || null;
+    }
+    return snapshot.contentSets.find((set) => set.enabled) ?? snapshot.contentSets[0] ?? null;
+  })();
+
+  if (args.contentSet && !resolvedContentSet) {
+    console.error(`Content set '${args.contentSet}' not found in manifest.`);
+    process.exit(1);
+    return;
+  }
+
   if (args.debug) {
     console.log(JSON.stringify(snapshot, null, 2));
   } else {
     console.log(`Loaded: ${snapshot.manifest.title} (${snapshot.manifest.id}) v${snapshot.manifest.version}`);
     const lang = snapshot.sessionInit?.preferred_language;
     if (lang) console.log(`preferred_language: ${lang}`);
+    if (resolvedContentSet) {
+      console.log(
+        `Active content set: ${resolvedContentSet.id} (${resolvedContentSet.enabled ? 'enabled' : 'disabled'})`,
+      );
+      console.log(`Scenario index: ${resolvedContentSet.scenarioIndex}`);
+      if (resolvedContentSet.capabilitiesFile) {
+        console.log(`Capabilities file: ${resolvedContentSet.capabilitiesFile}`);
+      }
+    } else if (snapshot.contentSets.length === 0) {
+      console.log('No content sets declared; using manifest defaults.');
+    }
   }
 }
 

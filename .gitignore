@@ -1,13 +1,10 @@
 node_modules
+.next/
 dist/
 *.log
 *.tmp
 *.tsbuildinfo
 runtime-test-output.txt
-runtime-test.js
-test-runtime.js
-test-new-runtime.js
-validate-runtime.js
 _status.txt
 _st*.txt
 _git_*.txt

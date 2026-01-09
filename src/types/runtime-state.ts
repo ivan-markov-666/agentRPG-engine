@@ -24,6 +24,8 @@ export interface RangeStat {
   max?: number;
 }
 
+export type CompanionRelationshipMap = Record<string, number>;
+
 export interface CoreStats {
   health?: number;
   energy?: number;
@@ -32,6 +34,9 @@ export interface CoreStats {
   hunger?: number;
   thirst?: number;
   morale?: number;
+  carry_capacity_max?: number;
+  carry_weight_current?: number;
+  encumbrance_level?: string;
   reputation?: ReputationMap;
   currency?: CurrencyMap;
   status_effects?: StatusEffects;
@@ -74,12 +79,53 @@ export interface Inventory {
 
 export type FlagMap = Record<string, boolean | number | string>;
 
+export interface WeatherState {
+  type?: string;
+  intensity?: string;
+  temperature_c?: number;
+  wind?: string;
+}
+
+export interface LocationState {
+  area_id?: string;
+  name?: string;
+  map_marker?: string;
+  coordinates?: [number, number];
+}
+
+export interface WorldState {
+  date?: string;
+  time_of_day?: string;
+  weather?: WeatherState;
+  visibility?: string;
+  noise_level?: string;
+  location?: LocationState;
+}
+
+export interface AmuletState {
+  equipped?: boolean;
+  burden?: number;
+  status?: string;
+  cooldown_remaining_minutes?: number;
+}
+
+export interface ContentSetRuntimeState {
+  enabled?: boolean;
+  last_scene_id?: string;
+  progress?: number | string | Record<string, unknown> | unknown[];
+  state?: Record<string, unknown>;
+  notes?: string;
+  [key: string]: unknown;
+}
+
 export interface RuntimeState {
   current_area_id?: string;
   current_day?: number;
   current_hour?: number;
   active_quests?: ActiveQuestState[];
   stats?: CoreStats;
+  world_state?: WorldState;
+  companion_relationships?: CompanionRelationshipMap;
   flags?: FlagMap;
   inventories?: Inventory[];
   exploration_enabled?: boolean;
@@ -88,5 +134,7 @@ export interface RuntimeState {
     enabled?: boolean;
     [key: string]: unknown;
   };
+  amulet_state?: AmuletState;
+  content_sets?: Record<string, ContentSetRuntimeState>;
   [key: string]: unknown;
 }

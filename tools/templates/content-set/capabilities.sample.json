@@ -1,0 +1,6 @@
+{
+  "convoy_morale": { "enabled": true, "desc": "Морал / риск гейт", "min": 0, "max": 100 },
+  "supply_tokens": { "enabled": true, "desc": "Ресурси за логистика", "min": 0, "max": 6 },
+  "faction_track_a": { "enabled": true, "desc": "Репутация с фракция A", "min": -5, "max": 5 },
+  "faction_track_b": { "enabled": true, "desc": "Репутация с фракция B", "min": -5, "max": 5 }
+}

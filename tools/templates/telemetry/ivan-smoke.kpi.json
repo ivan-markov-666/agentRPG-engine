@@ -1,0 +1,12 @@
+{
+  "firstActiveQuestMs": 240000,
+  "refusalAttempts": 1,
+  "refusalSuccesses": 1,
+  "validationAttempts": 3,
+  "completedQuests": 4,
+  "debugEnabled": false,
+  "dlc01CollapseStage": 2,
+  "dlc02LegacyRank": 3,
+  "dlc03ConvoyMorale": 72,
+  "dlc04StrongholdIntegrity": 68
+}

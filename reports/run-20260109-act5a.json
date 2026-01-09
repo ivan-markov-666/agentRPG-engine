@@ -1,0 +1,123 @@
+{
+  "errors": 0,
+  "warnings": 14,
+  "cap_errors": 0,
+  "top_codes": [
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "count": 7
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "count": 5
+    },
+    {
+      "code": "QUEST-REWARDS-XP-RANGE",
+      "count": 1
+    },
+    {
+      "code": "QUEST-REWARDS-GOLD-VALUE",
+      "count": 1
+    }
+  ],
+  "issues": [
+    {
+      "code": "QUEST-REWARDS-XP-RANGE",
+      "level": "WARN",
+      "file": "D:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-10.md",
+      "message": "XP reward (1500) is outside recommended 50-1000 range",
+      "fix": "Adjust XP to stay within the standard balance window"
+    },
+    {
+      "code": "QUEST-REWARDS-GOLD-VALUE",
+      "level": "WARN",
+      "file": "D:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-10.md",
+      "message": "Gold reward line is missing numeric value",
+      "fix": "Use \"- Gold: 75 gold ...\" format with digits"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "D:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-10.md",
+      "message": "Area [[cross-forest]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "D:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-10.md",
+      "message": "Area [[cross-forest-vigil]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "D:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-10.md",
+      "message": "Area [[cross-forest]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "D:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-10.md",
+      "message": "Area [[wonders-bridges]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "D:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-10.md",
+      "message": "Area [[philippopolis]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "D:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-10.md",
+      "message": "Area [[cross-forest-hermit-oak]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "D:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-10.md",
+      "message": "Area [[cross-forest]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-10' links [[cross-forest]] but exploration log lacks entry tagged quest:main-quest-10",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-10' links [[cross-forest-vigil]] but exploration log lacks entry tagged quest:main-quest-10",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-10' links [[wonders-bridges]] but exploration log lacks entry tagged quest:main-quest-10",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-10' links [[philippopolis]] but exploration log lacks entry tagged quest:main-quest-10",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-10' links [[cross-forest-hermit-oak]] but exploration log lacks entry tagged quest:main-quest-10",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    }
+  ]
+}

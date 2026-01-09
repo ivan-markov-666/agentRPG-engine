@@ -1,0 +1,20 @@
+{
+  "item.brace_kit": {
+    "enabled": true,
+    "desc": "Комплект от подпори и клинове за стабилизиране на пукнатини",
+    "min": 0,
+    "max": 5
+  },
+  "spell.calcify": {
+    "enabled": true,
+    "desc": "Ритуал, който втвърдява рушащи се камъни",
+    "min": 0,
+    "max": 1
+  },
+  "hazard.collapse_stage": {
+    "enabled": true,
+    "desc": "Степен на срутване (0 стабилно · 4 критично)",
+    "min": 0,
+    "max": 4
+  }
+}

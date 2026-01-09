@@ -1,0 +1,1578 @@
+[
+  {
+    "id": "kamenitsa-nightwatch",
+    "title": "Нощният обход на Каменица",
+    "type": "area",
+    "area_id": "starting-area",
+    "quest_id": "main-quest-01",
+    "description": "Докато селото спи, героят обикаля дядовата къща, таблото и ковачницата на Стоян, за да потвърди, че пътят към Мостово е чист.",
+    "added_at": "2026-01-08T05:20:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:starting-area",
+      "quest:main-quest-01",
+      "quest:main-quest-02",
+      "act:1"
+    ]
+  },
+  {
+    "id": "ridge-trail-training",
+    "title": "Тренировката по билото над Каменица",
+    "type": "area",
+    "area_id": "default-area",
+    "quest_id": "main-quest-02",
+    "description": "На билния път към стадото героят репетира с Шаро, регулира товара и бележи къде може да се върне при нужда.",
+    "added_at": "2026-01-08T06:10:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:default-area",
+      "quest:main-quest-01",
+      "quest:main-quest-02",
+      "quest:main-quest-03",
+      "quest:main-quest-04"
+    ]
+  },
+  {
+    "id": "mostovo-herb-terraces",
+    "title": "Терасите на Мостово при събирачите на билки",
+    "type": "area",
+    "area_id": "mostovo",
+    "quest_id": "main-quest-02",
+    "description": "Героят изкачва каменните тераси, наблюдава сушенето на билки и планира как да помогне на Калина и пазара на Мостово.",
+    "added_at": "2026-01-08T08:05:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:mostovo",
+      "quest:main-quest-01",
+      "quest:main-quest-02",
+      "quest:main-quest-04",
+      "quest:side-quest-mos-help-14",
+      "economy",
+      "companion:kalina"
+    ]
+  },
+  {
+    "id": "vrata-sentinel-climb",
+    "title": "Изкачването към стражите на Врата",
+    "type": "event",
+    "area_id": "vrata",
+    "quest_id": "main-quest-03",
+    "description": "По стръмната пътека към Врата героят следва указанията на Баба Руска и отбелязва къде братството държи наблюдателните си точки.",
+    "added_at": "2026-01-08T10:20:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:vrata",
+      "quest:main-quest-01",
+      "quest:main-quest-02",
+      "quest:main-quest-03",
+      "quest:main-quest-04",
+      "threat:brotherhood"
+    ]
+  },
+  {
+    "id": "gornoslav-letter-drop",
+    "title": "Писмото на Баба Руска за новия пазител",
+    "type": "event",
+    "area_id": "gornoslav",
+    "quest_id": "main-quest-01",
+    "description": "Калина чете на глас писмото от Горнослав, в което Баба Руска зове героя да дойде за първия урок още преди Act I да започне.",
+    "added_at": "2026-01-08T11:30:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:gornoslav",
+      "quest:main-quest-01",
+      "lore",
+      "companion:kalina"
+    ]
+  },
+  {
+    "id": "gornoslav-herbal-ritual",
+    "title": "Хербалният ритуал в Горнослав",
+    "type": "area",
+    "area_id": "gornoslav",
+    "quest_id": "main-quest-03",
+    "description": "Под надзора на Баба Руска героят записва рецептата за отвара срещу страховете преди решението за Станимака.",
+    "added_at": "2026-01-08T12:45:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:gornoslav",
+      "quest:main-quest-03",
+      "quest:main-quest-04",
+      "quest:side-quest-mos-help-14",
+      "companion:kalina",
+      "lore"
+    ]
+  },
+  {
+    "id": "zabyrdo-dragon-tale",
+    "title": "Легендата за праханта в Забърдо",
+    "type": "event",
+    "area_id": "zabyrdo",
+    "quest_id": "main-quest-01",
+    "description": "Старейшината в Забърдо описва как праханта и магарето са победили змея, подготвяйки героя за по-късните изпитания.",
+    "added_at": "2026-01-08T12:00:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:zabyrdo",
+      "quest:main-quest-01",
+      "lore"
+    ]
+  },
+  {
+    "id": "kamenitsa-farewell-council",
+    "title": "Съветът на Каменица преди тръгване за Станимака",
+    "type": "area",
+    "area_id": "starting-area",
+    "quest_id": "main-quest-04",
+    "description": "Стоян и Отец Методий събират хората на площада, за да благословят избора на героя и да съберат дарове за пътя към Станимака.",
+    "added_at": "2026-01-08T13:30:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:starting-area",
+      "quest:main-quest-04",
+      "act:1",
+      "economy"
+    ]
+  },
+  {
+    "id": "stanimaka-water-market-entry",
+    "title": "Водният данък на Станимака",
+    "type": "area",
+    "area_id": "stanimaka",
+    "quest_id": "main-quest-05",
+    "description": "Героят пристига на пазара на Никофор, плаща водния данък и официално включва Станимака като Act II hub.",
+    "added_at": "2026-01-09T07:10:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:stanimaka",
+      "quest:main-quest-05",
+      "act:2",
+      "economy"
+    ]
+  },
+  {
+    "id": "spurs-rope-trial",
+    "title": "Изпитът на Сребърните шпори",
+    "type": "event",
+    "area_id": "spurs-village",
+    "quest_id": "main-quest-05",
+    "description": "Речните стражи карат героя да премине по трите въжета над реката, за да получи договор за мостовете.",
+    "added_at": "2026-01-09T07:20:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:spurs-village",
+      "quest:main-quest-05",
+      "skill:agility",
+      "act:2"
+    ]
+  },
+  {
+    "id": "bachkovo-supply-pledge",
+    "title": "Даровете за игумена",
+    "type": "area",
+    "area_id": "bachkovo-monastery",
+    "quest_id": "main-quest-05",
+    "description": "Преди да отпътува към манастира, героят описва даровете на Никофор и обещанието към Теодосий, което ще отвори портите на Бачково.",
+    "added_at": "2026-01-09T07:58:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:bachkovo-monastery",
+      "quest:main-quest-05",
+      "act:2",
+      "lore"
+    ]
+  },
+  {
+    "id": "three-waters-mill-ritual",
+    "title": "Ритуалът на трите песни",
+    "type": "area",
+    "area_id": "three-waters",
+    "quest_id": "main-quest-05",
+    "description": "Доминик мелничарят настройва трите струи, а героят слуша песента, за да открие монета #3.",
+    "added_at": "2026-01-09T07:35:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:three-waters",
+      "quest:main-quest-05",
+      "puzzle",
+      "act:2"
+    ]
+  },
+  {
+    "id": "petric-night-trial",
+    "title": "Нощта в църквата на Петричка крепост",
+    "type": "event",
+    "area_id": "petric-fortress",
+    "quest_id": "main-quest-06",
+    "description": "Монахът заключва героя в скалната църква и изисква Willpower изпитание, преди да даде писмо към Бачково.",
+    "added_at": "2026-01-09T08:00:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:petric-fortress",
+      "quest:main-quest-06",
+      "trial",
+      "act:2"
+    ]
+  },
+  {
+    "id": "petric-letter-briefing",
+    "title": "Ръкостискането с пазачите на Петрич",
+    "type": "event",
+    "area_id": "petric-fortress",
+    "quest_id": "main-quest-05",
+    "description": "След като Никофор подпечатва писмото, героят представя монетата и обяснява плана пред стражите на Петричка крепост, за да осигури коридор към манастира.",
+    "added_at": "2026-01-09T07:55:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:petric-fortress",
+      "quest:main-quest-05",
+      "act:2",
+      "diplomacy"
+    ]
+  },
+  {
+    "id": "bachkovo-icon-vigil",
+    "title": "Бдението пред Влахерниотиса",
+    "type": "event",
+    "area_id": "bachkovo-monastery",
+    "quest_id": "main-quest-06",
+    "description": "След тридневен пост героят стои пред иконата, вижда видения и получава писмо за Клувията.",
+    "added_at": "2026-01-09T08:30:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:bachkovo-monastery",
+      "quest:main-quest-06",
+      "lore",
+      "faith",
+      "act:2"
+    ]
+  },
+  {
+    "id": "kluvia-hidden-mechanism",
+    "title": "Символът в Клувията",
+    "type": "event",
+    "area_id": "kluvia-hermitage",
+    "quest_id": "main-quest-07",
+    "description": "Теодосий показва на героя как да активира трите камъка и да отвори нишата с писмото за Чудните мостове.",
+    "added_at": "2026-01-09T08:50:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:kluvia-hermitage",
+      "quest:main-quest-07",
+      "puzzle",
+      "act:2"
+    ]
+  },
+  {
+    "id": "cross-forest-twelve-crosses",
+    "title": "Поклонът при дванадесетте кръста",
+    "type": "area",
+    "area_id": "cross-forest",
+    "quest_id": "main-quest-07",
+    "description": "Героят следва пазителя отец Методий и пази поклонниците от хаидушки нападения на Кръстова гора.",
+    "added_at": "2026-01-09T09:05:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:cross-forest",
+      "quest:main-quest-07",
+      "act:2",
+      "threat:brotherhood"
+    ]
+  },
+  {
+    "id": "wonders-samodiva-vigil",
+    "title": "Нощта със самодивите",
+    "type": "event",
+    "area_id": "wonders-bridges",
+    "quest_id": "main-quest-07",
+    "description": "Поклонниците танцуват край огъня, а героят устоява на чара на самодивите преди да прекоси Чудните мостове.",
+    "added_at": "2026-01-09T09:20:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:wonders-bridges",
+      "quest:main-quest-07",
+      "act:2",
+      "status:samodiva"
+    ]
+  },
+  {
+    "id": "wonders-dragonblood-crevice",
+    "title": "Пукнатината с кръвта на змея",
+    "type": "area",
+    "area_id": "wonders-bridges",
+    "quest_id": "main-quest-07",
+    "description": "Под арките героят събира червения мъх и костните ехота, за да завърши изпитанието „Кръвта на змея“. ",
+    "added_at": "2026-01-09T09:35:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:wonders-bridges",
+      "quest:main-quest-07",
+      "alchemy",
+      "act:2"
+    ]
+  },
+  {
+    "id": "zabyrdo-dragonblood-return",
+    "title": "Вестта за кръвта на змея",
+    "type": "event",
+    "area_id": "zabyrdo",
+    "quest_id": "main-quest-07",
+    "description": "След изпитанието при Чудните мостове героят се завръща в Забърдо и споделя със старейшините за червения мъх и костните ехо, които ще променят плана за Белинташ.",
+    "added_at": "2026-01-09T09:50:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:zabyrdo",
+      "quest:main-quest-07",
+      "act:2",
+      "lore"
+    ]
+  },
+  {
+    "id": "philippopolis-gate-signal-bells",
+    "title": "Звънците на червените порти",
+    "type": "area",
+    "area_id": "philippopolis-gates",
+    "quest_id": "main-quest-08",
+    "description": "Капитан Радослав отброява влизането на героя, докато камбанките над портата звънят по код и записват нов Act III hub в дневника.",
+    "added_at": "2026-01-09T10:05:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:philippopolis-gates",
+      "quest:main-quest-08",
+      "act:3",
+      "security"
+    ]
+  },
+  {
+    "id": "three-crowns-terrace-pledge",
+    "title": "Обетът на терасата на „Три корони“",
+    "type": "event",
+    "area_id": "philippopolis-three-crowns",
+    "quest_id": "main-quest-08",
+    "description": "На терасата над пазара героят обсъжда с Алексий плана за библиотеката и се заклева да върне копието на документа без да издаде сенките.",
+    "added_at": "2026-01-09T10:20:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:philippopolis-three-crowns",
+      "quest:main-quest-08",
+      "act:3",
+      "diplomacy"
+    ]
+  },
+  {
+    "id": "philippopolis-library-scrolls",
+    "title": "Свитъците на Елена",
+    "type": "area",
+    "area_id": "philippopolis-library",
+    "quest_id": "main-quest-08",
+    "description": "Елена отваря секцията с тракийските карти и позволява на героя да копира маршрута към катакомбите, докато фонтанът шепти кодовете си.",
+    "added_at": "2026-01-09T10:35:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:philippopolis-library",
+      "quest:main-quest-08",
+      "act:3",
+      "lore"
+    ]
+  },
+  {
+    "id": "philippopolis-catacomb-disc",
+    "title": "Кръгът на тракийския олтар",
+    "type": "event",
+    "area_id": "philippopolis-catacombs",
+    "quest_id": "main-quest-08",
+    "description": "В катакомбите героят спира въртящия диск, говори със Стража и взима четвъртата монета, докато лампите мигат в стария код.",
+    "added_at": "2026-01-09T11:05:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:philippopolis-catacombs",
+      "quest:main-quest-08",
+      "act:3",
+      "puzzle"
+    ]
+  },
+  {
+    "id": "shadow-hall-oath",
+    "title": "Клетвата в дома на сенките",
+    "type": "event",
+    "area_id": "philippopolis-shadow-hall",
+    "quest_id": "main-quest-08",
+    "description": "Лира поставя пред героя дъската със знаци и настоява за обет на неутралитет, за да обяви гилдията за съюзник срещу болярския заговор.",
+    "added_at": "2026-01-09T11:25:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:philippopolis-shadow-hall",
+      "quest:main-quest-08",
+      "act:3",
+      "intrigue"
+    ]
+  },
+  {
+    "id": "philippopolis-hub-briefing",
+    "title": "Съветът на трите хълма",
+    "type": "area",
+    "area_id": "philippopolis",
+    "quest_id": "main-quest-08",
+    "description": "На площадката между кварталите героят събира куриери, за да синхронизира сигналите от портите, библиотеката и катакомбите преди да докладва на двора.",
+    "added_at": "2026-01-09T11:40:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:philippopolis",
+      "quest:main-quest-08",
+      "act:3",
+      "planning"
+    ]
+  },
+  {
+    "id": "cross-forest-scout-update",
+    "title": "Обновяването на сигналите при Кръстова гора",
+    "type": "event",
+    "area_id": "cross-forest",
+    "quest_id": "main-quest-08",
+    "description": "Посланиците от Филипопол проверяват дали дванадесетте кръста още изпращат огнени сигнали и молят героя да пренесе ново писмо към поклонниците.",
+    "added_at": "2026-01-09T11:55:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:cross-forest",
+      "quest:main-quest-08",
+      "act:3",
+      "signal"
+    ]
+  },
+  {
+    "id": "wonders-bridges-shadow-letter",
+    "title": "Пратката за Чудните мостове",
+    "type": "event",
+    "area_id": "wonders-bridges",
+    "quest_id": "main-quest-08",
+    "description": "Лира от сенките изпраща запечатано писмо до пазачите на Чудните мостове и героят гарантира доставката, за да подготви пътя към петата монета.",
+    "added_at": "2026-01-09T12:05:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:wonders-bridges",
+      "quest:main-quest-08",
+      "act:3",
+      "courier"
+    ]
+  },
+  {
+    "id": "zabyrdo-council-update",
+    "title": "Съветът на старейшините в Забърдо",
+    "type": "event",
+    "area_id": "zabyrdo",
+    "quest_id": "main-quest-08",
+    "description": "След новините от Филипопол героят изпраща емисар до Забърдо, който предупреждава селото да пази проходите и да чака знак за монета #5.",
+    "added_at": "2026-01-09T12:20:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:zabyrdo",
+      "quest:main-quest-08",
+      "act:3",
+      "lore"
+    ]
+  },
+  {
+    "id": "philippopolis-citadel-audience",
+    "title": "Аудиенцията при болярина Петър",
+    "type": "area",
+    "area_id": "philippopolis-citadel",
+    "quest_id": "main-quest-08",
+    "description": "В залата на Небет тепе героят представя монетата пред болярите, обсъжда магията на Валентин и избира политическо подравняване преди разследването.",
+    "added_at": "2026-01-09T12:35:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:philippopolis-citadel",
+      "quest:main-quest-08",
+      "act:3",
+      "politics"
+    ]
+  },
+  {
+    "id": "three-crowns-night-assault",
+    "title": "Нощният атентат при „Три корони“",
+    "type": "event",
+    "area_id": "philippopolis-three-crowns",
+    "quest_id": "main-quest-08",
+    "description": "Докато героят укрепва стаята с талисмани, сенки с маски на соколи нахлуват през прозореца и задействат алармите на стражите.",
+    "added_at": "2026-01-09T12:45:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:philippopolis-three-crowns",
+      "quest:main-quest-08",
+      "act:3",
+      "combat"
+    ]
+  },
+  {
+    "id": "samodiva-river-trial",
+    "title": "Танцът на Ясена при реката",
+    "type": "event",
+    "area_id": "cross-forest",
+    "quest_id": "main-quest-08",
+    "description": "Самодивата Ясена изисква танц върху росата, песен или загадка, преди да даде благословията си за пътя към Чудните мостове.",
+    "added_at": "2026-01-09T13:00:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:cross-forest",
+      "quest:main-quest-08",
+      "act:3",
+      "ritual"
+    ]
+  },
+  {
+    "id": "bridge-base-camp",
+    "title": "Лагерът под Чудните мостове",
+    "type": "area",
+    "area_id": "wonders-bridges",
+    "quest_id": "main-quest-08",
+    "description": "Колоната прави лагер преди влизането в Чудните мостове, чертае карти и записва видения за костите, които пеят.",
+    "added_at": "2026-01-09T13:15:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:wonders-bridges",
+      "quest:main-quest-08",
+      "act:3",
+      "camp"
+    ]
+  },
+  {
+    "id": "wonders-bridges-act4-briefing",
+    "title": "Сигналът за Караджовия процеп",
+    "type": "event",
+    "area_id": "wonders-bridges",
+    "quest_id": "main-quest-09",
+    "description": "След като духът на змея дава знак, колоната събира въжета и песни на Чудните мостове преди да тръгне към Караджовия процеп.",
+    "added_at": "2026-01-09T13:50:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:wonders-bridges",
+      "quest:main-quest-09",
+      "act:4",
+      "briefing"
+    ]
+  },
+  {
+    "id": "wonders-cave-second-vision",
+    "title": "Втората визия под Чудните мостове",
+    "type": "event",
+    "area_id": "wonders-bridges-cave",
+    "quest_id": "main-quest-09",
+    "description": "Духът на змея повтаря сигнала за Караджовия процеп и благославя колоната, преди да напуснат пещерите към Act IV изпитанията.",
+    "added_at": "2026-01-09T13:55:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:wonders-bridges-cave",
+      "quest:main-quest-09",
+      "act:4",
+      "vision"
+    ]
+  },
+  {
+    "id": "zabyrdo-morale-gathering",
+    "title": "Даровете на Забърдо за прохода",
+    "type": "event",
+    "area_id": "zabyrdo",
+    "quest_id": "main-quest-09",
+    "description": "Старейшините на Забърдо събират въжета, песни и сушено месо за Караджовия процеп, а героят води реч за морала преди похода.",
+    "added_at": "2026-01-09T13:58:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:zabyrdo",
+      "quest:main-quest-09",
+      "act:4",
+      "support"
+    ]
+  },
+  {
+    "id": "dragon-spirit-trial",
+    "title": "Гласът на змея под мостовете",
+    "type": "event",
+    "area_id": "wonders-bridges-cave",
+    "quest_id": "main-quest-08",
+    "description": "В пещерата под Чудните мостове героят разговаря с духа на змея, преминава арена от светлина и решава капана с костите, за да заслужи петата монета.",
+    "added_at": "2026-01-09T13:40:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:wonders-bridges-cave",
+      "quest:main-quest-08",
+      "act:3",
+      "trial"
+    ]
+  },
+  {
+    "id": "karadjov-chasm-crawl",
+    "title": "Пълзенето през Караджовия процеп",
+    "type": "area",
+    "area_id": "karadjov-pass",
+    "quest_id": "main-quest-09",
+    "description": "Колоната сваля багажа и преминава тесния процеп между скалите, избирайки между пълзене, въжета или магия, докато вятърът свири в ушите.",
+    "added_at": "2026-01-09T14:05:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:karadjov-pass",
+      "quest:main-quest-09",
+      "act:4",
+      "travel"
+    ]
+  },
+  {
+    "id": "karadjov-altar-echo",
+    "title": "Ехото на скалния олтар",
+    "type": "event",
+    "area_id": "karadjov-pass",
+    "quest_id": "main-quest-09",
+    "description": "На върха на Караджовия камък героят оставя монетите върху плочата с копита и слуша ехото, което подсказва пътя към седмата монета.",
+    "added_at": "2026-01-09T14:15:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:karadjov-pass",
+      "quest:main-quest-09",
+      "act:4",
+      "ritual"
+    ]
+  },
+  {
+    "id": "humility-tunnel",
+    "title": "Тунелът на смирението",
+    "type": "event",
+    "area_id": "karadjov-pass",
+    "quest_id": "main-quest-09",
+    "description": "Героят и companion свалят бронята и пълзят през тесния тунел, оставяйки гордостта зад себе си, за да заслужат благословията.",
+    "added_at": "2026-01-09T14:25:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:karadjov-pass",
+      "quest:main-quest-09",
+      "act:4",
+      "trial"
+    ]
+  },
+  {
+    "id": "coin-six-vortex",
+    "title": "Вихърът на шестата монета",
+    "type": "event",
+    "area_id": "karadjov-pass",
+    "quest_id": "main-quest-09",
+    "description": "Магическият вихър над нишата се успокоява, когато героят използва огън, вода или песента на забърденци, за да вземе шестата монета.",
+    "added_at": "2026-01-09T14:35:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:karadjov-pass",
+      "quest:main-quest-09",
+      "act:4",
+      "loot"
+    ]
+  },
+  {
+    "id": "hermit-warning",
+    "title": "Предупреждението на отшелника",
+    "type": "event",
+    "area_id": "cross-forest",
+    "quest_id": "main-quest-09",
+    "description": "Отшелникът край Кръстова гора предупреждава: „Когато видиш колесницата, не докосвай метал с голи ръце“, добавяйки hint за седмата монета.",
+    "added_at": "2026-01-09T14:50:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:cross-forest",
+      "quest:main-quest-09",
+      "act:4",
+      "lore"
+    ]
+  },
+  {
+    "id": "four-crosses-rite",
+    "title": "Ритуалът на четирите кръста",
+    "type": "event",
+    "area_id": "cross-forest-vigil",
+    "quest_id": "main-quest-09",
+    "description": "Героят избира кръста на стихията, целува го и получава благословия, докато поклонниците пеят за Караджовия войвода.",
+    "added_at": "2026-01-09T15:05:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:cross-forest-vigil",
+      "quest:main-quest-09",
+      "act:4",
+      "ritual"
+    ]
+  },
+  {
+    "id": "vigil-night-watch",
+    "title": "Нощното бдение под дванадесетте кръста",
+    "type": "event",
+    "area_id": "cross-forest-vigil",
+    "quest_id": "main-quest-09",
+    "description": "Без сън, само песен и шепот; героят записва в дневника и пази огньовете, докато звездите чертаят пътя към Белинташ.",
+    "added_at": "2026-01-09T15:20:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:cross-forest-vigil",
+      "quest:main-quest-09",
+      "act:4",
+      "camp"
+    ]
+  },
+  {
+    "id": "coin-seven-receipt",
+    "title": "Получаването на седмата монета",
+    "type": "event",
+    "area_id": "cross-forest-hermit-oak",
+    "quest_id": "main-quest-09",
+    "description": "Отшелникът подава Crossheart от кухия дъб, след като героят дава обет за мълчание и приема предупреждението за колесницата.",
+    "added_at": "2026-01-09T15:30:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:cross-forest-hermit-oak",
+      "quest:main-quest-09",
+      "act:4",
+      "loot"
+    ]
+  },
+  {
+    "id": "cross-forest-actv-briefing",
+    "title": "Последните инструкции в Кръстова гора",
+    "type": "event",
+    "area_id": "cross-forest",
+    "quest_id": "main-quest-10",
+    "description": "Отец Методий и отшелникът събират колоната на „Каменната длан“, за да отключат тайния проход към Белинташ и да разпределят провизиите.",
+    "added_at": "2026-01-09T15:45:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:cross-forest",
+      "quest:main-quest-10",
+      "act:5",
+      "briefing"
+    ]
+  },
+  {
+    "id": "vigil-final-blessing",
+    "title": "Благословията на четирите кръста за Act V",
+    "type": "event",
+    "area_id": "cross-forest-vigil",
+    "quest_id": "main-quest-10",
+    "description": "Поклонниците и Калина изпяват последната песен, за да благословят похода към Белинташ и да запечатат обетите.",
+    "added_at": "2026-01-09T15:50:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:cross-forest-vigil",
+      "quest:main-quest-10",
+      "act:5",
+      "ritual"
+    ]
+  },
+  {
+    "id": "hermit-final-warning",
+    "title": "Последното предупреждение на отшелника",
+    "type": "event",
+    "area_id": "cross-forest-hermit-oak",
+    "quest_id": "main-quest-10",
+    "description": "Отшелникът поставя ръка върху амулета и казва, че ако колесницата бъде обезпокоена, Родопите ще горят — последен hint преди спускането.",
+    "added_at": "2026-01-09T15:55:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:cross-forest-hermit-oak",
+      "quest:main-quest-10",
+      "act:5",
+      "lore"
+    ]
+  },
+  {
+    "id": "wonders-bridges-legend-update",
+    "title": "Легендата за змея се обновява",
+    "type": "event",
+    "area_id": "wonders-bridges",
+    "quest_id": "main-quest-10",
+    "description": "Пастирите под Чудните мостове записват нови стихове за колесницата и чакат сигнал дали тя е запечатана.",
+    "added_at": "2026-01-09T16:00:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:wonders-bridges",
+      "quest:main-quest-10",
+      "act:5",
+      "lore"
+    ]
+  },
+  {
+    "id": "philippopolis-final-letters",
+    "title": "Писмата към двора от Филипопол",
+    "type": "event",
+    "area_id": "philippopolis",
+    "quest_id": "main-quest-10",
+    "description": "Ликург и Алексий изпращат запечатани писма за съдбата на колесницата, които чакат знак от Белинташ преди да стигнат до княза.",
+    "added_at": "2026-01-09T16:02:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:philippopolis",
+      "quest:main-quest-10",
+      "act:5",
+      "diplomacy"
+    ]
+  },
+  {
+    "id": "belintash-tunnel-entry",
+    "title": "Влизането в тунела под Белинташ",
+    "type": "area",
+    "area_id": "belintash-tunnel",
+    "quest_id": "main-quest-10",
+    "description": "След тайния маршрут от Кръстова гора колоната запечатва входа и запалва факли, докато студеният въздух от тунела ги обгръща.",
+    "added_at": "2026-01-09T16:05:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-tunnel",
+      "quest:main-quest-10",
+      "act:5",
+      "entry"
+    ]
+  },
+  {
+    "id": "living-walls-test",
+    "title": "Стражите на стените оживяват",
+    "type": "event",
+    "area_id": "belintash-tunnel",
+    "quest_id": "main-quest-10",
+    "description": "Лицата в стените започват да шептят въпроси; героят избира дали да говори с тях, да ги отпрати с огън, или да мине със завързани очи.",
+    "added_at": "2026-01-09T16:10:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-tunnel",
+      "quest:main-quest-10",
+      "act:5",
+      "trial"
+    ]
+  },
+  {
+    "id": "oath-altar-ash",
+    "title": "Клетвата и прахът от олтара",
+    "type": "event",
+    "area_id": "belintash-tunnel",
+    "quest_id": "main-quest-10",
+    "description": "Пред покрития с прах олтар героят решава дали да повтори клетвата, да вземе Sacred Ash или просто да наблюдава.",
+    "added_at": "2026-01-09T16:18:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-tunnel",
+      "quest:main-quest-10",
+      "act:5",
+      "ritual"
+    ]
+  },
+  {
+    "id": "armory-temptation",
+    "title": "Изкушението в камерата на оръжията",
+    "type": "event",
+    "area_id": "belintash-tunnel",
+    "quest_id": "main-quest-10",
+    "description": "Ръждясали доспехи и реликви изпитват волята; героят решава дали да вземе талисман или да остави всичко непокътнато.",
+    "added_at": "2026-01-09T16:25:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-tunnel",
+      "quest:main-quest-10",
+      "act:5",
+      "temptation"
+    ]
+  },
+  {
+    "id": "treasure-hall-glare",
+    "title": "Златната зала на Белинташ",
+    "type": "area",
+    "area_id": "belintash-tunnel",
+    "quest_id": "main-quest-10",
+    "description": "Цялата зала блещука от злато; прахът по стъпалата издава, че мнозина са се провалили преди.",
+    "added_at": "2026-01-09T16:30:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-tunnel",
+      "quest:main-quest-10",
+      "act:5",
+      "lore"
+    ]
+  },
+  {
+    "id": "greed-trial",
+    "title": "Тестът на алчността",
+    "type": "event",
+    "area_id": "belintash-tunnel",
+    "quest_id": "main-quest-10",
+    "description": "Маса със златни чаши примамва героя да пие; отказът или разрушаването им определя дали духовете ще бъдат умилостивени.",
+    "added_at": "2026-01-09T16:35:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-tunnel",
+      "quest:main-quest-10",
+      "act:5",
+      "trial"
+    ]
+  },
+  {
+    "id": "underground-lake-crossing",
+    "title": "Пресичането на подземното езеро",
+    "type": "event",
+    "area_id": "belintash-tunnel",
+    "quest_id": "main-quest-10",
+    "description": "Ледените води принуждават героя да избере между плуване, построяване на сал или магически воден щит.",
+    "added_at": "2026-01-09T16:42:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-tunnel",
+      "quest:main-quest-10",
+      "act:5",
+      "hazard"
+    ]
+  },
+  {
+    "id": "spirits-lament",
+    "title": "Шепотът на жертвите",
+    "type": "event",
+    "area_id": "belintash-tunnel",
+    "quest_id": "main-quest-10",
+    "description": "Кости и сенки умоляват за песен или жертва; героят може да използва Sacred Ash или Willpower, за да ги успокои.",
+    "added_at": "2026-01-09T16:48:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-tunnel",
+      "quest:main-quest-10",
+      "act:5",
+      "lore"
+    ]
+  },
+  {
+    "id": "seven-lock-gate",
+    "title": "Вратата със седем отвора",
+    "type": "event",
+    "area_id": "belintash-tunnel",
+    "quest_id": "main-quest-10",
+    "description": "Монетите влизат в каналите и светлината очертава пътя към камерата на колесницата.",
+    "added_at": "2026-01-09T16:55:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-tunnel",
+      "quest:main-quest-10",
+      "act:5",
+      "unlock"
+    ]
+  },
+  {
+    "id": "chariot-chamber-arrival",
+    "title": "Площадката на колесницата",
+    "type": "area",
+    "area_id": "belintash-sanctum",
+    "quest_id": "main-quest-10",
+    "description": "Златната колесница блести със съзвездия; героят стъпва на мозайката и усеща как амулетът се нажежава.",
+    "added_at": "2026-01-09T17:05:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-sanctum",
+      "quest:main-quest-10",
+      "act:5",
+      "reveal"
+    ]
+  },
+  {
+    "id": "amulet-voice",
+    "title": "Гласът на амулета",
+    "type": "event",
+    "area_id": "belintash-sanctum",
+    "quest_id": "main-quest-10",
+    "description": "Амулетът пита защо търсиш колесницата — отговорът решава дали ще пазиш тайната, ще служиш на царя или на знанието.",
+    "added_at": "2026-01-09T17:10:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-sanctum",
+      "quest:main-quest-10",
+      "act:5",
+      "decision"
+    ]
+  },
+  {
+    "id": "truth-decision",
+    "title": "Изборът на истината",
+    "type": "event",
+    "area_id": "belintash-sanctum",
+    "quest_id": "main-quest-10",
+    "description": "Колесницата показва видение за гибел и спасение; героят решава дали да я остави, използва или документира.",
+    "added_at": "2026-01-09T17:15:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-sanctum",
+      "quest:main-quest-10",
+      "act:5",
+      "major-choice"
+    ]
+  },
+  {
+    "id": "seal-ritual",
+    "title": "Ритуалът на запечатването",
+    "type": "event",
+    "area_id": "belintash-sanctum",
+    "quest_id": "main-quest-10",
+    "description": "Седемте монети се поставят в стелите, companions скандират, а амулетът управлява светлината.",
+    "added_at": "2026-01-09T17:20:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-sanctum",
+      "quest:main-quest-10",
+      "act:5",
+      "ritual"
+    ]
+  },
+  {
+    "id": "collapse-start",
+    "title": "Камените започват да се рушат",
+    "type": "event",
+    "area_id": "belintash-sanctum",
+    "quest_id": "main-quest-10",
+    "description": "Веднага след ритуала плочите се разпукват, активирайки таймера за бягство.",
+    "added_at": "2026-01-09T17:22:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-sanctum",
+      "quest:main-quest-10",
+      "act:5",
+      "hazard"
+    ]
+  },
+  {
+    "id": "collapse-main-route",
+    "title": "Главният коридор на срутването",
+    "type": "area",
+    "area_id": "belintash-collapse",
+    "quest_id": "main-quest-10",
+    "description": "Официалният изход започва да се свива; падат камъни и се изискват Athletics/Spell checks.",
+    "added_at": "2026-01-09T17:24:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-collapse",
+      "quest:main-quest-10",
+      "act:5",
+      "escape"
+    ]
+  },
+  {
+    "id": "secret-shaft-option",
+    "title": "Тайният шахт към повърхността",
+    "type": "event",
+    "area_id": "belintash-collapse",
+    "quest_id": "main-quest-10",
+    "description": "С помощта на `intel.tunnel_map` героят намира вертикален шахт със старо въже.",
+    "added_at": "2026-01-09T17:26:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-collapse",
+      "quest:main-quest-10",
+      "act:5",
+      "route"
+    ]
+  },
+  {
+    "id": "letter-niche-note",
+    "title": "Писмото, което никой не прочете",
+    "type": "event",
+    "area_id": "belintash-collapse",
+    "quest_id": "main-quest-10",
+    "description": "Героят оставя послание в нишата, описвайки пътя и съдбата на монетите.",
+    "added_at": "2026-01-09T17:28:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-collapse",
+      "quest:main-quest-10",
+      "act:5",
+      "journal"
+    ]
+  },
+  {
+    "id": "last-sacrifice",
+    "title": "Последният шанс",
+    "type": "event",
+    "area_id": "belintash-collapse",
+    "quest_id": "main-quest-10",
+    "description": "Героят решава дали да хвърли монета, да жертва светлината на амулета или да пази дневника с цената на нараняване.",
+    "added_at": "2026-01-09T17:30:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-collapse",
+      "quest:main-quest-10",
+      "act:5",
+      "sacrifice"
+    ]
+  },
+  {
+    "id": "final-vision-glow",
+    "title": "Светлината в тъмното",
+    "type": "event",
+    "area_id": "belintash-collapse",
+    "quest_id": "main-quest-10",
+    "description": "Преди последния изход героят вижда три сенки, които благославят запечатаната колесница.",
+    "added_at": "2026-01-09T17:32:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-collapse",
+      "quest:main-quest-10",
+      "act:5",
+      "vision"
+    ]
+  },
+  {
+    "id": "act5-final-choice",
+    "title": "Краят на Act V",
+    "type": "event",
+    "area_id": "belintash-collapse",
+    "quest_id": "main-quest-10",
+    "description": "Героят избира дали да излезе навън, да остане пазител или да остави дневника и монетите за епилога.",
+    "added_at": "2026-01-09T17:35:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-collapse",
+      "quest:main-quest-10",
+      "act:5",
+      "ending"
+    ]
+  },
+  {
+    "id": "epilogue-silence",
+    "title": "Черен екран и тишина",
+    "type": "event",
+    "area_id": "epilogue-vanga",
+    "quest_id": "main-quest-11",
+    "description": "Гласът на Ванга се появява след тишина; изборът на звук задава тона на епилога.",
+    "added_at": "1973-08-12T13:00:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:epilogue-vanga",
+      "quest:main-quest-11",
+      "act:epilogue",
+      "audio"
+    ]
+  },
+  {
+    "id": "epilogue-vanga-prophecy",
+    "title": "Пророчеството за осемте жертви",
+    "type": "event",
+    "area_id": "epilogue-vanga",
+    "quest_id": "main-quest-11",
+    "description": "Ванга говори на иманяри в Рупите: предупреждения за осем жертви, писмото и плачещите кръстове.",
+    "added_at": "1973-08-12T13:05:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:epilogue-vanga",
+      "quest:main-quest-11",
+      "act:epilogue",
+      "prophecy"
+    ]
+  },
+  {
+    "id": "epilogue-archaeologists",
+    "title": "Археолозите на Белинташ",
+    "type": "event",
+    "area_id": "epilogue-vanga",
+    "quest_id": "main-quest-11",
+    "description": "Кадър от 1970-те: археолози снимат руни, обсъждат монета и решават дали да се оттеглят.",
+    "added_at": "1973-08-12T13:10:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:epilogue-vanga",
+      "quest:main-quest-11",
+      "act:epilogue",
+      "history"
+    ]
+  },
+  {
+    "id": "epilogue-cemetery-choice",
+    "title": "Гробището при Белинташ",
+    "type": "event",
+    "area_id": "epilogue-vanga",
+    "quest_id": "main-quest-11",
+    "description": "Камерата се спира на кръстовете; избираш дали се вижда нов кръст, писмо или само мъгла.",
+    "added_at": "1973-08-12T13:15:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:epilogue-vanga",
+      "quest:main-quest-11",
+      "act:epilogue",
+      "cemetery"
+    ]
+  },
+  {
+    "id": "epilogue-fade",
+    "title": "Гласът затихва",
+    "type": "event",
+    "area_id": "epilogue-vanga",
+    "quest_id": "main-quest-11",
+    "description": "Ванга прошепва „Не всичко е злато, което блести“ и епилогът завършва с избрания финален кадър.",
+    "added_at": "1973-08-12T13:20:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:epilogue-vanga",
+      "quest:main-quest-11",
+      "act:epilogue",
+      "ending"
+    ]
+  },
+  {
+    "id": "epilogue-letter-found",
+    "title": "Писмото на героя е намерено",
+    "type": "event",
+    "area_id": "epilogue-heir-meadow",
+    "quest_id": "main-quest-12",
+    "description": "Внучката, млад археолог или старейшина от Забърдо намират писмото в нишата и го носят на поляната.",
+    "added_at": "1975-07-22T15:10:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:epilogue-heir-meadow",
+      "quest:main-quest-12",
+      "act:epilogue",
+      "letter"
+    ]
+  },
+  {
+    "id": "epilogue-song-theme",
+    "title": "Възраждането на песента",
+    "type": "event",
+    "area_id": "epilogue-heir-meadow",
+    "quest_id": "main-quest-12",
+    "description": "Наследникът изпява песента на Белинташ и избира тема — жертва, опасност или надежда.",
+    "added_at": "1975-07-22T15:20:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:epilogue-heir-meadow",
+      "quest:main-quest-12",
+      "act:epilogue",
+      "song"
+    ]
+  },
+  {
+    "id": "epilogue-archivist-letters",
+    "title": "Писмата на археолога",
+    "type": "event",
+    "area_id": "philippopolis",
+    "quest_id": "main-quest-12",
+    "description": "Археологът събира копия на писмата и изпраща доклад към музея в Пловдив, който решава как да реагира.",
+    "added_at": "1975-07-22T15:25:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:philippopolis",
+      "quest:main-quest-12",
+      "act:epilogue",
+      "diplomacy"
+    ]
+  },
+  {
+    "id": "epilogue-heir-pact",
+    "title": "Пактът на наследниците",
+    "type": "event",
+    "area_id": "epilogue-heir-meadow",
+    "quest_id": "main-quest-12",
+    "description": "Трите семейства решават дали да пазят тайната, да обучат нови пазители или да публикуват писмата.",
+    "added_at": "1975-07-22T15:35:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:epilogue-heir-meadow",
+      "quest:main-quest-12",
+      "act:epilogue",
+      "pact"
+    ]
+  },
+  {
+    "id": "epilogue-final-shot-ii",
+    "title": "Кадърът, който остава (Забърдо)",
+    "type": "event",
+    "area_id": "epilogue-heir-meadow",
+    "quest_id": "main-quest-12",
+    "description": "Камерата се отдръпва, показвайки Белинташ в здрач с надпис “Тайната оцелява”, изчезващи координати или продължаваща песен от наследниците.",
+    "added_at": "1975-07-22T15:40:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:epilogue-heir-meadow",
+      "quest:main-quest-12",
+      "act:epilogue",
+      "ending"
+    ]
+  },
+  {
+    "id": "epilogue-vanga-bridge",
+    "title": "Гласът на Ванга във втората част",
+    "type": "event",
+    "area_id": "epilogue-vanga",
+    "quest_id": "main-quest-12",
+    "description": "Ванга слуша новините от наследниците и повтаря избраната тема на песента, за да свърже Епилог I и II.",
+    "added_at": "1975-07-22T15:05:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:epilogue-vanga",
+      "quest:main-quest-12",
+      "act:epilogue",
+      "voice-over"
+    ]
+  },
+  {
+    "id": "epilogue-collapse-flashback",
+    "title": "Споменът за срутването",
+    "type": "event",
+    "area_id": "belintash-collapse",
+    "quest_id": "main-quest-12",
+    "description": "Наследниците отварят писмото и виждат описанието на срутването и нишата, където то е било оставено.",
+    "added_at": "1975-07-22T15:12:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-collapse",
+      "quest:main-quest-12",
+      "act:epilogue",
+      "flashback"
+    ]
+  },
+  {
+    "id": "vanga-mentions-philippopolis",
+    "title": "Ванга споменава Филипопол",
+    "type": "event",
+    "area_id": "philippopolis",
+    "quest_id": "main-quest-11",
+    "description": "Гласът на Ванга описва как писмата от Филипопол стигат до Рупите и как дворът реагира на предупреждението.",
+    "added_at": "1973-08-12T13:08:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:philippopolis",
+      "quest:main-quest-11",
+      "act:epilogue",
+      "voice-over"
+    ]
+  },
+  {
+    "id": "vanga-collapse-vision",
+    "title": "Ванга вижда срутването",
+    "type": "event",
+    "area_id": "belintash-collapse",
+    "quest_id": "main-quest-11",
+    "description": "По време на пророчеството Ванга описва нишата и рухването под Белинташ, напомняйки за писмото.",
+    "added_at": "1973-08-12T13:12:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-collapse",
+      "quest:main-quest-11",
+      "act:epilogue",
+      "flashback"
+    ]
+  },
+  {
+    "id": "philippopolis-archive-ripple",
+    "title": "Архивистите слушат пророчеството",
+    "type": "event",
+    "area_id": "philippopolis",
+    "quest_id": "main-quest-11",
+    "description": "След като иманярите си тръгват, архивистите в Пловдив записват гласа на Ванга и го включват в писмата към двора.",
+    "added_at": "1973-08-12T13:18:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:philippopolis",
+      "quest:main-quest-11",
+      "act:epilogue",
+      "archive"
+    ]
+  },
+  {
+    "id": "zabyrdo-support-circle",
+    "title": "Забърдо подкрепя наследниците",
+    "type": "event",
+    "area_id": "zabyrdo",
+    "quest_id": "main-quest-12",
+    "description": "Старейшините на Забърдо изпращат пазители и билкари към поляната, за да подпомогнат четенето на писмото и събирането на фамилиите.",
+    "added_at": "1975-07-22T15:05:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:zabyrdo",
+      "quest:main-quest-12",
+      "act:epilogue",
+      "support"
+    ]
+  },
+  {
+    "id": "epilogue-amulet-surge",
+    "title": "Амулетът се разгаря",
+    "type": "event",
+    "area_id": "belintash-amulet-vault",
+    "quest_id": "main-quest-14",
+    "description": "Когато епилогът стига до камерата, амулетът в ръката на героя се нажежава и избира дали да остане или да бъде предаден.",
+    "added_at": "2024-09-18T21:05:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-amulet-vault",
+      "quest:main-quest-14",
+      "act:epilogue",
+      "amulet"
+    ]
+  },
+  {
+    "id": "epilogue-inscription-choice",
+    "title": "Надписът под лампите",
+    "type": "event",
+    "area_id": "belintash-amulet-vault",
+    "quest_id": "main-quest-14",
+    "description": "Стенописът блести под LED лампите; решава се кой го превежда и каква версия остава в историята.",
+    "added_at": "2024-09-18T21:10:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-amulet-vault",
+      "quest:main-quest-14",
+      "act:epilogue",
+      "inscription"
+    ]
+  },
+  {
+    "id": "epilogue-fate-debate",
+    "title": "Съдбата на тайната",
+    "type": "event",
+    "area_id": "belintash-amulet-vault",
+    "quest_id": "main-quest-14",
+    "description": "Съветът решава дали да излъчи на живо, да пази тайна или да инсценира катастрофа.",
+    "added_at": "2024-09-18T21:15:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-amulet-vault",
+      "quest:main-quest-14",
+      "act:epilogue",
+      "decision"
+    ]
+  },
+  {
+    "id": "epilogue-narrator-tone",
+    "title": "Гласът зад кадър",
+    "type": "event",
+    "area_id": "belintash-amulet-vault",
+    "quest_id": "main-quest-14",
+    "description": "Разказвачът избира финалния тон — героичен, ироничен или предупреждаващ.",
+    "added_at": "2024-09-18T21:18:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-amulet-vault",
+      "quest:main-quest-14",
+      "act:epilogue",
+      "narration"
+    ]
+  },
+  {
+    "id": "epilogue-final-shot",
+    "title": "Кадърът, който остава",
+    "type": "event",
+    "area_id": "belintash-amulet-vault",
+    "quest_id": "main-quest-14",
+    "description": "Камерата показва мистериозен пламък, списък с наследници или светлина към нова локация, според избора.",
+    "added_at": "2024-09-18T21:20:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-amulet-vault",
+      "quest:main-quest-14",
+      "act:epilogue",
+      "ending"
+    ]
+  },
+  {
+    "id": "epilogue13-camp-setup",
+    "title": "Лагерът светва отново",
+    "type": "event",
+    "area_id": "belintash-modern-camp",
+    "quest_id": "main-quest-13",
+    "description": "Дроновете и генераторите се включват за брояча на жертвите; екипът избира стил на визуализацията.",
+    "added_at": "2024-09-18T20:40:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-modern-camp",
+      "quest:main-quest-13",
+      "act:epilogue",
+      "setup"
+    ]
+  },
+  {
+    "id": "epilogue13-collapse-route",
+    "title": "Резервният тунел",
+    "type": "event",
+    "area_id": "belintash-collapse",
+    "quest_id": "main-quest-13",
+    "description": "Инженерите маркират старите коридори като резервно трасе и записват нишата на писмото.",
+    "added_at": "2024-09-18T20:55:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:belintash-collapse",
+      "quest:main-quest-13",
+      "act:epilogue",
+      "engineering"
+    ]
+  },
+  {
+    "id": "epilogue13-philippopolis-brief",
+    "title": "Брифингът от Пловдив",
+    "type": "event",
+    "area_id": "philippopolis",
+    "quest_id": "main-quest-13",
+    "description": "Университетът изпраща инструкции и финансиране за модерната експедиция преди откриването на тунела.",
+    "added_at": "2024-09-18T20:30:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:philippopolis",
+      "quest:main-quest-13",
+      "act:epilogue",
+      "briefing"
+    ]
+  },
+  {
+    "id": "epilogue14-camp-control",
+    "title": "Контролна зала на лагера",
+    "type": "event",
+    "area_id": "belintash-modern-camp",
+    "quest_id": "main-quest-14",
+    "description": "По време на Епилог IV лагера координира livestream/секретност и подава сигнали към камерата.",
+    "added_at": "2024-09-18T21:00:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-modern-camp",
+      "quest:main-quest-14",
+      "act:epilogue",
+      "control"
+    ]
+  },
+  {
+    "id": "epilogue14-collapse-lockdown",
+    "title": "Запечатване на коридорите",
+    "type": "event",
+    "area_id": "belintash-collapse",
+    "quest_id": "main-quest-14",
+    "description": "В зависимост от решението екипът или стабилизира, или взривява старите тунели, за да пази тайната.",
+    "added_at": "2024-09-18T21:25:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:belintash-collapse",
+      "quest:main-quest-14",
+      "act:epilogue",
+      "lockdown"
+    ]
+  },
+  {
+    "id": "epilogue14-zabyrdo-reaction",
+    "title": "Реакцията на Забърдо",
+    "type": "event",
+    "area_id": "zabyrdo",
+    "quest_id": "main-quest-14",
+    "description": "Старейшините получават финалното решение (списък с наследници, пазители или мълчание) и планират бъдещите пазители.",
+    "added_at": "2024-09-18T21:30:00Z",
+    "origin": "player-request",
+    "tags": [
+      "area:zabyrdo",
+      "quest:main-quest-14",
+      "act:epilogue",
+      "reaction"
+    ]
+  },
+  {
+    "id": "epilogue14-philippopolis-report",
+    "title": "Докладът до Пловдив",
+    "type": "event",
+    "area_id": "philippopolis",
+    "quest_id": "main-quest-14",
+    "description": "Бюрото в Пловдив получава запис от финалния кадър и решава как да реагира според ending-а.",
+    "added_at": "2024-09-18T21:35:00Z",
+    "origin": "gm-suggested",
+    "tags": [
+      "area:philippopolis",
+      "quest:main-quest-14",
+      "act:epilogue",
+      "report"
+    ]
+  }
+]

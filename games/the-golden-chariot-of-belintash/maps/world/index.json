@@ -1,0 +1,35 @@
+{
+  "schema_version": "maps.world.v1",
+  "image": {
+    "file": "maps/world/world.png",
+    "width_px": 1024,
+    "height_px": 768
+  },
+  "regions": [
+    {
+      "id": "default-region",
+      "label": "Aurora Valley",
+      "bounding_box": {
+        "x": 120,
+        "y": 180,
+        "width": 280,
+        "height": 220
+      },
+      "area_id": "default-area",
+      "map_file": "maps/areas/default-area.json",
+      "notes": "Starter hub and surrounding farms."
+    }
+  ],
+  "ascii_preview": [
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~   @  Aurora Valley     ^   ~",
+    "~        ~~~~                 ~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+  ],
+  "legend": {
+    "~": "Ocean",
+    "@": "Capital City",
+    "^": "Mountain Range"
+  },
+  "notes": "Demo world map showing the single starter region."
+}

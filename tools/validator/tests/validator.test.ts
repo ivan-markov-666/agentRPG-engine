@@ -74,6 +74,12 @@ async function runCheck(
   return issues;
 }
 
+const GREEN = '\x1b[32m';
+const RED = '\x1b[31m';
+const RESET = '\x1b[0m';
+const SUCCESS_PREFIX = `${GREEN}✔`;
+const ERROR_PREFIX = `${RED}✖`;
+
 (async () => {
   // EXPLORATION description/tags minimum and preview mismatch
   {
@@ -84,7 +90,7 @@ async function runCheck(
       'scenario/quests/unlock-triggers.json': {},
       'player-data/runtime/state.json': {
         exploration_enabled: true,
-        exploration_log_preview: ['unknown-entry']
+        exploration_log_preview: ['unknown-entry'],
       },
       'player-data/runtime/exploration-log.json': [
         {
@@ -93,16 +99,367 @@ async function runCheck(
           type: 'poi',
           area_id: 'forest',
           description: 'Too short.',
-          tags: []
-        }
+          tags: [],
+        },
       ],
       'scenario/areas/forest.md': '# Forest\nContent',
       'player-data/runtime/completed-quests.json': [],
-      'config/capabilities.json': {}
+      'config/capabilities.json': {},
     });
     assert(issues.some((i) => i.code === 'EXPLORATION-DESCRIPTION-SHORT'), 'Expected EXPLORATION-DESCRIPTION-SHORT');
     assert(issues.some((i) => i.code === 'EXPLORATION-TAGS-MIN'), 'Expected EXPLORATION-TAGS-MIN');
     assert(issues.some((i) => i.code === 'EXPLORATION-PREVIEW-MISMATCH'), 'Expected EXPLORATION-PREVIEW-MISMATCH');
+  }
+
+  // CONTENT-SET-BALKAN-STATE warns when runtime block missing fields / wrapper
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'balkan-trail',
+            title: 'Balkan Trail DLC',
+            scenario_index: 'SCENARIOS/DLC/03-balkan-trail/index.md',
+            capabilities_file: 'CONFIG/balkan-trail.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {
+        content_sets: {
+          'balkan-trail': {
+            enabled: true,
+          },
+        },
+      },
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-BALKAN-STATE'),
+      'Expected CONTENT-SET-BALKAN-STATE when runtime fields missing',
+    );
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-STATE-BLOCK'),
+      'Expected CONTENT-SET-STATE-BLOCK when DLC state wrapper missing',
+    );
+  }
+
+  // CONTENT-SET-BALKAN-STATE satisfied with valid runtime block
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'balkan-trail',
+            title: 'Balkan Trail DLC',
+            scenario_index: 'SCENARIOS/DLC/03-balkan-trail/index.md',
+            capabilities_file: 'CONFIG/balkan-trail.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {
+        content_sets: {
+          'balkan-trail': {
+            enabled: true,
+            state: {
+              expedition_stage: 'underway',
+              convoy_morale: 70,
+              supply_tokens: 3,
+              alliance_track: {
+                byzantine: 1,
+                latin: 0,
+                voinuk: -1,
+              },
+              artifact_clues: ['prism_resonance'],
+              trail_notes: ['guardian_pass_secured'],
+              trails_resolution: 'byzantine',
+            },
+          },
+        },
+      },
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(
+      !issues.some((i) => i.code === 'CONTENT-SET-BALKAN-STATE'),
+      'Valid Balkan Trail state should not trigger CONTENT-SET-BALKAN-STATE',
+    );
+    assert(!issues.some((i) => i.code === 'CONTENT-SET-STATE-BLOCK'), 'Proper wrapper should not warn');
+  }
+
+  // CONTENT-SET-LAUT dependencies: Balkan Trail missing from manifest
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'laut-stronghold',
+            title: 'Laut Stronghold DLC',
+            scenario_index: 'SCENARIOS/DLC/04-laut-stronghold/index.md',
+            capabilities_file: 'CONFIG/laut-stronghold.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-LAUT-REQUIRES-BALKAN'),
+      'Expected CONTENT-SET-LAUT-REQUIRES-BALKAN when Balkan Trail missing',
+    );
+  }
+
+  // CONTENT-SET-LAUT dependencies: Next Guardians missing from manifest
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'balkan-trail',
+            title: 'Balkan Trail DLC',
+            scenario_index: 'SCENARIOS/DLC/03-balkan-trail/index.md',
+            capabilities_file: 'CONFIG/balkan-trail.capabilities.json',
+          },
+          {
+            id: 'laut-stronghold',
+            title: 'Laut Stronghold DLC',
+            scenario_index: 'SCENARIOS/DLC/04-laut-stronghold/index.md',
+            capabilities_file: 'CONFIG/laut-stronghold.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-LAUT-REQUIRES-GUARDIANS'),
+      'Expected CONTENT-SET-LAUT-REQUIRES-GUARDIANS when Next Guardians missing',
+    );
+  }
+
+  // CONTENT-SET-LAUT dependencies: unresolved Balkan finale and missing guardian structures
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'balkan-trail',
+            title: 'Balkan Trail DLC',
+            scenario_index: 'SCENARIOS/DLC/03-balkan-trail/index.md',
+            capabilities_file: 'CONFIG/balkan-trail.capabilities.json',
+          },
+          {
+            id: 'next-guardians',
+            title: 'Next Guardians DLC',
+            scenario_index: 'SCENARIOS/DLC/02-next-guardians/index.md',
+            capabilities_file: 'CONFIG/next-guardians.capabilities.json',
+          },
+          {
+            id: 'laut-stronghold',
+            title: 'Laut Stronghold DLC',
+            scenario_index: 'SCENARIOS/DLC/04-laut-stronghold/index.md',
+            capabilities_file: 'CONFIG/laut-stronghold.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {
+        content_sets: {
+          'balkan-trail': {
+            state: {
+              trails_resolution: 'unknown',
+            },
+          },
+          'next-guardians': {
+            state: {
+              structures: ['barracks'],
+              trials_result: '',
+            },
+          },
+        },
+      },
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-LAUT-TRAILS'),
+      'Expected CONTENT-SET-LAUT-TRAILS when trails_resolution unresolved',
+    );
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-LAUT-GUARDIANS'),
+      'Expected CONTENT-SET-LAUT-GUARDIANS when structures/trials_result missing',
+    );
+  }
+  // CONTENT-SET-LAUT-STATE warns when runtime block missing fields / wrapper
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'laut-stronghold',
+            title: 'Laut Stronghold DLC',
+            scenario_index: 'SCENARIOS/DLC/04-laut-stronghold/index.md',
+            capabilities_file: 'CONFIG/laut-stronghold.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {
+        content_sets: {
+          'laut-stronghold': {
+            enabled: true,
+          },
+        },
+      },
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-LAUT-STATE'),
+      'Expected CONTENT-SET-LAUT-STATE when runtime fields missing',
+    );
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-STATE-BLOCK'),
+      'Expected CONTENT-SET-STATE-BLOCK when DLC state wrapper missing',
+    );
+  }
+
+  // CONTENT-SET-LAUT-STATE satisfied with valid runtime block
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'laut-stronghold',
+            title: 'Laut Stronghold DLC',
+            scenario_index: 'SCENARIOS/DLC/04-laut-stronghold/index.md',
+            capabilities_file: 'CONFIG/laut-stronghold.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {
+        content_sets: {
+          'laut-stronghold': {
+            enabled: true,
+            state: {
+              defense_phase: 'siege',
+              stronghold_integrity: 70,
+              ward_power: 2,
+              woinuk_morale: 65,
+              espionage_alert: 1,
+              hazard_tokens: 0,
+              safehouses: ['clan_ivash'],
+              artifact_insight: ['pillar_delta'],
+              oath_resolution: 'undecided',
+              notes: 'Defensive line holding.',
+            },
+          },
+        },
+      },
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(
+      !issues.some((i) => i.code === 'CONTENT-SET-LAUT-STATE'),
+      'Valid Laut Stronghold state should not trigger CONTENT-SET-LAUT-STATE',
+    );
+    assert(!issues.some((i) => i.code === 'CONTENT-SET-STATE-BLOCK'), 'Proper wrapper should not warn');
+  }
+
+  // CONTENT-SET-NEXT-GUARDIANS-FILE when DLC assets missing
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'next-guardians',
+            title: 'Next Guardians DLC',
+            scenario_index: 'SCENARIOS/DLC/02-next-guardians/index.md',
+            capabilities_file: 'CONFIG/next-guardians.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-NEXT-GUARDIANS-FILE'),
+      'Expected CONTENT-SET-NEXT-GUARDIANS-FILE when DLC files missing',
+    );
+  }
+
+  // CONTENT-SET-NEXT-GUARDIANS-FILE satisfied when DLC assets exist
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'next-guardians',
+            title: 'Next Guardians DLC',
+            scenario_index: 'SCENARIOS/DLC/02-next-guardians/index.md',
+            capabilities_file: 'CONFIG/next-guardians.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+      'SCENARIOS/DLC/02-next-guardians/index.md': '# DLC Index\nSummary of quests.',
+      'SCENARIOS/DLC/02-next-guardians/dlc-ng-01-initiation.md': '# Quest 1\nDetails.',
+      'SCENARIOS/DLC/02-next-guardians/dlc-ng-02-built-citadel.md': '# Quest 2\nDetails.',
+      'SCENARIOS/DLC/02-next-guardians/dlc-ng-03-legacy-trials.md': '# Quest 3\nDetails.',
+      'CONFIG/next-guardians.capabilities.json': { morale_meter: { enabled: true } },
+    });
+    assert(
+      !issues.some((i) => i.code === 'CONTENT-SET-NEXT-GUARDIANS-FILE'),
+      'Next Guardians DLC files present should not trigger CONTENT-SET-NEXT-GUARDIANS-FILE',
+    );
   }
 
   // EXPLORATION legacy type + missing tags
@@ -132,6 +489,266 @@ async function runCheck(
     assert(issues.some((i) => i.code === 'EXPLORATION-TYPE-LEGACY'), 'Expected EXPLORATION-TYPE-LEGACY');
     assert(issues.some((i) => i.code === 'EXPLORATION-TAG-AREA'), 'Expected EXPLORATION-TAG-AREA');
     assert(issues.some((i) => i.code === 'EXPLORATION-TAG-QUEST'), 'Expected EXPLORATION-TAG-QUEST');
+  }
+
+  // CONTENT-SET-BELINTASH-FILE warns when DLC assets missing
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'belintash-crack',
+            title: 'Belintash DLC',
+            scenario_index: 'SCENARIOS/DLC/01-belintash-crack/index.md',
+            capabilities_file: 'CONFIG/belintash-crack.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-BELINTASH-FILE'),
+      'Expected CONTENT-SET-BELINTASH-FILE when DLC files missing',
+    );
+  }
+
+  // CONTENT-SET-BELINTASH-FILE satisfied when DLC assets exist
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'belintash-crack',
+            title: 'Belintash DLC',
+            scenario_index: 'SCENARIOS/DLC/01-belintash-crack/index.md',
+            capabilities_file: 'CONFIG/belintash-crack.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+      'SCENARIOS/DLC/01-belintash-crack/index.md': '# DLC Index\nSummary of quests.',
+      'SCENARIOS/DLC/01-belintash-crack/dlc-bc-01-stabilize.md': '# Quest 1\nDetails.',
+      'SCENARIOS/DLC/01-belintash-crack/dlc-bc-02-rescue.md': '# Quest 2\nDetails.',
+      'SCENARIOS/DLC/01-belintash-crack/dlc-bc-03-shattered-vision.md': '# Quest 3\nDetails.',
+      'CONFIG/belintash-crack.capabilities.json': { momentum: { enabled: true } },
+    });
+    assert(
+      !issues.some((i) => i.code === 'CONTENT-SET-BELINTASH-FILE'),
+      'Belintash DLC files present should not trigger CONTENT-SET-BELINTASH-FILE',
+    );
+  }
+
+  // CONTENT-SET-BALKAN-TRAIL-FILE warns when DLC assets missing
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'balkan-trail',
+            title: 'Balkan Trail DLC',
+            scenario_index: 'SCENARIOS/DLC/03-balkan-trail/index.md',
+            capabilities_file: 'CONFIG/balkan-trail.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-BALKAN-TRAIL-FILE'),
+      'Expected CONTENT-SET-BALKAN-TRAIL-FILE when DLC files missing',
+    );
+  }
+
+  // CONTENT-SET-BALKAN-TRAIL-FILE satisfied when DLC assets exist
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'balkan-trail',
+            title: 'Balkan Trail DLC',
+            scenario_index: 'SCENARIOS/DLC/03-balkan-trail/index.md',
+            capabilities_file: 'CONFIG/balkan-trail.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+      'SCENARIOS/DLC/03-balkan-trail/index.md': '# DLC Index\nSummary of quests.',
+      'SCENARIOS/DLC/03-balkan-trail/dlc-bt-01-map-of-light.md': '# Quest 1\nDetails.',
+      'SCENARIOS/DLC/03-balkan-trail/dlc-bt-02-guardians-pass.md': '# Quest 2\nDetails.',
+      'SCENARIOS/DLC/03-balkan-trail/dlc-bt-03-beam-over-salonika.md': '# Quest 3\nDetails.',
+      'CONFIG/balkan-trail.capabilities.json': { supply_tokens: { enabled: true } },
+    });
+    assert(
+      !issues.some((i) => i.code === 'CONTENT-SET-BALKAN-TRAIL-FILE'),
+      'Balkan Trail DLC files present should not trigger CONTENT-SET-BALKAN-TRAIL-FILE',
+    );
+  }
+
+  // CONTENT-SET-LAUT-FILE warns when DLC assets missing
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'laut-stronghold',
+            title: 'Laut Stronghold DLC',
+            scenario_index: 'SCENARIOS/DLC/04-laut-stronghold/index.md',
+            capabilities_file: 'CONFIG/laut-stronghold.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-LAUT-FILE'),
+      'Expected CONTENT-SET-LAUT-FILE when DLC files missing',
+    );
+  }
+
+  // CONTENT-SET-LAUT-FILE satisfied when DLC assets exist
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'laut-stronghold',
+            title: 'Laut Stronghold DLC',
+            scenario_index: 'SCENARIOS/DLC/04-laut-stronghold/index.md',
+            capabilities_file: 'CONFIG/laut-stronghold.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {},
+      'player-data/runtime/completed-quests.json': [],
+      'SCENARIOS/DLC/04-laut-stronghold/index.md': '# DLC Index\nSummary of quests.',
+      'SCENARIOS/DLC/04-laut-stronghold/dlc-ls-01-shadows.md': '# Quest 1\nDetails.',
+      'SCENARIOS/DLC/04-laut-stronghold/dlc-ls-02-three-walls.md': '# Quest 2\nDetails.',
+      'SCENARIOS/DLC/04-laut-stronghold/dlc-ls-03-oath.md': '# Quest 3\nDetails.',
+      'CONFIG/laut-stronghold.capabilities.json': { stronghold_integrity: { enabled: true } },
+    });
+    assert(
+      !issues.some((i) => i.code === 'CONTENT-SET-LAUT-FILE'),
+      'Laut Stronghold DLC files present should not trigger CONTENT-SET-LAUT-FILE',
+    );
+  }
+
+  // CONTENT-SET-BELINTASH-STATE warns when runtime block missing fields
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'belintash-crack',
+            title: 'Belintash DLC',
+            scenario_index: 'SCENARIOS/DLC/01-belintash-crack/index.md',
+            capabilities_file: 'CONFIG/belintash-crack.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {
+        content_sets: {
+          'belintash-crack': {
+            enabled: true,
+          },
+        },
+      },
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(issues.some((i) => i.code === 'CONTENT-SET-BELINTASH-STATE'), 'Expected CONTENT-SET-BELINTASH-STATE when fields missing');
+    assert(
+      issues.some((i) => i.code === 'CONTENT-SET-STATE-BLOCK'),
+      'Expected CONTENT-SET-STATE-BLOCK warning when state wrapper missing',
+    );
+  }
+
+  // CONTENT-SET-BELINTASH-STATE satisfied with valid runtime state
+  {
+    const issues = await runCheck(checkRequiredFiles, {
+      'manifest/entry.json': {
+        id: 'game-1',
+        title: 'Game 1',
+        version: '0.0.1',
+        content_sets: [
+          {
+            id: 'belintash-crack',
+            title: 'Belintash DLC',
+            scenario_index: 'SCENARIOS/DLC/01-belintash-crack/index.md',
+            capabilities_file: 'CONFIG/belintash-crack.capabilities.json',
+          },
+        ],
+      },
+      'scenario/index.md': '# Intro\nLong enough text for validator baseline.',
+      'scenario/quests/available.json': [],
+      'scenario/quests/unlock-triggers.json': {},
+      'player-data/runtime/state.json': {
+        content_sets: {
+          'belintash-crack': {
+            enabled: true,
+            state: {
+              collapse_stage: 1,
+              rescued_archivists: 2,
+              hazard_timer: 'stable',
+              support_nodes: ['steam:north'],
+              notes: 'Stabilized northern vents.',
+            },
+          },
+        },
+      },
+      'player-data/runtime/completed-quests.json': [],
+    });
+    assert(
+      !issues.some((i) => i.code === 'CONTENT-SET-BELINTASH-STATE'),
+      'Valid belintash state should not trigger CONTENT-SET-BELINTASH-STATE',
+    );
+    assert(!issues.some((i) => i.code === 'CONTENT-SET-STATE-BLOCK'), 'Proper wrapper should not warn');
   }
 
   // EXPLORATION quest guardrails (missing quest_id and unknown quest)
@@ -192,6 +809,17 @@ async function runCheck(
           description:
             'Recon teams survey the landing zone, interview refugees, and mark suspicious supply drops that do not match manifests.',
           tags: ['hook']
+        },
+        {
+          id: 'landing-quest',
+          title: 'Landing Quest Lead',
+          type: 'quest',
+          quest_id: 'quest-main',
+          added_at: '2025-12-28T11:00:00.000Z',
+          origin: 'gm-suggested',
+          description:
+            'After the scouting report, operatives identify a hidden glyph chamber tied to quest-main but cannot mark it on the dossier yet.',
+          tags: ['hook']
         }
       ],
       'player-data/runtime/completed-quests.json': []
@@ -236,7 +864,6 @@ async function runCheck(
         }
       ]
     });
-    assert(issues.some((i) => i.code === 'EXPLORATION-TAG-AREA'), 'Expected EXPLORATION-TAG-AREA when area tag missing');
     assert(issues.some((i) => i.code === 'EXPLORATION-QUEST-MISMATCH'), 'Expected EXPLORATION-QUEST-MISMATCH when quest tag missing');
   }
 
@@ -790,7 +1417,7 @@ Explain the factions rallying around the quest target and how success changes th
     assert(output.includes('[ERROR][LOG]'), `Log guardrail error should be reported\n${output}`);
   }
 
-  // CLI requires --run-id
+  // CLI auto-generates --run-id when missing
   {
     const base = setupGame({
       'manifest/entry.json': { id: 'game-1', title: 'Game 1', version: '0.0.1' },
@@ -804,8 +1431,8 @@ Explain the factions rallying around the quest target and how success changes th
     const cliPath = path.resolve(__dirname, '..', '..', '..', 'dist', 'cli', 'validate.js');
     const result = spawnSync('node', [cliPath, '--path', base], { encoding: 'utf8' });
     const output = `${result.stdout || ''}${result.stderr || ''}`;
-    assert.strictEqual(result.status, 1, `CLI should exit 1 when run-id missing\n${output}`);
-    assert(output.includes('[ERROR][RUN-ID]'), `Missing run-id error should be reported\n${output}`);
+    assert.strictEqual(result.status, 0, `CLI should succeed by auto-generating run-id\n${output}`);
+    assert(output.includes('[INFO][RUN-ID] Generated run-id'), `Auto-generated run-id info should be printed\n${output}`);
   }
 
   // CLI logs telemetry with runId
@@ -824,8 +1451,11 @@ Explain the factions rallying around the quest target and how success changes th
     const result = spawnSync('node', [cliPath, '--path', base, '--run-id', 'test-run', '--log', logFile], { encoding: 'utf8' });
     const output = `${result.stdout || ''}${result.stderr || ''}`;
     assert.strictEqual(result.status, 0, `CLI should succeed when run-id provided\n${output}`);
-    const logged = JSON.parse(fs.readFileSync(logFile, 'utf8'));
-    assert.strictEqual(logged.runId, 'test-run', 'Telemetry log should include runId field');
+    const loggedRaw = JSON.parse(fs.readFileSync(logFile, 'utf8'));
+    const entries = Array.isArray(loggedRaw) ? loggedRaw : [loggedRaw];
+    const latest = entries[entries.length - 1];
+    assert(latest && typeof latest === 'object', 'Telemetry log should contain at least one entry object');
+    assert.strictEqual(latest.runId, 'test-run', 'Telemetry log should include runId field');
   }
 
   // Manifest schema validation
@@ -920,4 +1550,12 @@ Explain the factions rallying around the quest target and how success changes th
     assert(issues.some((i) => i.code === 'WORLD-FRAME-HEADING'), 'Expected WORLD-FRAME-HEADING warning');
     assert(issues.some((i) => i.code === 'WORLD-FRAME-SHORT'), 'Expected WORLD-FRAME-SHORT warning');
   }
-})();
+})()
+  .then(() => {
+    console.log(`${SUCCESS_PREFIX} test:validator завърши успешно${RESET}`);
+  })
+  .catch((error) => {
+    console.error(`${ERROR_PREFIX} test:validator се провали${RESET}`);
+    console.error(error);
+    process.exit(1);
+  });

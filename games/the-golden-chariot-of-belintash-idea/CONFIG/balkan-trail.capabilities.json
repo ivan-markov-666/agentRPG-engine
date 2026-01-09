@@ -1,0 +1,10 @@
+{
+  "convoy_morale": { "enabled": true, "desc": "Настроението и куражът на експедицията", "min": 0, "max": 100 },
+  "supply_tokens": { "enabled": true, "desc": "Налични конвои и припаси", "min": 0, "max": 6 },
+  "alliance_track_byzantine": { "enabled": true, "desc": "Репутация с византийските магове", "min": -5, "max": 5 },
+  "alliance_track_latin": { "enabled": true, "desc": "Репутация с латинските инженери", "min": -5, "max": 5 },
+  "alliance_track_voinuk": { "enabled": true, "desc": "Репутация с войнушките разузнавачи", "min": -5, "max": 5 },
+  "artifact_clues": { "enabled": true, "desc": "Събрани рунически следи", "min": 0, "max": 8 },
+  "trail_notes": { "enabled": true, "desc": "Флагове за ключови сцени/решения", "min": 0, "max": 12 },
+  "trails_resolution_score": { "enabled": true, "desc": "Финално влияние на избраната фракция", "min": -3, "max": 3 }
+}

@@ -37,7 +37,8 @@
     "quest:add": "ts-node --project tsconfig.json tools/quests/add-quest.ts",
     "quest:scaffold": "ts-node --project tsconfig.json tools/quests/scaffold-quest.ts",
     "area:add": "ts-node --project tsconfig.json tools/areas/add-area.ts",
-    "remedy:orphans": "ts-node --project tsconfig.json tools/remedy/orphans.ts"
+    "remedy:orphans": "ts-node --project tsconfig.json tools/remedy/orphans.ts",
+    "content-set:add": "ts-node --project tsconfig.json tools/content-set/add.ts"
   },
   "dependencies": {
     "ajv": "^8.17.1",

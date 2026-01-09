@@ -6,6 +6,14 @@ import { validateFileWithSchema } from '../utils/schema';
 import type { BasicContext } from '../context';
 import type { Issue } from '../types';
 
+interface ContentSetEntry {
+  id?: string;
+  scenario_index?: string;
+  capabilities_file?: string;
+  unlock_condition?: string;
+  state_namespace?: string;
+}
+
 interface ManifestEntry {
   ui_index?: string;
   saves_index?: string;
@@ -14,6 +22,7 @@ interface ManifestEntry {
   capabilities_file?: string;
   map_world_index?: string;
   map_assets_dir?: string;
+  content_sets?: ContentSetEntry[];
 }
 
 const repoSchemasDir = path.resolve(__dirname, '..', '..', '..', 'tools', 'validator', 'schemas');
@@ -82,6 +91,52 @@ export async function checkRuntimeContracts(ctx: BasicContext): Promise<void> {
         `Manifest points to missing file (${code}): ${rel}`,
         'Create the file or fix the manifest pointer',
       );
+    }
+  });
+
+  const contentSets = Array.isArray(manifest.content_sets) ? (manifest.content_sets as ContentSetEntry[]) : [];
+
+  contentSets.forEach((set, idx) => {
+    const setId = typeof set.id === 'string' && set.id.trim() ? set.id.trim() : null;
+    if (!setId) {
+      add(
+        issues,
+        'WARN',
+        'CONTENT-SET-ID',
+        'manifest/entry.json',
+        `content_sets[${idx}] is missing a valid 'id'`,
+        'Provide string id (slug) for each content set',
+      );
+    }
+
+    const setScenarioIndex = getStringField(set as Record<string, unknown>, 'scenario_index');
+    if (setScenarioIndex) {
+      const abs = path.join(base, setScenarioIndex);
+      if (!fs.existsSync(abs)) {
+        add(
+          issues,
+          'ERROR',
+          'CONTENT-SET-SCENARIO-MISSING',
+          setScenarioIndex,
+          `Content set ${setId || `#${idx + 1}`} points to missing scenario_index`,
+          'Create file or adjust scenario_index',
+        );
+      }
+    }
+
+    const setCapabilitiesFile = getStringField(set as Record<string, unknown>, 'capabilities_file');
+    if (setCapabilitiesFile) {
+      const abs = path.join(base, setCapabilitiesFile);
+      if (!fs.existsSync(abs)) {
+        add(
+          issues,
+          'ERROR',
+          'CONTENT-SET-CAPABILITIES-MISSING',
+          setCapabilitiesFile,
+          `Content set ${setId || `#${idx + 1}`} points to missing capabilities_file`,
+          'Create file or adjust capabilities_file',
+        );
+      }
     }
   });
 

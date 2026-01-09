@@ -1,0 +1,22 @@
+[
+  {
+    "id": "laut-recon",
+    "title": "Лаут: Пасажи на разузнавачите",
+    "type": "area",
+    "area_id": "laut-stronghold",
+    "description": "Съвместен обход на три махали около Лаут. Тимът маркира тайни входове, водни кладенци и подозрителни огнени сигнали по реката.",
+    "added_at": "2026-01-05T09:45:00.000Z",
+    "origin": "gm-scripted",
+    "tags": ["hook", "area:laut-stronghold", "quest:dlc-ls-01-briefing"]
+  },
+  {
+    "id": "balkan-trail-scout",
+    "title": "Светлинен фар над Мелник",
+    "type": "quest",
+    "quest_id": "dlc-bt-03-ritual",
+    "description": "По време на нощен преход конниците откриват сияещ ward върху стари византийски плочи. Нужно е да решим дали да активираме ритуала или да го пренесем към Лаут.",
+    "added_at": "2026-01-06T13:20:00.000Z",
+    "origin": "player-choice",
+    "tags": ["hook", "quest:dlc-bt-03-ritual", "beam", "high-risk"]
+  }
+]

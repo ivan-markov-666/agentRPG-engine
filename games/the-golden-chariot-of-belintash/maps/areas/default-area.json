@@ -1,0 +1,48 @@
+{
+  "schema_version": "maps.area.v1",
+  "area_id": "default-area",
+  "image": {
+    "file": "maps/areas/default-area.png",
+    "width_px": 640,
+    "height_px": 480
+  },
+  "hotspots": [
+    {
+      "id": "town-square",
+      "label": "Town Square",
+      "bounds": {
+        "bounding_box": {
+          "x": 200,
+          "y": 210,
+          "width": 120,
+          "height": 100
+        }
+      },
+      "linked_quest_ids": ["main-quest-01"],
+      "notes": "Central plaza with fountain and quest board."
+    },
+    {
+      "id": "farm-road",
+      "label": "Road to Farms",
+      "bounds": {
+        "polygon": [
+          {"x": 80, "y": 260},
+          {"x": 160, "y": 240},
+          {"x": 200, "y": 320},
+          {"x": 100, "y": 340}
+        ]
+      }
+    }
+  ],
+  "ascii_preview": [
+    "~~~~~~~~~~~~~~~",
+    "~   @   ==    ~",
+    "~       ==    ~",
+    "~~~~~~~~~~~~~~~"
+  ],
+  "legend": {
+    "@": "Town Square",
+    "=": "Road"
+  },
+  "notes": "Example area map showing two hotspots."
+}

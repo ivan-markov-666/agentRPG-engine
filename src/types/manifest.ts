@@ -1,3 +1,15 @@
+export interface ContentSetEntry {
+  id: string;
+  title: string;
+  description?: string;
+  scenario_index?: string;
+  capabilities_file?: string;
+  unlock_condition?: string;
+  default_enabled?: boolean;
+  state_namespace?: string;
+  notes?: string;
+}
+
 export interface ManifestEntry {
   id: string;
   game_id?: string;
@@ -20,4 +32,7 @@ export interface ManifestEntry {
     entrypoint?: string;
     commands?: Record<string, string>;
   };
+  engine_features?: Record<string, boolean>;
+  engine_notes?: string;
+  content_sets?: ContentSetEntry[];
 }

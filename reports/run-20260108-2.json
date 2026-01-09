@@ -1,0 +1,34 @@
+{
+  "errors": 0,
+  "warnings": 3,
+  "cap_errors": 0,
+  "top_codes": [
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "count": 3
+    }
+  ],
+  "issues": [
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-01' links [[gornoslav]] but exploration log lacks entry tagged quest:main-quest-01",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-01' links [[zabyrdo]] but exploration log lacks entry tagged quest:main-quest-01",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-04' links [[starting-area]] but exploration log lacks entry tagged quest:main-quest-04",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    }
+  ]
+}

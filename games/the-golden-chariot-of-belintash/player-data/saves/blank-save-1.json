@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "save_id": "blank-save-1",
+  "created_at": "2026-01-08T15:30:00Z",
+  "scene_id": "act1-kamenitsa-square",
+  "summary": "Act I — Каменица площад (готов за път към Мостово)",
+  "cursor": {
+    "scene_id": "starting-area"
+  },
+  "state": {
+    "current_area_id": "starting-area",
+    "active_quests": [
+      {
+        "quest_id": "main-quest-02",
+        "status": "active",
+        "progress": 1,
+        "current_step_id": "mq02-terraces"
+      }
+    ],
+    "stats": {
+      "health": 80,
+      "stamina": 55,
+      "focus": 25,
+      "morale": 5,
+      "hunger": 30,
+      "thirst": 25,
+      "amulet_burden": 18,
+      "carry_capacity": 35,
+      "reputation": {
+        "bulgarian_court": 0,
+        "byzantine_exiles": 0,
+        "latin_traders": 0,
+        "bogomils": 0,
+        "orthodox_church": 25,
+        "common_folk": 10
+      },
+      "currency": {
+        "gold_hyperpyron": 0,
+        "silver_trachy": 0,
+        "copper_coins": 15,
+        "trade_goods": 0
+      }
+    },
+    "world_state": {
+      "date": "1221-05-12",
+      "time_of_day": "morning",
+      "weather": {
+        "type": "sunny",
+        "intensity": "mild",
+        "temperature_c": 18,
+        "wind": "calm"
+      },
+      "location": {
+        "area_id": "starting-area",
+        "name": "Каменица",
+        "map_marker": "kamenitsa_house"
+      }
+    },
+    "companion_relationships": {
+      "sharo": 25
+    },
+    "exploration_enabled": true,
+    "exploration_log_preview": [
+      "kamenitsa-nightwatch",
+      "mostovo-herb-terraces"
+    ]
+  }
+}

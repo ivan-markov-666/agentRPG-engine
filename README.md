@@ -40,7 +40,67 @@
   3. Използвай предоставените CLI примери (validate/runtime/metrics) и синхронизирай резултатите с telemetry/KPI файловете, както е описано в README.  
   4. При съмнение за guardrail провери `ivan.md` секциите „ВАЖНО:“ (capabilities↔state, exploration log, UI/saves, runtime CLI). Те обобщават изискванията от validator checks и JSON схемите.  
   5. Когато добавяш нови NPC/areas/quests, копирай от skeleton-а и потвърждавай с Ivan, че backlinks, rewards и exploration записи са покрити (има конкретни bullet-и за това).
+- **Фази, вход/изход и инфраструктура (преглед):**
+
+| Phase | Цел | Входове / източници | Създавани/редактирани документи | Tooling / инфраструктура |
+|-------|-----|----------------------|---------------------------------|---------------------------|
+| **1. Language Gate** | Пита играча за език и записва избора. | manifest, текущ `session-init`, state (ако има). | `player-data/session-init.json`, (по избор) state flags. | Няма доп. tooling; сцена в сценария за езиков избор. |
+| **2. World + Core Loop** | Определя world frame и каталог. | idea/world документи, MAIN-QUEST-OUTLINE, HISTORICAL-FACTS. | `scenario/world/index.md`, `scenario/index.md`, първи `areas/*.md`, `quests/*.md`, `available.json`, `unlock-triggers.json`. | `quest:add`, `scenario:index`, SCENARIO-TRACEABILITY. |
+| **3. Content MVP** | Попълва стартови quests/areas и NPC hooks. | World frame + outline-и, нови идеи. | Допълнителни `scenario/quests/*.md`, `scenario/areas/*.md`, NPC/Items docs; обновени JSON-и и index-и. | Tooling от Phase 2 + exploration helpers; SCENARIO-WRITING-PLAN hook-ове. |
+| **4. Systems (Capabilities/State)** | Синхронизира capabilities ↔ runtime state. | GAME-CAPABILITIES, нужди за HUD/world метрики. | `config/capabilities.json`, `player-data/runtime/state.json`, `session-init`, `completed-quests.json`, `exploration-log.json`. | TypeScript типове, JSON schema, economy/metrics tooling. |
+| **5. UI + Iteration** | Подготвя UI contracts, saves/history. | Runtime state, UI изисквания. | `ui/index.json`, `ui/{scene,actions,hud,history}.json`, `player-data/saves/*`, `history.full.jsonl`. | manifest.ui_index, runtime CLI (`npm run runtime`), saves/full-history contracts. |
+| **6. Validate & Fix** | Пуска validator/telemetry и фиксира guardrails. | `npm run validate` reports, telemetry history. | Поправки в горните файлове; JSON telemetry/metrics. | `npm run validate`, `telemetry:demo`, `metrics:report`, snapshot/auto-archive. |
+| **7. Post-Launch Expansion** | Добавя ново съдържание без да чупи базата. | Съществуващи canonical файлове + нови идеи. | Нови quests/areas/NPC/items + traceability entries, обновени capabilities/state/UI при нужда. | Същата инфраструктура като фази 2–6; акцент върху backwards compatibility и чисти валидаторни отчети. |
+
+- **Bridge workflow:** Ivan задава интерактивни въпроси (world, quest, capabilities, UI, източници), формулира diff план, прилага промени само в `games/<id>/**`, обновява traceability и насочва към `npm run validate`/telemetry след ключови промени. Таблицата по-горе служи като прикачена карта за входовете и изходите на всяка фаза.
 - **Как помага на екипа:** Ivan служи като „контрактен асистент“ – описва DoD guardrails, tooling workflows, препоръчителни команди и въпроси към потребителя. Използването му намалява риска от engine-level промени и ускорява валидирането преди `npm run validate` / `npm run runtime`. README + Ivan са двата задължителни референса при онбординг на нов автор или GM.
+
+### Ivan Phase Flow (Mermaid overview)
+
+```mermaid
+flowchart TD
+    classDef start fill:#1f78c1,stroke:#0b3a63,color:#fff,font-weight:bold;
+    classDef action fill:#f4f6fb,stroke:#4e596d,color:#0d1b2a,font-size:12px;
+    classDef decision fill:#fce7c8,stroke:#c37928,color:#723c00,font-weight:bold;
+    classDef optional fill:#e3f7ef,stroke:#2f8f62,color:#0a442c;
+    classDef loop fill:#fde7ef,stroke:#c13565,color:#5f0a2d;
+
+    A0((Start)) --> A1{Phase 1<br/>Language Gate}
+    A1 -->|Collect preferred language| A2[Update session-init<br/>+ runtime flags]
+    A2 --> A3{Phase 2<br/>World + Core Loop}
+    A3 -->|Read idea/world docs| A4[Create world index<br/>scenario index + first quest/area]
+    A4 --> A5{Phase 3<br/>Content MVP}
+    A5 -->|Add quests/areas/NPC hooks| A6[Sync available/unlock<br/>traceability + plan hooks]
+    A6 --> A7{Phase 4<br/>Systems & State}
+    A7 -->|Update GAME-CAPABILITIES| A8[Align config/capabilities.json<br/>runtime state/session/exploration]
+    A8 --> A9{Phase 5<br/>UI + Iteration}
+    A9 -->|Need UI/saves?| A10[Build ui/index + scene/actions/hud/history<br/>saves/history files]
+    A9 -->|Not needed| A11((Skip UI))
+    A10 --> A11
+    A11 --> A12{Phase 6<br/>Validate & Fix}
+    A12 -->|Run npm run validate<br/>telemetry workflows| A13{All guardrails clean?}
+    A13 -->|No| A14[Return to impacted phase<br/>apply fixes] --> A12
+    A13 -->|Yes| A15{Phase 7<br/>Post-Launch Expansion}
+    A15 -->|Add new content<br/>keep compatibility| A16[Traceability + backwards checks]
+    A16 --> A17{Need more content?}
+    A17 -->|Yes| A3
+    A17 -->|No| A18((Done))
+
+    subgraph Legend[Legend]
+        direction LR
+        L1((Start/End))
+        L2([Action / Deliverable])
+        L3{Decision / Check}
+        L4((Optional Path))
+        L5{{Loopback}}
+    end
+
+    class A0,A18,L1 start;
+    class A2,A4,A6,A8,A10,A16,L2 action;
+    class A1,A3,A5,A7,A9,A12,A13,A15,A17,L3 decision;
+    class A11,L4 optional;
+    class A14,L5 loop;
+```
 
 ## Quick Start — Blank Game Skeleton
 1. **Copy the skeleton**:
@@ -152,6 +212,10 @@
 ### Runtime CLI
 - **Quick load check:** `npm run runtime -- --path games/<gameId>` loads manifest, session-init and state, and prints a short summary.
 - **Debug mode:** `npm run runtime -- --path games/<gameId> --debug` prints the full JSON snapshot.
+- **Content sets (DLC packs):**
+  - List available sets: `npm run runtime -- --path games/<gameId> --list-content-sets`
+  - Force a specific set: `npm run runtime -- --path games/<gameId> --content-set dlc-example`
+  - When no `--content-set` is passed, the CLI auto-selects the first enabled set (falls back to the first declared entry).
 - **Error handling:** the CLI returns a non-zero exit code on missing files or invalid JSON.
 
 ### Sprint Metrics Workflow

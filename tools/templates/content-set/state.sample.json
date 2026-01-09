@@ -1,0 +1,12 @@
+{
+  "expedition_stage": "planning",
+  "convoy_morale": 50,
+  "supply_tokens": 2,
+  "alliance_track": {
+    "faction_a": 0,
+    "faction_b": 0,
+    "faction_c": 0
+  },
+  "artifact_clues": [],
+  "notes": []
+}

@@ -1,0 +1,85 @@
+{
+  "errors": 0,
+  "warnings": 8,
+  "cap_errors": 0,
+  "top_codes": [
+    {
+      "code": "AREA-QUEST-BACKLINK",
+      "count": 3
+    },
+    {
+      "code": "QUEST-REWARDS-GOLD-RANGE",
+      "count": 2
+    },
+    {
+      "code": "AREA-LINK",
+      "count": 1
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "count": 1
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "count": 1
+    }
+  ],
+  "issues": [
+    {
+      "code": "AREA-QUEST-BACKLINK",
+      "level": "WARN",
+      "file": "scenario\\areas\\starting-area.md",
+      "message": "Quest [[main-quest-04]] does not mention area 'starting-area'",
+      "fix": "Add [[area_id]] inside quest file or remove quest link from area"
+    },
+    {
+      "code": "AREA-LINK",
+      "level": "WARN",
+      "file": "scenario\\areas\\vrata.md",
+      "message": "Link [[belintash-plateau]] not found as quest or area",
+      "fix": "Create file or adjust link target"
+    },
+    {
+      "code": "AREA-QUEST-BACKLINK",
+      "level": "WARN",
+      "file": "scenario\\areas\\gornoslav.md",
+      "message": "Quest [[main-quest-01]] does not mention area 'gornoslav'",
+      "fix": "Add [[area_id]] inside quest file or remove quest link from area"
+    },
+    {
+      "code": "AREA-QUEST-BACKLINK",
+      "level": "WARN",
+      "file": "scenario\\areas\\zabyrdo.md",
+      "message": "Quest [[main-quest-01]] does not mention area 'zabyrdo'",
+      "fix": "Add [[area_id]] inside quest file or remove quest link from area"
+    },
+    {
+      "code": "QUEST-REWARDS-GOLD-RANGE",
+      "level": "WARN",
+      "file": "D:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-02.md",
+      "message": "Gold reward (20) is outside recommended 25-500 range",
+      "fix": "Adjust gold to stay within the standard balance window"
+    },
+    {
+      "code": "QUEST-REWARDS-GOLD-RANGE",
+      "level": "WARN",
+      "file": "D:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\side-quest-mos-help-14.md",
+      "message": "Gold reward (12) is outside recommended 25-500 range",
+      "fix": "Adjust gold to stay within the standard balance window"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "D:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\side-quest-mos-help-14.md",
+      "message": "Area [[gornoslav]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'side-quest-mos-help-14' links [[gornoslav]] but exploration log lacks entry tagged quest:side-quest-mos-help-14",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    }
+  ]
+}

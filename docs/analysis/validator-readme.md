@@ -62,6 +62,22 @@ Validates the file contracts of a game built on AgentRPG Engine: required files,
 - Regardless of mode, additional guardrails from `checkRequiredFiles` also run: `EXPLORATION-DESCRIPTION-SHORT`, `EXPLORATION-TAGS-MIN`, `EXPLORATION-DUPLICATE-ID/TITLE`, `EXPLORATION-AREA-MISSING`, `EXPLORATION-PREVIEW-MISMATCH`.
 - `npm run exploration:add ...` helps scaffold valid entries (see the README section “Exploration log helper”). The script accepts legacy aliases (`poi`, `landmark`, `event-hook`) and maps them to allowed schema values **before** writing JSON, so final files always use `area`/`quest`/`event`.
 
+### Content set (DLC) guardrails
+- Manifest entries may declare optional `content_sets[]` blocks. Each block must include:
+  - `id` (slug, 3-60 chars, lowercase, `a-z0-9-`).
+  - `title` (1-200 chars). Description, unlock condition, state namespace, etc. are optional but recommended.
+- Runtime validator checks (from `runtime-contracts`):
+  - `CONTENT-SET-ID` — missing/empty `id`.
+  - `CONTENT-SET-SCENARIO-MISSING` — referenced `scenario_index` path does not exist.
+  - `CONTENT-SET-CAPABILITIES-MISSING` — referenced `capabilities_file` path does not exist.
+- JSON Schema rules:
+  - `tools/validator/schemas/manifest.entry.schema.json` enforces `content_sets[].id/title/...` structure.
+  - `tools/validator/schemas/state.schema.json` adds `content_sets` runtime state bag — each key follows the same `id` slug and can store `enabled`, `progress`, `state` and notes.
+- Tips:
+  - Keep `state_namespace` unique per content set to avoid collisions in shared runtime flags.
+  - Use `default_enabled` when a set should load automatically for new players.
+  - When adding DLC files, run `npm run runtime -- --list-content-sets` to confirm scenario/capability pointers are correct before shipping.
+
 ### Quick aliases (optional)
 - PowerShell (add to `$PROFILE`):
   ```powershell

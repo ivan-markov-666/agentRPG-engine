@@ -1,0 +1,20 @@
+{
+  "schema_version": "ui.hud.v1",
+  "bars": {
+    "health": { "current": 80, "max": 100 },
+    "stamina": { "current": 55, "max": 100 },
+    "focus": { "current": 25, "max": 50 },
+    "morale": { "current": 5, "max": 100 },
+    "amulet_burden": { "current": 18, "max": 100 }
+  },
+  "currency": {
+    "gold_hyperpyron": 0,
+    "silver_trachy": 0,
+    "copper_coins": 15,
+    "trade_goods": 0
+  },
+  "needs": {
+    "hunger": 30,
+    "thirst": 25
+  }
+}

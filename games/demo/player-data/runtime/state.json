@@ -16,12 +16,18 @@
     "morale": 50,
     "hunger": 20,
     "thirst": 10,
+    "carry_capacity_max": 55,
+    "carry_weight_current": 42,
+    "encumbrance_level": "heavy",
     "reputation": {
       "guild": 15,
       "village": -5
     },
     "currency": {
-      "gold": 120
+      "gold_hyperpyron": 5,
+      "silver_trachy": 60,
+      "copper_coins": 120,
+      "trade_goods": 3
     },
     "armor": 5,
     "stealth": 8,
@@ -29,6 +35,33 @@
     ,
     "crit_chance": 0.15,
     "crit_multiplier": 1.8
+  },
+  "world_state": {
+    "date": "1221-08-02",
+    "time_of_day": "evening",
+    "weather": {
+      "type": "storm",
+      "intensity": "heavy",
+      "temperature_c": 12,
+      "wind": "gusty"
+    },
+    "visibility": "low",
+    "noise_level": "loud",
+    "location": {
+      "area_id": "stanimaqa-market",
+      "name": "Станимака",
+      "map_marker": "market_square",
+      "coordinates": [25.0305, 41.9863]
+    }
+  },
+  "companion_relationships": {
+    "default-companion": 5
+  },
+  "amulet_state": {
+    "equipped": false,
+    "burden": 85,
+    "status": "exhausted",
+    "cooldown_remaining_minutes": 45
   },
   "exploration_enabled": true,
   "exploration_log_preview": [

@@ -1,0 +1,61 @@
+{
+  "current_area_id": "belintash_tunnel_entry",
+  "flags": {
+    "seal_complete": false
+  },
+  "content_sets": {
+    "belintash-crack": {
+      "enabled": false,
+      "state": {
+        "collapse_stage": 0,
+        "rescued_archivists": 0,
+        "hazard_timer": "stable",
+        "support_nodes": [],
+        "notes": "TODO: populate after DLC intro."
+      }
+    },
+    "next-guardians": {
+      "enabled": false,
+      "state": {
+        "legacy_rank": 0,
+        "town_morale": 50,
+        "heir_alignment": "neutral",
+        "structures": [],
+        "trials_result": "victory"
+      },
+      "notes": "TODO: initialize heir training outcomes."
+    },
+    "balkan-trail": {
+      "enabled": false,
+      "state": {
+        "expedition_stage": "planning",
+        "convoy_morale": 60,
+        "supply_tokens": 3,
+        "alliance_track": {
+          "byzantine": 0,
+          "latin": 0,
+          "voinuk": 0
+        },
+        "artifact_clues": [],
+        "trail_notes": [],
+        "trails_resolution": null
+      },
+      "notes": "TODO: convoy loadout, artifact clues, diplomacy scores."
+    },
+    "laut-stronghold": {
+      "enabled": false,
+      "state": {
+        "defense_phase": "scouting",
+        "stronghold_integrity": 65,
+        "ward_power": 1,
+        "woinuk_morale": 60,
+        "espionage_alert": 1,
+        "hazard_tokens": 0,
+        "safehouses": [],
+        "artifact_insight": [],
+        "oath_resolution": "undecided",
+        "notes": "Awaiting first recon briefing from Ana-Laut."
+      }
+    }
+  }
+}

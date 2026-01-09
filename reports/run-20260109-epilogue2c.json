@@ -1,0 +1,88 @@
+{
+  "errors": 0,
+  "warnings": 9,
+  "cap_errors": 0,
+  "top_codes": [
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "count": 3
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "count": 3
+    },
+    {
+      "code": "AREA-QUEST-BACKLINK",
+      "count": 2
+    },
+    {
+      "code": "QUEST-LINK",
+      "count": 1
+    }
+  ],
+  "issues": [
+    {
+      "code": "AREA-QUEST-BACKLINK",
+      "level": "WARN",
+      "file": "scenario\\areas\\philippopolis.md",
+      "message": "Quest [[main-quest-12]] does not mention area 'philippopolis'",
+      "fix": "Add [[area_id]] inside quest file or remove quest link from area"
+    },
+    {
+      "code": "AREA-QUEST-BACKLINK",
+      "level": "WARN",
+      "file": "scenario\\areas\\belintash-collapse.md",
+      "message": "Quest [[main-quest-12]] does not mention area 'belintash-collapse'",
+      "fix": "Add [[area_id]] inside quest file or remove quest link from area"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-11.md",
+      "message": "Area [[belintash-collapse]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-11.md",
+      "message": "Area [[belintash-collapse]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-11.md",
+      "message": "Area [[belintash-collapse]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-11' links [[philippopolis]] but exploration log lacks entry tagged quest:main-quest-11",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-11' links [[belintash-collapse]] but exploration log lacks entry tagged quest:main-quest-11",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "QUEST-LINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-12.md",
+      "message": "Link [[main-quest-13]] not found as quest or area",
+      "fix": "Create file or adjust link target"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-12' links [[zabyrdo]] but exploration log lacks entry tagged quest:main-quest-12",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    }
+  ]
+}

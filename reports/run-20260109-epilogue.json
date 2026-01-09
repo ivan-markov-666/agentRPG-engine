@@ -1,0 +1,78 @@
+{
+  "errors": 0,
+  "warnings": 7,
+  "cap_errors": 0,
+  "top_codes": [
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "count": 2
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "count": 2
+    },
+    {
+      "code": "QUEST-REWARDS-LOOT",
+      "count": 1
+    },
+    {
+      "code": "QUEST-REWARDS-GOLD-RANGE",
+      "count": 1
+    },
+    {
+      "code": "QUEST-LINK",
+      "count": 1
+    }
+  ],
+  "issues": [
+    {
+      "code": "QUEST-REWARDS-LOOT",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-11.md",
+      "message": "LOOT reward missing or malformed",
+      "fix": "Add \"- Loot: ...\" line with details/numbers"
+    },
+    {
+      "code": "QUEST-REWARDS-GOLD-RANGE",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-11.md",
+      "message": "Gold reward (0) is outside recommended 25-500 range",
+      "fix": "Adjust gold to stay within the standard balance window"
+    },
+    {
+      "code": "QUEST-LINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-11.md",
+      "message": "Link [[main-quest-12]] not found as quest or area",
+      "fix": "Create file or adjust link target"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-11.md",
+      "message": "Area [[philippopolis]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "QUEST-AREA-BACKLINK",
+      "level": "WARN",
+      "file": "d:\\Projects\\agentRPG-engine\\games\\the-golden-chariot-of-belintash\\scenario\\quests\\main-quest-11.md",
+      "message": "Area [[belintash-collapse]] does not reference this quest",
+      "fix": "Add [[quest_id]] inside area file to keep navigation bidirectional"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-11' links [[philippopolis]] but exploration log lacks entry tagged quest:main-quest-11",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    },
+    {
+      "code": "EXPLORATION-QUEST-MISMATCH",
+      "level": "WARN",
+      "file": "player-data/runtime/exploration-log.json",
+      "message": "Quest 'main-quest-11' links [[belintash-collapse]] but exploration log lacks entry tagged quest:main-quest-11",
+      "fix": "Add quest:<id> tag to the relevant exploration entry or run quest:add with --exploration-hook"
+    }
+  ]
+}
